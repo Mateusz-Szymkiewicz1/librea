@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Book from './pages/Book.jsx';
 import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
 import NoMatch from './pages/NoMatch.jsx';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/book/:id" element={<Book />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>

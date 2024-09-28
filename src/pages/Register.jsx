@@ -1,17 +1,26 @@
-import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
-function Login() {
+function Register() {
+  const [pass1, setPass1] = useState(false)
+  const [pass2, setPass2] = useState(false)
   const submit = (e) => {
     e.preventDefault();
   }
-  const [pass, setPass] = useState(false)
   const togglePassword = (e) => {
-    setPass(!pass)
-    if(document.querySelector('#password').type == "password"){
-      document.querySelector('#password').type = "text"
+    setPass1(!pass1)
+    if(document.querySelector('#password1').type == "password"){
+      document.querySelector('#password1').type = "text"
     }else{
-      document.querySelector('#password').type = "password"
+      document.querySelector('#password1').type = "password"
+    }
+  }
+  const togglePassword2 = (e) => {
+    setPass2(!pass2)
+    if(document.querySelector('#password2').type == "password"){
+      document.querySelector('#password2').type = "text"
+    }else{
+      document.querySelector('#password2').type = "password"
     }
   }
   return (
@@ -92,7 +101,7 @@ function Login() {
   </div>
   <div className="w-full bg-neutral-700 lg:w-1/2 flex items-center justify-center text-slate-200">
     <div className="max-w-md w-full p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center">Sign In</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center">Sign Up</h1>
       <h1 className="text-sm font-semibold mb-6 text-neutral-400 text-center">Join to Our Community with all time access and free </h1>
       <div className="mt-4 flex flex-col lg:flex-row items-center justify-between">
         <div className="w-full mb-2 lg:mb-0">
@@ -102,7 +111,7 @@ function Login() {
               <path fill="#518ef8" d="M507.527 208.176C510.467 223.662 512 239.655 512 256c0 18.328-1.927 36.206-5.598 53.451-12.462 58.683-45.025 109.925-90.134 146.187l-.014-.014-73.044-3.727-10.338-64.535c29.932-17.554 53.324-45.025 65.646-77.911h-136.89V208.176h245.899z"></path>
               <path fill="#28b446" d="m416.253 455.624.014.014C372.396 490.901 316.666 512 256 512c-97.491 0-182.252-54.491-225.491-134.681l82.961-67.91c21.619 57.698 77.278 98.771 142.53 98.771 28.047 0 54.323-7.582 76.87-20.818l83.383 68.262z"></path>
               <path fill="#f14336" d="m419.404 58.936-82.933 67.896C313.136 112.246 285.552 103.82 256 103.82c-66.729 0-123.429 42.957-143.965 102.724l-83.397-68.276h-.014C71.23 56.123 157.06 0 256 0c62.115 0 119.068 22.126 163.404 58.936z"></path>
-            </svg> Sign In with Google </button>
+            </svg> Sign Up with Google </button>
         </div>
       </div>
       <div className="mt-4 text-sm text-slate-200 text-center">
@@ -114,12 +123,16 @@ function Login() {
           <input type="text" id="username" name="username" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
         </div>
         <div>
+          <label htmlFor="email" className="block text-sm font-medium text-slate-200">Email</label>
+          <input type="email" id="email" name="email" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+        </div>
+        <div>
           <label htmlFor="password" className="block text-sm font-medium text-slate-200">Password</label>
           <div className="relative">
-    <input id="password" type="password" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+    <input id="password1" type="password" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
     <button onClick={togglePassword} type="button" className="absolute inset-y-6 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none focus:text-blue-600 text-neutral-400 focus:text-blue-500">
       <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        {!pass && 
+        {!pass1 && 
           <>
           <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
           <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
@@ -134,11 +147,31 @@ function Login() {
   </div>
         </div>
         <div>
-          <button onClick={submit} className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none transition">Sign In</button>
+          <label htmlFor="password2" className="block text-sm font-medium text-slate-200">Repeat password</label>
+          <div className="relative">
+    <input id="password2" type="password" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+    <button onClick={togglePassword2} type="button" className="absolute inset-y-6 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none focus:text-blue-600 text-neutral-400 focus:text-blue-500">
+      <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {!pass2 && 
+          <>
+          <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+          <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+          <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+          <line x1="2" x2="22" y1="2" y2="22"></line>    
+          </> 
+        }
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
+    </button>
+  </div>
+        </div>
+        <div>
+          <button onClick={submit} className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none transition">Sign Up</button>
         </div>
       </form>
       <div className="mt-4 text-sm font-semibold text-slate-200 text-center">
-        <p>Don't have an account? <NavLink to="/register" className="text-blue-400 hover:underline">Register here</NavLink>
+        <p>Already have an account? <NavLink to="/login" className="text-blue-400 hover:underline">Login here</NavLink>
         </p>
       </div>
     </div>
@@ -149,4 +182,4 @@ function Login() {
   )
 }
 
-export default Login
+export default Register
