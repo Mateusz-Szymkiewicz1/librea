@@ -62,4 +62,24 @@ app.get('/book/:id', (req,res) => {
   })
 })
 
+app.get('/search/:search', (req,res) => {
+  connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 50`,[req.params.search], (err, rows, fields) => {
+    if(rows && rows.length > 0){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
+app.get('/search_autocomplete/:search', (req,res) => {
+  connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 10`,[req.params.search], (err, rows, fields) => {
+    if(rows && rows.length > 0){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
 app.listen(3000)

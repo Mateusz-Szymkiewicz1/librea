@@ -120,16 +120,16 @@ function Register() {
       <form className="space-y-4">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-slate-200">Username</label>
-          <input type="text" id="username" name="username" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+          <input type="text" maxLength="50" id="username" name="username" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
         </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-slate-200">Email</label>
-          <input type="email" id="email" name="email" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+          <input type="email" id="email" maxLength="100" name="email" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
         </div>
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-slate-200">Password</label>
           <div className="relative">
-    <input id="password1" type="password" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+    <input id="password1" type="password" maxLength="100" className="mt-1 p-2 pr-10 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
     <button onClick={togglePassword} type="button" className="absolute inset-y-6 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none focus:text-blue-600 text-neutral-400 focus:text-blue-500">
       <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {!pass1 && 
@@ -149,7 +149,7 @@ function Register() {
         <div>
           <label htmlFor="password2" className="block text-sm font-medium text-slate-200">Repeat password</label>
           <div className="relative">
-    <input id="password2" type="password" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+    <input id="password2" type="password" maxLength="100" className="mt-1 p-2 pr-10 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
     <button onClick={togglePassword2} type="button" className="absolute inset-y-6 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none focus:text-blue-600 text-neutral-400 focus:text-blue-500">
       <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {!pass2 && 
