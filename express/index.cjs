@@ -52,4 +52,14 @@ const connection = mysql.createConnection({
   database: 'librea'
 })
 
+app.get('/book/:id', (req,res) => {
+  connection.query(`SELECT * FROM books WHERE id = ?`,[req.params.id], (err, rows, fields) => {
+    if(rows && rows.length == 1){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
 app.listen(3000)

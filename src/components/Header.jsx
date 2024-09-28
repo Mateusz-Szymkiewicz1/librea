@@ -4,7 +4,7 @@ function Header() {
   return (
     <>
       <div className="text-white w-100 bg-neutral-700 shadow flex flex-row sm:justify-between px-2 items-center p-2 sm:p-0">
-          <NavLink to="/"><img src="/favicon.ico" className="h-16 sm:block hidden"></img></NavLink>   
+          <NavLink to="/"><img src="/icon.png" className="h-16 sm:block hidden"></img></NavLink>   
           <div className="flex h-11 sm:w-96 w-50">
             <input type="text" placeholder="Search..." className="w-full outline-none h-11 bg-neutral-800 text-slate-200 text-sm px-3" />
             <button type='button' className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4">
