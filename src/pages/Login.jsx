@@ -1,9 +1,39 @@
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate()
+  const [login, setLogin] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
   const submit = (e) => {
     e.preventDefault();
+    if(!login || !password){
+      setError("Fill the inputs!")
+      return
+    }
+    if(!/^[A-Za-z0-9]+([A-Za-z0-9]*|[]?[A-Za-z0-9]+)*$/.test(login)){
+      setError("Can't put special characters in the username!")
+      return
+    } 
+    fetch("http://localhost:3000/login", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        login: login,
+        pass: password,
+      }),
+    }).then(res => res.json()).then(res => {
+      if(res.status == 0){
+        setError(res.text)
+      }else{
+        navigate("/")
+      }
+    })
   }
   const [pass, setPass] = useState(false)
   const togglePassword = (e) => {
@@ -111,12 +141,12 @@ function Login() {
       <form className="space-y-4">
         <div>
           <label htmlFor="username" className="block text-sm font-medium text-slate-200">Username</label>
-          <input type="text" maxLength="50" id="username" name="username" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+          <input type="text" maxLength="50" onChange={(e) => setLogin(e.target.value)} id="username" name="username" className="mt-1 p-2 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
         </div>
         <div>
           <label htmlFor="password" className="block text-sm font-medium text-slate-200">Password</label>
           <div className="relative">
-    <input id="password" type="password" maxLength="100" className="mt-1 p-2 pr-10 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
+    <input id="password" type="password" onChange={(e) => setPassword(e.target.value)} maxLength="100" className="mt-1 p-2 pr-10 w-full bg-neutral-600 rounded-md focus:outline-none"></input>
     <button onClick={togglePassword} type="button" className="absolute inset-y-6 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none focus:text-blue-600 text-neutral-400 focus:text-blue-500">
       <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {!pass && 
@@ -145,6 +175,22 @@ function Login() {
   </div>
 </div>
       </div>
+      {error &&
+      <>
+          <div className="fixed bottom-4 z-50 right-4 min-w-64">
+            <div className="flex justify-between rounded-lg shadow-lg p-4 border bg-red-500 border border-red-600">
+                <p className="text-white text-lg mr-5 dark:text-slate-200">
+                { error }
+                </p>
+                <button onClick={() => setError("")} className="text-white dark:text-slate-200 focus:outline-none">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+          </div>
+        </>
+      }
     </>
   )
 }

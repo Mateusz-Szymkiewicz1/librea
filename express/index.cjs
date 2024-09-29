@@ -90,4 +90,23 @@ app.post('/register', (req,res) => {
   })
 })
 
+app.post('/login', (req,res) => {
+  if(req.session.user){
+    return res.json(req.session.user)
+  }
+  connection.query(`SELECT * FROM users WHERE login = ?`,[req.body.login], (err, rows, fields) => {
+    if(rows && rows.length == 1){
+      if(bcrypt.compareSync(req.body.pass, rows[0].haslo)){
+        req.session.user = rows[0].login
+        res.send({status: 200})
+      }else{
+        res.send({ status: 0, text: "Niepoprawne dane logowania!"})
+      }
+    }else{
+      res.send({ status: 0, text: "Niepoprawne dane logowania!"})
+    }
+  })
+})
+
+
 app.listen(3000)
