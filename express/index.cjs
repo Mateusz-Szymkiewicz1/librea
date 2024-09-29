@@ -62,6 +62,24 @@ app.get('/book/:id', (req,res) => {
   })
 })
 
+app.post('/user/:login', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT login, katalogi FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
+    if(rows){
+      connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
+        if(rows2){
+          rows[0].ratings = rows2
+          res.send(rows)
+        }else{
+          res.send(rows)
+        }
+      })
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
 app.get('/search/:search', (req,res) => {
   connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 50`,[req.params.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
