@@ -5,3 +5,7 @@
 body{
   @apply bg-neutral-800;
 }
+
+*{
+  scroll-behavior: smooth;
+}
