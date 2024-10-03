@@ -31,7 +31,7 @@ function Login() {
       if(res.status == 0){
         setError(res.text)
       }else{
-        navigate("/")
+        window.location.replace("/")
       }
     })
   }

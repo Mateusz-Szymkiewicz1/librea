@@ -8,6 +8,7 @@ function Book() {
   const [book, setBook] = useState({})
   const [rating, setRating] = useState(0)
   const [user, setUser] = useState()
+  const [review, setReview] = useState()
   const handleRating = (rate) => {
     setRating(rate)
   }
@@ -27,27 +28,12 @@ function Book() {
     })
   }, [rating])
   useEffect(() => {
-    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(res => {
-      if(res.status != 0){
-        res[0].tagi = JSON.parse(res[0].tagi)
-        res[0].reviews.forEach((review, i) => {
-          fetch("http://localhost:3000/review_rating", {
-            credentials: 'include',
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user: review.user,
-              book: review.book
-            }),
-          }).then(res => res.json()).then(res2 => {
-              review.rating = res2[0].rating
-          })
-        })
-        setBook([...res][0])
-      }
-    })
+    if(user){
+      setReview(book.reviews.find((el) => el.user = user))
+      book.reviews = book.reviews.filter((el) => el.user != user)
+    }
+  }, [user])
+  useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
       method: "POST",
@@ -71,6 +57,27 @@ function Book() {
             }
           }
         })
+      }
+    })
+    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(res => {
+      if(res.status != 0){
+        res[0].tagi = JSON.parse(res[0].tagi)
+        res[0].reviews.forEach((review, i) => {
+          fetch("http://localhost:3000/review_rating", {
+            credentials: 'include',
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              user: review.user,
+              book: review.book
+            }),
+          }).then(res => res.json()).then(res2 => {
+              review.rating = res2[0].rating
+          })
+        })
+        setBook([...res][0])
       }
     })
   }, [refresh])
@@ -103,6 +110,9 @@ function Book() {
                 {!user &&
                   <p className="text-slate-200">You need to be logged in to vote.</p>
                 }
+                {rating &&
+                  <p className="text-slate-200">Your carrent rating: {rating}</p>
+                }
                 <Rating
                   onClick={handleRating}
                   readonly={!user}
@@ -112,13 +122,25 @@ function Book() {
                 />
               </div>
               <h2 id="reviews" className="text-3xl font-semibold ml-10 clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
+              {review &&
+                <div className="bg-blue-950 ml-10 p-5 text-white my-5 mr-16">
+                  <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{review.user.login.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{review.user.login}</span></h3>
+                  <p className="text-2xl font-bold clear-both pt-3">{review.rating}/10</p>
+                  {review.spoiler == "0" &&
+                    <p className="clear-both break-words text-xl pt-3">{review.text}</p>
+                  }
+                  {review.spoiler == "1" &&
+                    <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer">Reveal</span></p>
+                  }
+                </div>
+              }
               {book.reviews.map((el, i) => {
                   return (
                     <div className="bg-neutral-600 ml-10 p-5 text-white my-5 mr-16" key={i}>
                       <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3>
                       <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                       {el.spoiler == "0" &&
-                        <p className="clear-both text-xl pt-3">{el.text}</p>
+                        <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
                       }
                       {el.spoiler == "1" &&
                         <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer">Reveal</span></p>

@@ -55,7 +55,7 @@ const connection = mysql.createConnection({
 app.get('/book/:id', (req,res) => {
   connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen, COUNT(reviews.id) AS ilosc_recenzji FROM books JOIN ratings ON ratings.book = books.id JOIN reviews ON reviews.book = books.id WHERE books.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      connection.query(`SELECT * FROM reviews WHERE book = ? LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
+      connection.query(`SELECT * FROM reviews WHERE book = ? ORDER BY id DESC LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
         res.send(rows)
       })
@@ -152,5 +152,9 @@ app.post('/rate', (req,res) => {
   })
 })
 
+app.post('/signout', (req,res) => {
+  req.session.destroy()
+  res.json("done")
+})
 
 app.listen(3000)
