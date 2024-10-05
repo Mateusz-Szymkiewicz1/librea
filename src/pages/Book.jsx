@@ -5,12 +5,20 @@ import { Rating } from 'react-simple-star-rating'
 function Book() {
   const book_id = window.location.href.split('/').at(-1)
   const [refresh, setRefresh] = useState(true)
+  const [reviewratingdone, setReviewratingdone] = useState(false)
   const [book, setBook] = useState({})
   const [rating, setRating] = useState(0)
   const [user, setUser] = useState()
   const [review, setReview] = useState()
+  const [textarea, setTextarea] = useState("")
+  const [spoiler, setSpoiler] = useState(false)
   const handleRating = (rate) => {
     setRating(rate)
+  }
+  const handleReview = () => {
+    if(user){
+      console.log("a")
+    }
   }
   useEffect(() => {
     fetch("http://localhost:3000/rate", {
@@ -73,8 +81,13 @@ function Book() {
               user: review.user,
               book: review.book
             }),
-          }).then(res => res.json()).then(res2 => {
-              review.rating = res2[0].rating
+          }).then(res2 => res2.json()).then(res2 => {
+              if(!res2.text){
+                review.rating = res2[0].rating
+              }
+              if(i == res[0].reviews.length-1){
+                setReviewratingdone(true)
+              }
           })
         })
         setBook([...res][0])
@@ -86,8 +99,9 @@ function Book() {
       <div>
           {book.id > 0 &&
             <>
-              <img className="mt-10 ml-10 float-left h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-              <div className="float-left mt-10 mx-10 text-slate-200">
+              <div className="pl-10">
+              <img className="mt-10 float-left mr-10 h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+              <div className="float-left mt-10 mr-10 text-slate-200">
                 <h1 className="text-white text-4xl">{book.tytul}</h1>
                 <p className="text-white text-2xl mt-3 text-neutral-300">{book.autor}</p>
                 <p className="text-white text-xl mt-1 text-neutral-400">{book.rok}</p>
@@ -99,18 +113,24 @@ function Book() {
                   <svg className="w-6 h-6 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
                       <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                   </svg>
-                  <p className="ms-2 text-md font-bold text-gray-900 dark:text-white">{ (book.suma_ocen/book.ilosc_ocen).toFixed(1) }</p>
+                  {book.ilosc_ocen > 0 &&
+                    <p className="ms-2 text-md font-bold text-gray-900 dark:text-white">{ (book.suma_ocen/book.ilosc_ocen).toFixed(1) }</p>
+                  }
+                  {book.ilosc_ocen == 0 &&
+                    <p className="ms-2 text-md font-bold text-gray-900 dark:text-white">No ratings</p>
+                  }
                   <span className="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span>
                   <a href="#reviews" className="text-md font-medium text-gray-900 underline hover:no-underline dark:text-white">{book.ilosc_recenzji} review(s)</a>
                 </div>
               </div>
-              <p className="clear-both text-slate-200 ml-10 mr-16 py-10">{book.opis}</p>
+              <p className="clear-both text-slate-200 mr-16 py-10">{book.opis}</p>
+              </div>
               <div className="bg-neutral-600 sm:ml-10 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
                 <h3 className="text-white text-xl font-semibold mb-2">What's <span className="font-bold">your</span> rating?</h3>
                 {!user &&
-                  <p className="text-slate-200">You need to be logged in to vote.</p>
+                  <p className="text-slate-200 pb-3">You need to be logged in to vote.</p>
                 }
-                {rating &&
+                {rating != 0 &&
                   <p className="text-slate-200">Your carrent rating: {rating}</p>
                 }
                 <Rating
@@ -121,11 +141,30 @@ function Book() {
                   iconsCount={10}
                 />
               </div>
-              <h2 id="reviews" className="text-3xl font-semibold ml-10 clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
+              <div className="pl-10 pr-16">
+              <h2 id="reviews" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
+              <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
+              <div className="inline-flex items-center">
+              <label className="flex items-center cursor-pointer relative mt-2">
+                <input disabled={user ? false : true} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
+                <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                  </svg>
+                </span>
+              </label>
+              <span onChange={(e) => setSpoiler(e.target.checked)} className="text-white pl-2 pt-2">Mark as a spoiler</span>
+            </div> 
+            {!user && 
+              <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a review.</p>
+            }
+            <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'>Send</button>
               {review &&
-                <div className="bg-blue-950 ml-10 p-5 text-white my-5 mr-16">
+                <div className="bg-blue-950 p-5 text-white my-5">
                   <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{review.user.login.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{review.user.login}</span></h3>
-                  <p className="text-2xl font-bold clear-both pt-3">{review.rating}/10</p>
+                  {review.rating &&
+                      <p className="text-2xl font-bold clear-both pt-3">{review.rating}/10</p>
+                  }
                   {review.spoiler == "0" &&
                     <p className="clear-both break-words text-xl pt-3">{review.text}</p>
                   }
@@ -134,11 +173,13 @@ function Book() {
                   }
                 </div>
               }
-              {book.reviews.map((el, i) => {
+              {reviewratingdone == true && book.reviews.map((el, i) => {
                   return (
-                    <div className="bg-neutral-600 ml-10 p-5 text-white my-5 mr-16" key={i}>
+                    <div className="bg-neutral-600 p-5 text-white my-5" key={i}>
                       <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3>
-                      <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
+                      {el.rating &&
+                        <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
+                      }
                       {el.spoiler == "0" &&
                         <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
                       }
@@ -148,6 +189,7 @@ function Book() {
                     </div>
                   )
               })}
+              </div>
             </>
           }
           {!book.id > 0 &&
