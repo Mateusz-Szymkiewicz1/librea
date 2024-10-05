@@ -54,7 +54,6 @@ const connection = mysql.createConnection({
 
 app.get('/book/:id', (req,res) => {
   connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen, COUNT(reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id WHERE books.id = ?`,[req.params.id], (err, rows, fields) => {
-    console.log(rows)
     if(rows && rows.length == 1){
       connection.query(`SELECT * FROM reviews WHERE book = ? ORDER BY id DESC LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
@@ -152,6 +151,13 @@ app.post('/rate', (req,res) => {
         res.json("done")
       })
     }
+  })
+})
+
+app.post('/review', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO reviews (user,book,text,spoiler) VALUES ('${req.session.user}',?,?,?);`,[req.body.book,req.body.text, req.body.spoiler], (err, rows, fields) => {
+    res.json("done")
   })
 })
 

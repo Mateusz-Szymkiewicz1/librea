@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { useState } from "react"
 import { Rating } from 'react-simple-star-rating'
+import { NavLink } from "react-router-dom"
 
 function Book() {
   const book_id = window.location.href.split('/').at(-1)
@@ -9,18 +10,41 @@ function Book() {
   const [book, setBook] = useState({})
   const [rating, setRating] = useState(0)
   const [user, setUser] = useState()
-  const [review, setReview] = useState()
+  const [review, setReview] = useState([])
   const [textarea, setTextarea] = useState("")
   const [spoiler, setSpoiler] = useState(false)
+  const [error, setError] = useState("")
   const handleRating = (rate) => {
     setRating(rate)
   }
   const handleReview = () => {
-    if(user){
-      console.log("a")
+    if(!user) return
+    if(textarea.length < 1){
+      setError("Don't send an empty review!")
+      return
+    }else{
+      fetch("http://localhost:3000/review", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          book: book.id,
+          text: textarea,
+          spoiler: spoiler
+        }),
+      }).then(res => res.json()).then(res => {
+          setTextarea("")
+          setSpoiler(false)
+          document.querySelector("textarea").value = ""
+          document.querySelector("input[type=checkbox]").checked = false
+          setRefresh(!refresh)
+      })
     }
   }
   useEffect(() => {
+    if(rating == 0) return
     fetch("http://localhost:3000/rate", {
       credentials: 'include',
       method: "POST",
@@ -37,7 +61,7 @@ function Book() {
   }, [rating])
   useEffect(() => {
     if(user){
-      setReview(book.reviews.find((el) => el.user = user))
+      setReview([...book.reviews.filter((el) => el.user = user)])
       book.reviews = book.reviews.filter((el) => el.user != user)
     }
   }, [user])
@@ -146,37 +170,44 @@ function Book() {
               <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
               <div className="inline-flex items-center">
               <label className="flex items-center cursor-pointer relative mt-2">
-                <input disabled={user ? false : true} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
+                <input disabled={user ? false : true} onChange={(e) => setSpoiler(e.target.checked)} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
                 <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
                   </svg>
                 </span>
               </label>
-              <span onChange={(e) => setSpoiler(e.target.checked)} className="text-white pl-2 pt-2">Mark as a spoiler</span>
+              <span className="text-white pl-2 pt-2">Mark as a spoiler</span>
             </div> 
             {!user && 
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a review.</p>
             }
             <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'>Send</button>
-              {review &&
-                <div className="bg-blue-950 p-5 text-white my-5">
-                  <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{review.user.login.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{review.user.login}</span></h3>
-                  {review.rating &&
-                      <p className="text-2xl font-bold clear-both pt-3">{review.rating}/10</p>
-                  }
-                  {review.spoiler == "0" &&
-                    <p className="clear-both break-words text-xl pt-3">{review.text}</p>
-                  }
-                  {review.spoiler == "1" &&
-                    <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer">Reveal</span></p>
-                  }
+              {review.map((el, i) => {
+                return (
+                  <div className="bg-blue-950 p-5 text-white my-5" key={i}>
+                    <NavLink to={"/profile/"+el.user.login}>
+                    <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.login.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user.login}</span></h3></NavLink>
+                    {el.rating &&
+                        <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
+                    }
+                    {el.spoiler == "0" &&
+                      <p className="clear-both break-words text-xl pt-3">{el.text}</p>
+                    }
+                    {el.spoiler == "1" &&
+                      <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer" onClick={() => {
+                        review[i].spoiler = 0
+                        setReview([...review])
+                      }}>Reveal</span></p>
+                    }
                 </div>
-              }
+                )
+              })}
               {reviewratingdone == true && book.reviews.map((el, i) => {
                   return (
-                    <div className="bg-neutral-600 p-5 text-white my-5" key={i}>
-                      <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3>
+                    <div className="bg-neutral-700 p-5 text-white my-5" key={i}>
+                      <NavLink to={"/profile/"+el.user}>
+                      <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3></NavLink>
                       {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                       }
@@ -184,7 +215,10 @@ function Book() {
                         <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
                       }
                       {el.spoiler == "1" &&
-                        <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer">Reveal</span></p>
+                        <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer" onClick={() => {
+                          book.reviews[i].spoiler = 0
+                          setBook(structuredClone(book))
+                        }}>Reveal</span></p>
                       }
                     </div>
                   )
@@ -199,6 +233,23 @@ function Book() {
             </div>
           }
       </div>
+
+      {error &&
+      <>
+          <div className="fixed bottom-4 z-50 right-4 min-w-64">
+            <div className="flex justify-between rounded-lg shadow-lg p-4 border bg-red-500 border border-red-600">
+                <p className="text-white text-lg mr-5 dark:text-slate-200">
+                { error }
+                </p>
+                <button onClick={() => setError("")} className="text-white dark:text-slate-200 focus:outline-none">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+          </div>
+        </>
+      }
     </>
   )
 }
