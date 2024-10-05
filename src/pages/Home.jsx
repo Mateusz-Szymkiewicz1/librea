@@ -6,6 +6,7 @@ function Home() {
   const navigate = useNavigate();
   const [user, setUser] = useState()
   const [recentlyrated, setRecentlyrated] = useState([])
+  const [recentreviews, setRecentreviews] = useState([])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -31,6 +32,13 @@ function Home() {
                 fetch("http://localhost:3000/book/"+el.book).then(res => res.json()).then(res => {
                   if(!res.text){
                     setRecentlyrated([...recentlyrated, res[0]])
+                  }
+                })
+              })
+              res2[0].reviews.slice(-5).reverse().forEach(el => {
+                fetch("http://localhost:3000/book/"+el.book).then(res => res.json()).then(res => {
+                  if(!res.text){
+                    setRecentreviews([...recentreviews, res[0]])
                   }
                 })
               })
@@ -85,7 +93,7 @@ function Home() {
           {user.katalogi.length == 0 &&
             <>
               <p className='text-neutral-400 text-xl ml-5 mt-2'>You haven't created a single collection yet!</p>
-              <button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Start right now</button>
+              <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Start right now</button></NavLink>
             </>
           }
           {user.ratings.length > 0 &&
@@ -93,6 +101,19 @@ function Home() {
               <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recently rated</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentlyrated.map((el,i) => 
+                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
+                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
+                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
+                </div></NavLink>)}
+              </div>
+            </>
+          }
+          {user.reviews.length > 0 &&
+            <>
+              <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recent reviews</p>
+              <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
+                {recentreviews.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
                   <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>

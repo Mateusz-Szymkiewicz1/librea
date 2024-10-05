@@ -5,6 +5,7 @@ import Book from './pages/Book.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import NoMatch from './pages/NoMatch.jsx';
+import CollectionNew from './pages/CollectionNew.jsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/book/:id" element={<Book />} />
+            <Route path="/collection/new" element={<CollectionNew />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
       </div>

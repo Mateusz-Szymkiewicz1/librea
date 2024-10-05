@@ -82,6 +82,11 @@ app.post('/user/:login', (req,res) => {
       connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
         if(rows2){
           rows[0].ratings = rows2
+        }
+      })
+      connection.query(`SELECT book FROM reviews WHERE reviews.user = ?`,[req.params.login], (err3, rows3, fields3) => {
+        if(rows3){
+          rows[0].reviews = rows3
           res.send(rows)
         }else{
           res.send(rows)
