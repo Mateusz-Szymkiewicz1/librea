@@ -7,8 +7,10 @@ import Register from './pages/Register.jsx';
 import NoMatch from './pages/NoMatch.jsx';
 import CollectionNew from './pages/CollectionNew.jsx';
 import Search from './pages/Search.jsx';
+import { useLocation } from 'react-router-dom';
 
 function App() {
+  const location = useLocation();
   return (
     <>
       <div>
@@ -18,7 +20,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/book/:id" element={<Book />} />
-            <Route path="/search/:search" element={<Search />} />
+            <Route path="/search/:search" element={<Search key={location.pathname} />} />
             <Route path="/collection/new" element={<CollectionNew />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>

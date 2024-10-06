@@ -144,8 +144,8 @@ function Book() {
       <div>
           {book.id > 0 &&
             <>
-              <div className="pl-10">
-              <img className="mt-10 float-left mr-10 h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+              <div className="sm:pl-10 pl-3">
+              <img className="sm:mt-10 mt-5 float-left mr-10 h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
               <div className="float-left mt-10 mr-10 text-slate-200">
                 <h1 className="text-white text-4xl">{book.tytul}</h1>
                 <p className="text-white text-2xl mt-3 text-neutral-300">{book.autor}</p>
@@ -186,7 +186,7 @@ function Book() {
                   iconsCount={10}
                 />
               </div>
-              <div className="pl-10 pr-16">
+              <div className="sm:pl-10 pl-3 sm:pr-16 pr-3">
               <h2 id="reviews" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
               <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
               <div className="inline-flex items-center">
@@ -270,9 +270,9 @@ function Book() {
           }
           {!book.id > 0 &&
             <div className="h-screen w-full flex flex-col justify-center items-center">
-              <span className="text-blue-600 text-center text-6xl font-bold -mt-32">404</span><br/>
-              <span className="text-white text-center text-5xl">No matches found!</span>
-            </div>
+            <img src="/404.svg" className="h-96 -mt-16"></img>
+            <span className="text-white text-center text-4xl mt-10">No matches found, sorry!</span>
+          </div>
           }
       </div>
 
