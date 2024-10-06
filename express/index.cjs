@@ -55,7 +55,7 @@ const connection = mysql.createConnection({
 app.get('/book/:id', (req,res) => {
   connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen, COUNT(reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id WHERE books.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      connection.query(`SELECT * FROM reviews WHERE book = ? ORDER BY id DESC LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
+      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes FROM reviews LEFT JOIN likes ON reviews.id = likes.review WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
         res.send(rows)
       })
@@ -77,11 +77,21 @@ app.post('/review_rating', (req,res) => {
 
 app.post('/user/:login', (req,res) => {
   if(!req.session.user) return
-  connection.query(`SELECT login, katalogi FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
+  connection.query(`SELECT login FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
     if(rows){
       connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
         if(rows2){
           rows[0].ratings = rows2
+        }
+      })
+      connection.query(`SELECT * FROM collections WHERE collections.user = ?`,[req.params.login], (err4, rows4, fields4) => {
+        if(rows4){
+          rows[0].collections = rows4
+        }
+      })
+      connection.query(`SELECT * FROM likes,reviews,books WHERE likes.user = ? AND likes.review = reviews.id AND books.id = ?;`,[req.params.login, req.body.book], (err5, rows5, fields5) => {
+        if(rows5){
+          rows[0].likes = rows5
         }
       })
       connection.query(`SELECT book FROM reviews WHERE reviews.user = ?`,[req.params.login], (err3, rows3, fields3) => {
@@ -109,7 +119,7 @@ app.get('/search/:search', (req,res) => {
 })
 
 app.get('/search_autocomplete/:search', (req,res) => {
-  connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 10`,[req.params.search], (err, rows, fields) => {
+  connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 6`,[req.params.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }else{
@@ -162,6 +172,20 @@ app.post('/rate', (req,res) => {
 app.post('/review', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO reviews (user,book,text,spoiler) VALUES ('${req.session.user}',?,?,?);`,[req.body.book,req.body.text, req.body.spoiler], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/review_like', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO likes (user,review) VALUES ('${req.session.user}',?);`,[req.body.review], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/review_unlike', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND review = ?`,[req.body.review], (err, rows, fields) => {
     res.json("done")
   })
 })

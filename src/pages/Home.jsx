@@ -25,7 +25,6 @@ function Home() {
         }).then(res2 => res2.json()).then(res2 => {
           if(!res2.text){
             console.log(res2[0])
-            res2[0].katalogi = JSON.parse(res2[0].katalogi)
             setUser(res2[0])
             if(res2[0].ratings){
               res2[0].ratings.slice(-5).reverse().forEach(el => {
@@ -90,7 +89,7 @@ function Home() {
       { user &&
         <>
           <h1 className="text-slate-200 font-semibold text-2xl ml-5 mt-10">Welcome back, {user.login}</h1>
-          {user.katalogi.length == 0 &&
+          {user.collections.length == 0 &&
             <>
               <p className='text-neutral-400 text-xl ml-5 mt-2'>You haven't created a single collection yet!</p>
               <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Start right now</button></NavLink>

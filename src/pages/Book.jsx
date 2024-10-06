@@ -6,7 +6,6 @@ import { NavLink } from "react-router-dom"
 function Book() {
   const book_id = window.location.href.split('/').at(-1)
   const [refresh, setRefresh] = useState(true)
-  const [reviewratingdone, setReviewratingdone] = useState(false)
   const [book, setBook] = useState({})
   const [rating, setRating] = useState(0)
   const [user, setUser] = useState()
@@ -16,6 +15,32 @@ function Book() {
   const [error, setError] = useState("")
   const handleRating = (rate) => {
     setRating(rate)
+  }
+  const like = (e) => {
+    let link = ""
+    if(e.target.classList.contains("fa-regular")){
+      e.target.classList.remove("fa-regular")
+      e.target.classList.add("fa-solid")
+      link = "review_like"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes+1
+    }else{
+      e.target.classList.remove("fa-solid")
+      e.target.classList.add("fa-regular")
+      link = "review_unlike"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes-1
+    }
+    fetch("http://localhost:3000/"+link, {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        review: e.target.dataset.review
+      }),
+    })
   }
   const handleReview = () => {
     if(!user) return
@@ -53,18 +78,22 @@ function Book() {
       },
       body: JSON.stringify({
         rating: rating,
-        book: book.id
+        book: book_id
       }),
     }).then(res => res.json()).then(res => {
         setRefresh(!refresh)
     })
   }, [rating])
   useEffect(() => {
-    if(user){
-      setReview([...book.reviews.filter((el) => el.user = user)])
-      book.reviews = book.reviews.filter((el) => el.user != user)
+    try{
+      if(user && book.reviews){
+        setReview([...book.reviews.filter((el) => el.user == user.login)])
+        book.reviews = book.reviews.filter((el) => el.user != user.login)
+      }
+    }catch(e){
+      console.log(e)
     }
-  }, [user])
+  }, [user, book])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -79,10 +108,12 @@ function Book() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-          }
+          },
+          body: JSON.stringify({
+            book: book_id
+          }),
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
-            res2[0].katalogi = JSON.parse(res2[0].katalogi)
             setUser(res2[0])
             if(res2[0].ratings.find(x => x.id == book.id)){
               setRating(res2[0].ratings.find(x => x.id == book.id).rating)
@@ -91,29 +122,19 @@ function Book() {
         })
       }
     })
-    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(res => {
+    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(async res => {
       if(res.status != 0){
         res[0].tagi = JSON.parse(res[0].tagi)
-        res[0].reviews.forEach((review, i) => {
-          fetch("http://localhost:3000/review_rating", {
-            credentials: 'include',
+        for (const review of res[0].reviews) {
+          const ratingRes = await fetch("http://localhost:3000/review_rating", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              user: review.user,
-              book: review.book
-            }),
-          }).then(res2 => res2.json()).then(res2 => {
-              if(!res2.text){
-                review.rating = res2[0].rating
-              }
-              if(i == res[0].reviews.length-1){
-                setReviewratingdone(true)
-              }
-          })
-        })
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user: review.user, book: review.book }),
+          });
+  
+          const ratingData = await ratingRes.json();
+          review.rating = ratingData[0]?.rating;
+        }
         setBook([...res][0])
       }
     })
@@ -187,7 +208,7 @@ function Book() {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>
                     <NavLink to={"/profile/"+el.user.login}>
-                    <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.login.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user.login}</span></h3></NavLink>
+                    <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3></NavLink>
                     {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                     }
@@ -200,10 +221,19 @@ function Book() {
                         setReview([...review])
                       }}>Reveal</span></p>
                     }
+                    <div>
+                      {user && user.likes.find(x => x.review == el.id) &&
+                        <i onClick={like} className="fa-solid fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                      }
+                      {user && !user.likes.find(x => x.review == el.id) &&
+                        <i onClick={like} className="fa-regular fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                      }
+                      <span className="pl-2 text-xl">{el.likes}</span>
+                    </div>
                 </div>
                 )
               })}
-              {reviewratingdone == true && book.reviews.map((el, i) => {
+              {book.reviews.map((el, i) => {
                   return (
                     <div className="bg-neutral-700 p-5 text-white my-5" key={i}>
                       <NavLink to={"/profile/"+el.user}>
@@ -220,6 +250,18 @@ function Book() {
                           setBook(structuredClone(book))
                         }}>Reveal</span></p>
                       }
+                      <div>
+                        {user && user.likes.find(x => x.review == el.id) &&
+                          <i onClick={like} className="fa-solid fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                        }
+                        {user && !user.likes.find(x => x.review == el.id) &&
+                          <i onClick={like} className="fa-regular fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                        }
+                        {!user &&
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-5 cursor-pointer"></i></NavLink>
+                        }
+                        <span className="pl-2 text-xl">{el.likes}</span>
+                      </div>
                     </div>
                   )
               })}
