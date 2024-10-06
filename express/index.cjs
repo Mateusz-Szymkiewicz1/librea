@@ -119,7 +119,7 @@ app.get('/search/:search', (req,res) => {
 })
 
 app.get('/search_autocomplete/:search', (req,res) => {
-  connection.query(`SELECT * FROM books WHERE tytul LIKE ? OR autor LIKE ? OR tagi LIKE ? LIMIT 6`,[req.params.search], (err, rows, fields) => {
+  connection.query(`SELECT * FROM books WHERE tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%')`,[req.params.search,req.params.search,req.params.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }else{
