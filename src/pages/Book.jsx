@@ -203,7 +203,7 @@ function Book() {
             {!user && 
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a review.</p>
             }
-            <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'>Send</button>
+            <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Send</button>
               {review.map((el, i) => {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>

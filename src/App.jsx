@@ -19,7 +19,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/book/:id" element={<Book />} />
+            <Route path="/book/:id" element={<Book key={location.pathname} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />
             <Route path="/collection/new" element={<CollectionNew />} />
             <Route path="*" element={<NoMatch />} />

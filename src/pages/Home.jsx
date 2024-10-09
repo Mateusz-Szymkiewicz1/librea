@@ -26,6 +26,18 @@ function Home() {
           if(!res2.text){
             console.log(res2[0])
             setUser(res2[0])
+            if(res2[0].collections){
+              res2[0].collections.forEach(el => {
+                el.books = JSON.parse(el.books)
+                el.books.forEach(book => {
+                  fetch("http://localhost:3000/book/"+book.id).then(res => res.json()).then(res => {
+                    if(!res.text){
+                      book.okladka = res[0].okladka
+                    }
+                  })
+                })
+              })
+            }
             if(res2[0].ratings){
               res2[0].ratings.slice(-5).reverse().forEach(el => {
                 fetch("http://localhost:3000/book/"+el.book).then(res => res.json()).then(res => {
@@ -34,6 +46,8 @@ function Home() {
                   }
                 })
               })
+            }
+            if(res2[0].reviews){
               res2[0].reviews.slice(-5).reverse().forEach(el => {
                 fetch("http://localhost:3000/book/"+el.book).then(res => res.json()).then(res => {
                   if(!res.text){
@@ -93,6 +107,51 @@ function Home() {
             <>
               <p className='text-neutral-400 text-xl ml-5 mt-2'>You haven't created a single collection yet!</p>
               <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Start right now</button></NavLink>
+            </>
+          }
+          {user.collections.length > 0 &&
+            <>
+            <p className='text-slate-200 text-2xl ml-5 mt-16'>Your collections</p>
+            <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Create a collection</button></NavLink>
+            <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
+            {user.collections.map(el => {
+              return (
+                <NavLink to={"/collection/"+el.id} key={el.id}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
+                  <div className='grid grid-cols-2'>
+                  <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[0].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  {el.books.length > 1 &&
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[1].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  }
+                  {el.books.length > 2 &&
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[2].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  }
+                  {el.books.length > 3 &&
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[3].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  }
+                  {el.books.length == 1 &&
+                    <>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    </>
+                  }
+                  {el.books.length == 2 &&
+                    <>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    </>
+                  }
+                  {el.books.length == 3 &&
+                    <>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    </>
+                  }
+                  </div>
+                  <p className="text-white mt-3 text-xl">{el.name}</p>
+                  <p className="text-slate-200 mt-1 text-lg">by: {el.user}</p>
+                </div></NavLink>)
+            })}
+            </div>
             </>
           }
           {user.ratings.length > 0 &&
