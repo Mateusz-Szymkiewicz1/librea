@@ -146,7 +146,7 @@ app.get('/search_autocomplete/:search', (req,res) => {
 app.post('/register', (req,res) => {
   const pass = req.body.pass;
   const pass_hashed = bcrypt.hashSync(pass)
-  connection.query(`INSERT INTO users(login,haslo,email,katalogi) VALUES (?,?,?,"[]");`,[req.body.login,pass_hashed,req.body.email], (err, rows, fields) => {
+  connection.query(`INSERT INTO users(login,haslo,email,prof) VALUES (?,?,?,"");`,[req.body.login,pass_hashed,req.body.email], (err, rows, fields) => {
     res.json("done")
   })
 })

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 09, 2024 at 10:17 PM
+-- Generation Time: Paź 10, 2024 at 10:59 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -83,6 +83,13 @@ CREATE TABLE `likes` (
   `collection` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `likes`
+--
+
+INSERT INTO `likes` (`id`, `user`, `review`, `collection`) VALUES
+(42, 'asd', 0, 6);
+
 -- --------------------------------------------------------
 
 --
@@ -146,7 +153,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('LM5SN6f7jGVeTH1gXFslbJB0IVTyOghj', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-11T15:55:49.911Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1728662150);
+('OdF8eXx1fNOKAagFzTHU4_9VeTTjlerH', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-12T20:57:57.751Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"qwerty\"}', 1728766678);
 
 -- --------------------------------------------------------
 
@@ -158,15 +165,17 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `login` text NOT NULL,
   `haslo` text NOT NULL,
-  `email` text NOT NULL
+  `email` text NOT NULL,
+  `prof` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `login`, `haslo`, `email`) VALUES
-(1, 'asd', '$2a$10$o/eaYXmszOAk8F3oHXRzNeZaGzH0atmFpG.PRmq7vuSSxWr3Xowam', 'szymkiewiczmateusz1@gmail.com');
+INSERT INTO `users` (`id`, `login`, `haslo`, `email`, `prof`) VALUES
+(1, 'asd', '$2a$10$o/eaYXmszOAk8F3oHXRzNeZaGzH0atmFpG.PRmq7vuSSxWr3Xowam', 'szymkiewiczmateusz1@gmail.com', ''),
+(2, 'qwerty', '$2a$10$hzi0yZyER4pXPMw1EB2R4umOcG1.plss1bgTc3Wd/iMb00fFOD8Y.', 'sfd@gmail.com', '');
 
 --
 -- Indeksy dla zrzutów tabel
@@ -234,7 +243,7 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -252,7 +261,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

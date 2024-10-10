@@ -74,6 +74,9 @@ function Collection() {
         <div className="px-5 mt-10">
           <h1 className="text-slate-200 text-3xl flex justify-between"><span>{collection.name}</span><div>
             <span className="text-slate-200 text-2xl">{collection.likes}</span>
+            {!user &&
+              <NavLink to={"/login"}><i className="fa-regular ml-3 fa-heart text-2xl cursor-pointer"></i></NavLink>
+            }
             {user && user.collections_likes.find(x => x.collection == id) &&
               <i className="fa-solid ml-3 fa-heart text-2xl cursor-pointer" onClick={like}></i>
             }

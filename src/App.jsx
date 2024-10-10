@@ -8,6 +8,7 @@ import NoMatch from './pages/NoMatch.jsx';
 import CollectionNew from './pages/CollectionNew.jsx';
 import Search from './pages/Search.jsx';
 import Collection from './pages/Collection.jsx';
+import Profile from './pages/Profile.jsx';
 import { useLocation } from 'react-router-dom';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/book/:id" element={<Book key={location.pathname} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />
+            <Route path="/profile/:user" element={<Profile key={location.pathname} />} />
             <Route path="/collection/new" element={<CollectionNew />} />
             <Route path="/collection/:id" element={<Collection key={location.pathname} />} />
             <Route path="*" element={<NoMatch />} />
