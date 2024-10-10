@@ -75,6 +75,16 @@ app.post('/review_rating', (req,res) => {
   })
 })
 
+app.get('/collection/:id', (req,res) => {
+  connection.query(`SELECT collections.*, COUNT(likes.id) AS likes FROM collections LEFT JOIN likes ON collections.id = likes.collection WHERE collections.id = ? GROUP BY collections.id`,[req.params.id], (err, rows, fields) => {
+    if(rows && rows.length == 1){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
 app.post('/user/:login', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT login FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
@@ -92,6 +102,11 @@ app.post('/user/:login', (req,res) => {
       connection.query(`SELECT * FROM likes,reviews,books WHERE likes.user = ? AND likes.review = reviews.id AND books.id = ?;`,[req.params.login, req.body.book], (err5, rows5, fields5) => {
         if(rows5){
           rows[0].likes = rows5
+        }
+      })
+      connection.query(`SELECT * FROM likes WHERE likes.user = ? AND likes.collection = ?`,[req.params.login, req.body.collection], (err6, rows6, fields6) => {
+        if(rows6){
+          rows[0].collections_likes = rows6
         }
       })
       connection.query(`SELECT book FROM reviews WHERE reviews.user = ?`,[req.params.login], (err3, rows3, fields3) => {
@@ -194,6 +209,20 @@ app.post('/review_like', (req,res) => {
 app.post('/review_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND review = ?`,[req.body.review], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/collection_like', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO likes (user,collection) VALUES ('${req.session.user}',?);`,[req.body.collection], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/collection_unlike', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND collection = ?`,[req.body.collection], (err, rows, fields) => {
     res.json("done")
   })
 })

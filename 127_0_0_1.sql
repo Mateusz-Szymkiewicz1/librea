@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 06, 2024 at 03:08 PM
+-- Generation Time: Paź 09, 2024 at 10:17 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -45,7 +45,8 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`, `okladka`) VALUES
-(1, 'Lost Illusions', 'Honoré de Balzac', 1837, 623, 'Handsome would-be poet Lucien Chardon is poor and naive, but highly ambitious. Failing to make his name in his dull provincial hometown, he is taken up by a patroness, the captivating married woman Madame de Bargeton, and prepares to forge his way in the glamorous beau monde of Paris. But Lucien has entered a world far more dangerous than he realized, as Madame de Bargeton\'s reputation becomes compromised and the fickle, venomous denizens of the courts and salons conspire to keep him out of their ranks. Lucien eventually learns that, wherever he goes, talent counts for nothing in comparison to money, intrigue and unscrupulousness. Lost Illusions is one of the greatest novels in the rich procession of the Comedie humaine, Balzac\'s panoramic social and moral history of his times.', '[\"classics\"]', 'lost_illusions.png');
+(1, 'Lost Illusions', 'Honoré de Balzac', 1837, 623, 'Handsome would-be poet Lucien Chardon is poor and naive, but highly ambitious. Failing to make his name in his dull provincial hometown, he is taken up by a patroness, the captivating married woman Madame de Bargeton, and prepares to forge his way in the glamorous beau monde of Paris. But Lucien has entered a world far more dangerous than he realized, as Madame de Bargeton\'s reputation becomes compromised and the fickle, venomous denizens of the courts and salons conspire to keep him out of their ranks. Lucien eventually learns that, wherever he goes, talent counts for nothing in comparison to money, intrigue and unscrupulousness. Lost Illusions is one of the greatest novels in the rich procession of the Comedie humaine, Balzac\'s panoramic social and moral history of his times.', '[\"classics\"]', 'lost_illusions.png'),
+(2, 'Gone with the Wind', 'Margaret Mitchell', 1936, 1056, 'Scarlett O\'Hara, the beautiful, spoiled daughter of a well-to-do Georgia plantation owner, must use every means at her disposal to claw her way out of the poverty she finds herself in after Sherman\'s March to the Sea.', '[\"classics\"]', 'gone_with_the_wind.png');
 
 -- --------------------------------------------------------
 
@@ -56,9 +57,18 @@ INSERT INTO `books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`, `o
 CREATE TABLE `collections` (
   `id` int(11) NOT NULL,
   `user` text NOT NULL,
+  `name` text NOT NULL,
   `books` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`books`)),
   `description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `collections`
+--
+
+INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`) VALUES
+(6, 'asd', 'asdasd', '[{\"id\":1},{\"id\":2}]', ''),
+(7, 'asd', 'French', '[{\"id\":1}]', 'fr fr ');
 
 -- --------------------------------------------------------
 
@@ -136,9 +146,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('gPoS03lZ1loMp6hDZYTQYHoltYvlsbD9', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-07T18:15:54.504Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1728324955),
-('NoZOwaiz76DmjsUECxroNIKOpLfdA5fz', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-07T10:00:25.416Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1728295225),
-('Vn6uvJQJAEnLm5ayBee_hg1AuHDClTnb', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-07T10:01:32.338Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1728295292);
+('LM5SN6f7jGVeTH1gXFslbJB0IVTyOghj', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-11T15:55:49.911Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1728662150);
 
 -- --------------------------------------------------------
 
@@ -214,13 +222,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `collections`
 --
 ALTER TABLE `collections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `likes`
