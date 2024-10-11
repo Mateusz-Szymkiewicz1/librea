@@ -16,7 +16,7 @@ function App() {
   return (
     <>
       <div>
-          <Header></Header>
+          <Header key={location.pathname} ></Header>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
+import NoMatch from "./NoMatch"
 
 function Collection() {
   let id = window.location.href.split('/').at(-1)
@@ -115,10 +116,7 @@ function Collection() {
         </div>
       }
       {!collection &&
-        <div className="h-screen w-full flex flex-col justify-center items-center">
-          <img src="/404.svg" className="h-96 -mt-16"></img>
-          <span className="text-white text-center text-4xl mt-10">No matches found, sorry!</span>
-        </div>
+        <NoMatch></NoMatch>
       }
     </>
   )

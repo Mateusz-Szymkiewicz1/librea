@@ -76,9 +76,8 @@ app.get('/collection/:id', (req,res) => {
 })
 
 app.post('/user/:login', (req,res) => {
-  if(!req.session.user) return
   connection.query(`SELECT login, prof FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
-    if(rows){
+    if(rows && rows.length > 0){
       connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
         if(rows2){
           rows[0].ratings = rows2
@@ -99,7 +98,7 @@ app.post('/user/:login', (req,res) => {
           rows[0].collections_likes = rows6
         }
       })
-      connection.query(`SELECT book FROM reviews WHERE reviews.user = ?`,[req.params.login], (err3, rows3, fields3) => {
+      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) WHERE reviews.user = ? GROUP BY reviews.id ORDER BY reviews.id DESC`,[req.params.login], (err3, rows3, fields3) => {
         if(rows3){
           rows[0].reviews = rows3
           res.send(rows)

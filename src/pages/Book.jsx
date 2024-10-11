@@ -2,6 +2,7 @@ import { createElement, useEffect } from "react"
 import { useState } from "react"
 import { Rating } from 'react-simple-star-rating'
 import { NavLink } from "react-router-dom"
+import NoMatch from "./NoMatch"
 
 function Book() {
   const book_id = window.location.href.split('/').at(-1)
@@ -85,7 +86,6 @@ function Book() {
   useEffect(() => {
     try{
       if(user && book.reviews){
-        setReview([...book.reviews.filter((el) => el.user == user.login)])
         book.reviews = book.reviews.filter((el) => el.user != user.login)
       }
     }catch(e){
@@ -113,9 +113,7 @@ function Book() {
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
             setUser(res2[0])
-            if(res2[0].ratings.find(x => x.book == book_id)){
-              setRating(res2[0].ratings.find(x => x.book == book_id).rating)
-            }
+            setReview(res2[0].reviews.filter(x => x.book == book_id))
           }
         })
       }
@@ -196,7 +194,7 @@ function Book() {
               {review.map((el, i) => {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>
-                    <NavLink to={"/profile/"+el.user.login}>
+                    <NavLink to={"/profile/"+el.user}>
                     <h3 className="text-xl">
                       {el.prof &&
                         <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/"+el.prof} onError={(e) => {
@@ -233,6 +231,7 @@ function Book() {
                 )
               })}
               {book.reviews.map((el, i) => {
+                  if(user && el.user == user.login) return
                   return (
                     <div className="bg-neutral-700 p-5 text-white my-5" key={i}>
                       <NavLink to={"/profile/"+el.user}>
@@ -278,10 +277,7 @@ function Book() {
             </>
           }
           {!book.id > 0 &&
-            <div className="h-screen w-full flex flex-col justify-center items-center">
-            <img src="/404.svg" className="h-96 -mt-16"></img>
-            <span className="text-white text-center text-4xl mt-10">No matches found, sorry!</span>
-          </div>
+            <NoMatch></NoMatch>
           }
       </div>
 
