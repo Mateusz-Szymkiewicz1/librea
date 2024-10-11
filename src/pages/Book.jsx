@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { createElement, useEffect } from "react"
 import { useState } from "react"
 import { Rating } from 'react-simple-star-rating'
 import { NavLink } from "react-router-dom"
@@ -15,6 +15,20 @@ function Book() {
   const [error, setError] = useState("")
   const handleRating = (rate) => {
     setRating(rate)
+    if(rate == 0) return
+    fetch("http://localhost:3000/rate", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        rating: rate,
+        book: book_id
+      }),
+    }).then(res => res.json()).then(res => {
+        setRefresh(!refresh)
+    })
   }
   const like = (e) => {
     let link = ""
@@ -69,22 +83,6 @@ function Book() {
     }
   }
   useEffect(() => {
-    if(rating == 0) return
-    fetch("http://localhost:3000/rate", {
-      credentials: 'include',
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        rating: rating,
-        book: book_id
-      }),
-    }).then(res => res.json()).then(res => {
-        setRefresh(!refresh)
-    })
-  }, [rating])
-  useEffect(() => {
     try{
       if(user && book.reviews){
         setReview([...book.reviews.filter((el) => el.user == user.login)])
@@ -116,26 +114,17 @@ function Book() {
           if(!res2.text){
             setUser(res2[0])
             if(res2[0].ratings.find(x => x.book == book_id)){
-              setRating(res2[0].ratings.find(x => x.id == book.id).rating)
+              setRating(res2[0].ratings.find(x => x.book == book_id).rating)
             }
           }
         })
       }
     })
-    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(async res => {
+    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(res => {
       if(res.status != 0){
+        console.log(res[0])
         res[0].tagi = JSON.parse(res[0].tagi)
-        for (const review of res[0].reviews) {
-          const ratingRes = await fetch("http://localhost:3000/review_rating", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user: review.user, book: review.book }),
-          });
-  
-          const ratingData = await ratingRes.json();
-          review.rating = ratingData[0]?.rating;
-        }
-        setBook([...res][0])
+        setBook(res[0])
       }
     })
   }, [refresh])
@@ -208,7 +197,17 @@ function Book() {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>
                     <NavLink to={"/profile/"+el.user.login}>
-                    <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3></NavLink>
+                    <h3 className="text-xl">
+                      {el.prof &&
+                        <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/"+el.prof} onError={(e) => {
+                        e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
+                        }}></img>
+                      }
+                      {!el.prof &&
+                        <span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> 
+                      }
+                      <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
+                    </h3></NavLink>
                     {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                     }
@@ -237,7 +236,17 @@ function Book() {
                   return (
                     <div className="bg-neutral-700 p-5 text-white my-5" key={i}>
                       <NavLink to={"/profile/"+el.user}>
-                      <h3 className="text-xl"><span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span></h3></NavLink>
+                      <h3 className="text-xl">
+                        {el.prof && 
+                          <img className="block h-10 w-10 cover-fit w-fit float-left" src={"user_uploads/"+el.prof} onError={(e) => {
+                            e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
+                            }}></img>
+                        }
+                        {!el.prof &&
+                          <span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> 
+                        }
+                        <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
+                      </h3></NavLink>
                       {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                       }

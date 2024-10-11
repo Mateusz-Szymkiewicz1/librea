@@ -85,7 +85,7 @@ function Collection() {
             }
           </div></h1>
           <NavLink to={"/profile/"+collection.user}><h2 className="text-neutral-400 text-2xl float-left">by: <span className="text-blue-500">{collection.user}</span></h2></NavLink>
-          <p className="text-neutral-400 text-xl mt-2">{collection.description}</p>
+          <p className="text-neutral-400 text-xl mt-10">{collection.description}</p>
           <div className="my-6 flex flex-col clear-both">
           {collection.books.map((el,i) => {
             return (

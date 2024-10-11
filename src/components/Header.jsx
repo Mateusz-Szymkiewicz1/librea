@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 function Header() {
   const navigator = useNavigate()
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState()
   const [search, setSearch] = useState("")
   const [autofill, setAutofill] = useState([])
   const handleSearch = (e) => {
@@ -41,17 +41,29 @@ function Header() {
       }
     }).then(() => window.location.reload())
   }
-  fetch("http://localhost:3000/login", {
-    credentials: 'include',
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    }
-  }).then(res => res.json()).then(res => {
-    if(!res.text){
-      setUser(res)
-    }
-  })
+  useEffect(() => {
+    fetch("http://localhost:3000/login", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(res => {
+      if(!res.text){
+        fetch("http://localhost:3000/user/"+res, {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }).then(res2 => res2.json()).then(async res2 => {
+          if(!res2.text){
+            setUser(res2[0])
+          }
+        })
+      }
+    })
+  }, [])
   const toggleDropdown = () => {
     if(document.querySelector(".dropdown_user").classList.contains("hidden")){
       document.querySelector(".dropdown_user").classList.remove("hidden")
@@ -80,7 +92,16 @@ function Header() {
             {user &&
               <>
               <div className="relative">
-                <span onClick={toggleDropdown} className="pr-5 block cursor-pointer"><span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">{user.slice(0,1).toUpperCase()}</span></span>
+                <span onClick={toggleDropdown} className="pr-5 block cursor-pointer">
+                  {user.prof &&
+                    <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/"+user.prof} onError={(e) => {
+                    e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">${user.login.slice(0,1).toUpperCase()}</span>`
+                    }}></img>
+                  }
+                  {!user.prof &&
+                    <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">{user.login.slice(0,1).toUpperCase()}</span>
+                  }
+                </span>
                 <div className="bg-neutral-700 absolute top-16 right-5 p-2 w-32 hidden dropdown_user">
                   <NavLink to={"profile/"+user} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-user mr-2"></i>Profile</p></NavLink>
                   <p onClick={wyloguj} className="p-3 cursor-pointer bg-red-500 hover:bg-red-600"><i className="fa fa-sign-out mr-2"></i>Sign out</p>
