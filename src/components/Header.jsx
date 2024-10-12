@@ -102,7 +102,7 @@ function Header() {
                     <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">{user.login.slice(0,1).toUpperCase()}</span>
                   }
                 </span>
-                <div className="bg-neutral-700 absolute top-16 right-5 p-2 w-32 hidden dropdown_user">
+                <div className="bg-neutral-700 border border-neutral-500 absolute top-16 right-5 p-2 w-32 hidden dropdown_user">
                   <NavLink to={"profile/"+user.login} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-user mr-2"></i>Profile</p></NavLink>
                   <p onClick={wyloguj} className="p-3 cursor-pointer bg-red-500 hover:bg-red-600"><i className="fa fa-sign-out mr-2"></i>Sign out</p>
                 </div>

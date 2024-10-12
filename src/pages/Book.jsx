@@ -14,6 +14,8 @@ function Book() {
   const [textarea, setTextarea] = useState("")
   const [spoiler, setSpoiler] = useState(false)
   const [error, setError] = useState("")
+  const [reviewCount, setReviewCount] = useState(0)
+  const [pages, setPages] = useState(0)
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -59,6 +61,10 @@ function Book() {
   }
   const handleReview = () => {
     if(!user) return
+    if(review.length > 0){
+      setError("You have written a review already. You can edit it!")
+      return
+    }
     if(textarea.length < 1){
       setError("Don't send an empty review!")
       return
@@ -83,15 +89,6 @@ function Book() {
       })
     }
   }
-  useEffect(() => {
-    try{
-      if(user && book.reviews){
-        book.reviews = book.reviews.filter((el) => el.user != user.login)
-      }
-    }catch(e){
-      console.log(e)
-    }
-  }, [user, book])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -123,9 +120,18 @@ function Book() {
         console.log(res[0])
         res[0].tagi = JSON.parse(res[0].tagi)
         setBook(res[0])
+        setReviewCount(res[0].ilosc_recenzji)
       }
     })
   }, [refresh])
+  useEffect(() => {
+    if(!review.length) return
+    setReviewCount(reviewCount-1)
+  }, [review])
+  useEffect(() => {
+    setPages(Math.ceil(reviewCount/50))
+    console.log(pages)
+  }, [reviewCount])
   return (
     <>
       <div>
