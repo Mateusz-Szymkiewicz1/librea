@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Rating } from 'react-simple-star-rating'
 import { NavLink } from "react-router-dom"
 import NoMatch from "./NoMatch"
+import ReactPaginate from 'react-paginate';
 
 function Book() {
   const book_id = window.location.href.split('/').at(-1)
@@ -16,6 +17,7 @@ function Book() {
   const [error, setError] = useState("")
   const [reviewCount, setReviewCount] = useState(0)
   const [pages, setPages] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -115,7 +117,7 @@ function Book() {
         })
       }
     })
-    fetch('http://localhost:3000/book/'+book_id).then(res => res.json()).then(res => {
+    fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*50)).then(res => res.json()).then(res => {
       if(res.status != 0){
         console.log(res[0])
         res[0].tagi = JSON.parse(res[0].tagi)
@@ -130,8 +132,18 @@ function Book() {
   }, [review])
   useEffect(() => {
     setPages(Math.ceil(reviewCount/50))
-    console.log(pages)
   }, [reviewCount])
+  const pageChange = (e) => {
+    let offset = (e.selected)*50
+    setCurrentPage(e.selected+1)
+    fetch('http://localhost:3000/book/'+book_id+"?offset="+offset).then(res => res.json()).then(res => {
+      if(res.status != 0){
+        res[0].tagi = JSON.parse(res[0].tagi)
+        setBook(res[0])
+        document.querySelector("#reviews").scrollIntoView()
+      }
+    })
+  }
   return (
     <>
       <div>
@@ -197,7 +209,7 @@ function Book() {
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a review.</p>
             }
             <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Send</button>
-              {review.map((el, i) => {
+              {currentPage == 1 && review.map((el, i) => {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>
                     <NavLink to={"/profile/"+el.user}>
@@ -280,6 +292,24 @@ function Book() {
                   )
               })}
               </div>
+            </>
+          }
+          {pages > 1 &&
+            <>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="Next"
+                pageRangeDisplayed={5}
+                pageCount={pages}
+                previousLabel="Previous"
+                renderOnZeroPageCount={null}
+                onPageChange={pageChange}
+                className="flex gap-3 ml-10 mb-10"
+                nextLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-10 hover:bg-blue-600"
+                previousLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-12 hover:bg-blue-600"
+                pageLinkClassName="cursor-pointer bg-blue-500 block p-5 flex justify-center items-center w-8 text-slate-200 h-8 text-xl hover:bg-blue-600"
+                activeClassName="brightness-125"
+              />
             </>
           }
           {!book.id > 0 &&

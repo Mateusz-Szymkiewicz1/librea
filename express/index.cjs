@@ -53,9 +53,14 @@ const connection = mysql.createConnection({
 })
 
 app.get('/book/:id', (req,res) => {
+  try{
+    parseInt(req.query.offset)
+  }catch(e){
+    res.send({ status: 0, text: "No matches found..."})
+  }
   connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen, COUNT(reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id WHERE books.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50`,[req.params.id], (err2, rows2, fields2) => {
+      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
         res.send(rows)
       })
@@ -198,6 +203,13 @@ app.post('/review_like', (req,res) => {
 app.post('/review_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND review = ?`,[req.body.review], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/collection_delete_book', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`UPDATE collections SET books = ? WHERE id = ?;`,[JSON.stringify(req.body.books), req.body.collection], (err, rows, fields) => {
     res.json("done")
   })
 })
