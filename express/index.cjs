@@ -214,6 +214,13 @@ app.post('/collection_delete_book', (req,res) => {
   })
 })
 
+app.post('/collection_edit_info', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`UPDATE collections SET name = ?, description = ? WHERE id = ?;`,[req.body.name,req.body.desc,req.body.collection], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/collection_like', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO likes (user,collection) VALUES ('${req.session.user}',?);`,[req.body.collection], (err, rows, fields) => {

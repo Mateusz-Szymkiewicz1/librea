@@ -82,7 +82,7 @@ function CollectionNew() {
       <div className="px-10 mt-10 w-1/2 float-left flex justify-center hidden lg:block">
         <img src="/collection.svg" className="h-[550px]"></img>
       </div>
-      <div className="add absolute hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+      <div className="add fixed hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
         <div className="bg-neutral-700 p-5 pb-8 text-white">
           <div className="flex justify-between">
             <h1 className="text-xl font-semibold">Add a book</h1>

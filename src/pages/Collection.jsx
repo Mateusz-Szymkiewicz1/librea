@@ -10,6 +10,8 @@ function Collection() {
   const [msg, setMsg] = useState()
   const [editName, setEditName] = useState("")
   const [editDesc, setEditDesc] = useState("")
+  const [search, setSearch] = useState("")
+  const [autofill, setAutofill] = useState([])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -45,6 +47,8 @@ function Collection() {
           res[0].books[index] = bookData[0];
         }
         setCollection(res[0])
+        setEditDesc(res[0].description)
+        setEditName(res[0].name)
       }
     })
   }, [])
@@ -114,7 +118,11 @@ function Collection() {
   }
   const editInfo = async () => {
     if(editName.length < 1){
-      setMsg({type: "error", text: "Collection's name is required!"})
+      setMsg({type: "error", text: "New collection's name is required!"})
+      return;
+    }
+    if(editName == collection.name && editDesc == collection.description){
+      setMsg({type: "error", text: "You didn't even change anything!"})
       return;
     }
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
@@ -126,13 +134,71 @@ function Collection() {
           return "stop"
       });
       if(response) return
-      console.log("done")
+      fetch("http://localhost:3000/collection_edit_info", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: editName,
+          desc: editDesc,
+          collection: id
+        })
+      }).then(res => {
+        collection.name = editName;
+        collection.description = editDesc;
+        setCollection(structuredClone(collection))
+        setMsg({type: "msg", text: "Edited collection's info!"})
+        closeEdit()
+      })
   }
   const closeEdit = () => {
     document.querySelector('.edit').classList.add("hidden")
   }
   const showEdit = () => {
     document.querySelector('.edit').classList.remove("hidden")
+  }
+  const closeAdd = () => {
+    document.querySelector('.add').classList.add("hidden")
+  }
+  const showAdd = () => {
+    document.querySelector('.add').classList.remove("hidden")
+  }
+  useEffect(() => {
+    if(search.length < 2){
+      setAutofill([...[]])
+      return
+    }
+    fetch("http://localhost:3000/search_autocomplete/"+search).then(res => res.json()).then(res => {
+      if(res.text){
+        setAutofill([])
+      }else{
+        setAutofill([...res])
+      }
+    })
+  }, [search])
+  useEffect(() => {
+    document.addEventListener("click", function(e){
+      setAutofill([])
+    })
+  }, [])
+  const addBook = (book) => {
+    let new_books = []
+    collection.books.forEach(el => {
+      new_books.push({id: el.id})
+    })
+    fetch("http://localhost:3000/collection_delete_book", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        books: new_books,
+        collection: collection.id
+      }),
+    })
   }
   return (
     <>
@@ -154,6 +220,9 @@ function Collection() {
           <NavLink to={"/profile/"+collection.user}><h2 className="text-neutral-400 text-2xl float-left">by: <span className="text-blue-500">{collection.user}</span></h2></NavLink>
           <p className="text-neutral-400 text-xl mt-10">{collection.description}</p>
           <div className="my-6 flex flex-col clear-both">
+          {user && user.login == collection.user &&
+            <button className='bg-blue-600 w-48 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={showAdd}>Add a book</button>
+          }
           {collection.books.map((el,i) => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
@@ -184,15 +253,44 @@ function Collection() {
           })}
           </div>
         </div>
-        <div className="edit hidden absolute top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="edit hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
         <div className="bg-neutral-700 p-5 pb-8 text-white">
           <div className="flex justify-between">
             <h1 className="text-xl font-semibold">Edit info</h1>
             <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEdit}></i>
           </div>
-          <input type="text" value={collection.name} onChange={(e) => setEditName(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Name" maxLength={200}/>
-        <input type="text" value={collection.description}  onChange={(e) => setEditDesc(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Description" maxLength={1000}/> 
+          <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Name" maxLength={200}/>
+        <input type="text" value={editDesc}  onChange={(e) => setEditDesc(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Description" maxLength={1000}/> 
         <button className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={editInfo}>Edit</button>
+        </div>
+      </div>
+      <div className="add fixed hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Add a book</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeAdd}></i>
+          </div>
+          <div className="h-11 w-72 relative">
+            <input type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full outline-none h-11 mt-3 bg-neutral-800 text-slate-200 px-3 add_search" />
+            <div className="absolute top-12 right-0 left-0 flex flex-col">
+              {autofill.map(el => {
+                return (
+                  <span key={el.id} onClick={(e) => {
+                    closeAdd();
+                    if(!collection.books.find(x => x.id == el.id)){
+                      collection.books.push(el)
+                      setCollection(structuredClone(collection))
+                      setMsg({type:"msg", text: "Added a book to the list!"})
+                      addBook({id: el.id})
+                    }else{
+                      setMsg({type:"error", text: "This book is already on the list!"})
+                    }
+                    document.querySelector(".add_search").value = ""
+                  }} className="cursor-pointer block add_suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1"></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </div>
       </>
