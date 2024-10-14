@@ -35,7 +35,7 @@ function Search() {
         <div className="my-6 flex flex-col">
           <div className="flex gap-3 flex-wrap">
           <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
-            <option selected value="id">Sort by: Default</option>
+            <option defaultValue="id">Sort by: Default</option>
             <option value="title">Sort by: Title</option>
             <option value="author">Sort by: Author</option>
             <option value="rating">Sort by: Rating</option>
@@ -75,7 +75,7 @@ function Search() {
                         <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
                     </svg>
                     {el.ilosc_ocen > 0 &&
-                      <span className="ms-2 text-md font-bold text-gray-900 dark:text-white">{ (el.suma_ocen/el.ilosc_ocen).toFixed(1) }</span>
+                      <span className="ms-2 text-md font-bold text-gray-900 dark:text-white">{ (el.suma_ocen/el.ilosc_ocen).toFixed(1) } ({el.ilosc_ocen})</span>
                     }
                     {el.ilosc_ocen == 0 &&
                       <span className="ms-2 text-md font-bold text-gray-900 dark:text-white">No ratings</span>
