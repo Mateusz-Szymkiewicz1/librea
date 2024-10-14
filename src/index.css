@@ -50,3 +50,15 @@ border: 0;
   background: #1dbb60;
 }
 @keyframes slideInDown{0%{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}
+
+.optionListContainer{
+  @apply bg-neutral-500;
+  margin-left: -3px;
+  margin-top: 3px;
+}
+.optionContainer{
+  border: 0 !important;
+}
+.highlightOption{
+  @apply bg-neutral-500;
+}

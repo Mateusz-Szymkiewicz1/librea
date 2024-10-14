@@ -1,15 +1,30 @@
 import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
+import Multiselect from "multiselect-react-dropdown"
 
 function Search() {
   const [wyniki, setWyniki] = useState([])
   const [sort, setSort] = useState("id")
+  const [tags, setTags] = useState([])
+  const [selectedTags, setSelectedTags] = useState([])
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
     fetch("http://localhost:3000/search/"+search+"/?sort="+sort).then(res => res.json()).then(res => {
+      res.forEach(el => {
+        el.tagi = JSON.parse(el.tagi)
+      })
+      selectedTags.forEach(tag => {
+        res = res.filter(x => x.tagi.includes(tag))
+      })
       setWyniki([...res])
     })
-  }, [sort])
+  }, [sort, selectedTags])
+  useEffect(() => {
+    fetch("http://localhost:3000/tags").then(res => res.json()).then(res => {
+      res.tags = JSON.parse(res.tags)
+      setTags(res.tags)
+    })
+  }, [])
   return (
     <>
       <div className="sm:px-10 px-3 mt-10">
@@ -18,12 +33,35 @@ function Search() {
           <h1 className="text-neutral-400 text-2xl pt-2">Sorry, we didn't find anything. Try searching something different</h1>
         }
         <div className="my-6 flex flex-col">
-        <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
-          <option selected value="id">Sort by: Default</option>
-          <option value="title">Sort by: Title</option>
-          <option value="author">Sort by: Author</option>
-          <option value="rating">Sort by: Rating</option>
-        </select>
+          <div className="flex gap-3 flex-wrap">
+          <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
+            <option selected value="id">Sort by: Default</option>
+            <option value="title">Sort by: Title</option>
+            <option value="author">Sort by: Author</option>
+            <option value="rating">Sort by: Rating</option>
+            </select>     
+              <Multiselect
+                isObject={false}
+                options={tags}
+                onSelect={(e) => setSelectedTags([...e])}
+                onRemove={(e) => setSelectedTags([...e])}
+                placeholder="Tags"
+                emptyRecordMsg="No tags found"
+                style={{
+                  multiselectContainer: {
+                    background: "#525252",
+                    borderRadius: "10px",
+                    border: "1px solid #505050",
+                    padding: "3px",
+                    color: "#fff",
+                    paddingTop: "0"
+                  },
+                  searchBox: {
+                    border: 'none'
+                  }
+                }}
+              />
+            </div>
           {wyniki.map(el => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">

@@ -80,6 +80,12 @@ app.get('/collection/:id', (req,res) => {
   })
 })
 
+app.get('/tags', (req,res) => {
+  connection.query(`SELECT * FROM tags`,[req.params.id], (err, rows, fields) => {
+      res.send(rows[0])
+  })
+})
+
 app.post('/user/:login', (req,res) => {
   connection.query(`SELECT login, prof FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
     if(rows && rows.length > 0){
