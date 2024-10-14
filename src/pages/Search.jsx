@@ -9,13 +9,22 @@ function Search() {
   const [selectedTags, setSelectedTags] = useState([])
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
-    fetch("http://localhost:3000/search/"+search+"/?sort="+sort).then(res => res.json()).then(res => {
-      res.forEach(el => {
-        el.tagi = JSON.parse(el.tagi)
+    fetch("http://localhost:3000/search", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        search: search,
+        sort: sort,
+        tags: selectedTags
       })
-      selectedTags.forEach(tag => {
-        res = res.filter(x => x.tagi.includes(tag))
-      })
+    }).then(res => res.json()).then(res => {
+      if(res.text){
+        setWyniki([])
+        return;
+      }
       setWyniki([...res])
     })
   }, [sort, selectedTags])

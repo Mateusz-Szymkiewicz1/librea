@@ -59,7 +59,6 @@ app.get('/book/:id', (req,res) => {
     res.send({ status: 0, text: "No matches found..."})
   }
   connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, SUM(DISTINCT ratings.rating) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id  WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
-    console.log(rows)
     if(rows && rows.length == 1){
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
@@ -124,18 +123,29 @@ app.post('/user/:login', (req,res) => {
   })
 })
 
-app.get('/search/:search', (req,res) => {
+app.post('/search', (req,res) => {
   let sort = "books.id ASC"
-  if(req.query.sort == "author"){
-    sort = "books.autor ASC"
+  if(req.body.sort == "author"){
+    sort = "SUBSTRING_INDEX(TRIM(books.autor), ' ', -1) ASC"
   }
-  if(req.query.sort == "title"){
+  if(req.body.sort == "title"){
     sort = "books.tytul ASC"
   }
-  if(req.query.sort == "rating"){
+  if(req.body.sort == "rating"){
     sort = "(SUM(ratings.rating)/COUNT(ratings.id)) DESC" 
   }
-  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%') GROUP BY books.id ORDER BY ${sort} LIMIT 50`,[req.params.search,req.params.search,req.params.search], (err, rows, fields) => {
+  let tag_query = ""
+  if(req.body.tags.length > 0){
+    tag_query = "AND books.tagi LIKE"
+    req.body.tags.forEach((tag, i) => {
+      if(i == req.body.tags.length-1){
+        tag_query = tag_query+` '%${tag}%'`
+      }else{
+        tag_query = tag_query+` '%${tag}%' AND books.tagi LIKE`
+      }
+    })
+  }
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE (tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%')) ${tag_query} GROUP BY books.id ORDER BY ${sort} LIMIT 50`,[req.body.search,req.body.search,req.body.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }else{

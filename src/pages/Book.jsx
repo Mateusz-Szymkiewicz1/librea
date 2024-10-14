@@ -112,6 +112,7 @@ function Book() {
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
             setUser(res2[0])
+            setRating(res2[0].ratings.find(x => x.book == book_id).rating)
             setReview(res2[0].reviews.filter(x => x.book == book_id))
           }
         })
