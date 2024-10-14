@@ -118,7 +118,17 @@ app.post('/user/:login', (req,res) => {
 })
 
 app.get('/search/:search', (req,res) => {
-  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%') GROUP BY books.id LIMIT 50`,[req.params.search,req.params.search,req.params.search], (err, rows, fields) => {
+  let sort = "books.id ASC"
+  if(req.query.sort == "author"){
+    sort = "books.autor ASC"
+  }
+  if(req.query.sort == "title"){
+    sort = "books.tytul ASC"
+  }
+  if(req.query.sort == "rating"){
+    sort = "(SUM(ratings.rating)/COUNT(ratings.id)) DESC" 
+  }
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%') GROUP BY books.id ORDER BY ${sort} LIMIT 50`,[req.params.search,req.params.search,req.params.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }else{

@@ -3,23 +3,28 @@ import { NavLink } from "react-router-dom"
 
 function Search() {
   const [wyniki, setWyniki] = useState([])
-  const [filtered, setFiltered] = useState([])
+  const [sort, setSort] = useState("id")
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
-    fetch("http://localhost:3000/search/"+search).then(res => res.json()).then(res => {
+    fetch("http://localhost:3000/search/"+search+"/?sort="+sort).then(res => res.json()).then(res => {
       setWyniki([...res])
-      setFiltered([...res])
     })
-  }, [])
+  }, [sort])
   return (
     <>
       <div className="sm:px-10 px-3 mt-10">
-        <h1 className="text-white text-3xl">Results for "{search}" ({filtered.length}):</h1>
-        {filtered.length == 0 &&
+        <h1 className="text-white text-3xl">Results for "{search}" ({wyniki.length}):</h1>
+        {wyniki.length == 0 &&
           <h1 className="text-neutral-400 text-2xl pt-2">Sorry, we didn't find anything. Try searching something different</h1>
         }
         <div className="my-6 flex flex-col">
-          {filtered.map(el => {
+        <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
+          <option selected value="id">Sort by: Default</option>
+          <option value="title">Sort by: Title</option>
+          <option value="author">Sort by: Author</option>
+          <option value="rating">Sort by: Rating</option>
+        </select>
+          {wyniki.map(el => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
