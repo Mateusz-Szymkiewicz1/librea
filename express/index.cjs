@@ -58,7 +58,7 @@ app.get('/book/:id', (req,res) => {
   }catch(e){
     res.send({ status: 0, text: "No matches found..."})
   }
-  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, SUM(DISTINCT ratings.rating) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id  WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id  WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2

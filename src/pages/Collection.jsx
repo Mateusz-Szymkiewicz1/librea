@@ -2,10 +2,12 @@ import { useEffect, useState } from "react"
 import { NavLink } from "react-router-dom"
 import NoMatch from "./NoMatch"
 import { useDecision } from "../components/useDecision"
+import Multiselect from "multiselect-react-dropdown"
 
 function Collection() {
   let id = window.location.href.split('/').at(-1)
   const [collection, setCollection] = useState()
+  const [filtered, setFiltered] = useState([])
   const [user, setUser] = useState()
   const [msg, setMsg] = useState()
   const [editName, setEditName] = useState("")
@@ -13,6 +15,15 @@ function Collection() {
   const [search, setSearch] = useState("")
   const [autofill, setAutofill] = useState([])
   const [loading, setLoading] = useState(true)
+  const [tags,setTags] = useState([])
+  const [selectedTags,setSelectedTags] = useState([])
+  const [sort, setSort] = useState("default")
+  useEffect(() => {
+    fetch("http://localhost:3000/tags").then(res => res.json()).then(res => {
+      res.tags = JSON.parse(res.tags)
+      setTags(res.tags)
+    })
+  }, [])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -45,6 +56,7 @@ function Collection() {
         for (let [index,book] of res[0].books.entries()) {
           const bookRes = await fetch("http://localhost:3000/book/"+book.id)
           const bookData = await bookRes.json();
+          bookData[0].tagi = JSON.parse(bookData[0].tagi)
           res[0].books[index] = bookData[0];
         }
         setCollection(res[0])
@@ -80,6 +92,33 @@ function Collection() {
       }),
     })
   }
+  useEffect(() => {
+    if(!collection) return
+    setFiltered([...collection.books])
+  }, [collection])
+  useEffect(() => {
+    if(!collection) return
+    let new_tab = [...collection.books];
+    if(sort == "title"){
+      new_tab.sort((a, b) => a.tytul.localeCompare(b.tytul))
+    }else if(sort == "author"){
+      new_tab.sort((a, b) => a.autor.split(" ").slice(-1)[0].localeCompare(b.autor.split(" ").slice(-1)[0]))
+    }else if(sort == "rating"){
+      new_tab.sort((a, b) => {
+        const ratingA = a.ilosc_ocen === 0 ? 0 : a.suma_ocen / a.ilosc_ocen;
+        const ratingB = b.ilosc_ocen === 0 ? 0 : b.suma_ocen / b.ilosc_ocen;
+        return ratingB - ratingA;
+      })
+    }else{
+      new_tab = [...collection.books]
+    }
+    if(selectedTags.length > 0){
+      selectedTags.forEach(tag => {
+        new_tab = new_tab.filter(x => x.tagi.includes(tag))
+      })
+    }
+    setFiltered([...new_tab])
+  }, [selectedTags, sort])
   const deleteBook = async (ev) => {
     ev.preventDefault()
     ev.stopPropagation();
@@ -225,7 +264,36 @@ function Collection() {
           {user && user.login == collection.user &&
             <button className='bg-blue-600 w-48 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={showAdd}>Add a book</button>
           }
-          {collection.books.map((el,i) => {
+          <div className="flex gap-3 flex-wrap mt-5">
+          <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
+            <option defaultValue="id">Sort by: Default</option>
+            <option value="title">Sort by: Title</option>
+            <option value="author">Sort by: Author</option>
+            <option value="rating">Sort by: Rating</option>
+            </select>     
+              <Multiselect
+                isObject={false}
+                options={tags}
+                onSelect={(e) => setSelectedTags([...e])}
+                onRemove={(e) => setSelectedTags([...e])}
+                placeholder="Tags"
+                emptyRecordMsg="No tags found"
+                style={{
+                  multiselectContainer: {
+                    background: "#525252",
+                    borderRadius: "10px",
+                    border: "1px solid #505050",
+                    padding: "3px",
+                    color: "#fff",
+                    paddingTop: "0"
+                  },
+                  searchBox: {
+                    border: 'none'
+                  }
+                }}
+              />
+            </div>
+          {filtered.map((el,i) => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
