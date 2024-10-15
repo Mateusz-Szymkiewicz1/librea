@@ -7,6 +7,9 @@ function Profile() {
   const [profile, setProfile] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
+  const [collectionLimit, setCollectionLimit] = useState(10)
+  const [recentlyrated, setRecentlyrated] = useState([])
+  const [recentreviews, setRecentreviews] = useState([])
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -53,6 +56,24 @@ function Profile() {
             })
           })
         }
+        if(res[0].ratings){
+          res[0].ratings.slice(-5).reverse().forEach(el => {
+            fetch("http://localhost:3000/book/"+el.book).then(res2 => res2.json()).then(res2 => {
+              if(!res2.text){
+                setRecentlyrated([...recentlyrated, res2[0]])
+              }
+            })
+          })
+        }
+        if(res[0].reviews){
+          res[0].reviews.slice(-5).reverse().forEach(el => {
+            fetch("http://localhost:3000/book/"+el.book).then(res2 => res2.json()).then(res2 => {
+              if(!res2.text){
+                setRecentreviews([...recentreviews, res2[0]])
+              }
+            })
+          })
+        }
       }
       setLoading(false)
     })
@@ -73,7 +94,7 @@ function Profile() {
                 }
                 <h1 className="text-4xl mt-3">{profile.login}</h1>
             </div>
-            <div className="w-full sm:w-3/4 bg-neutral-700 p-3 text-slate-200">
+            <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200">
             {profile.collections.length == 0 &&
             <>
               <p className='text-slate-200 text-2xl ml-5 mt-5'>Collections</p>
@@ -83,8 +104,8 @@ function Profile() {
           {profile.collections.length > 0 &&
             <>
             <p className='text-slate-200 text-2xl ml-5 mt-5'>Collections</p>
-            <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
-            {profile.collections.map(el => {
+            <div className='flex flex-wrap gap-5 ml-5 my-3 mb-4'>
+            {profile.collections.slice(0,collectionLimit).map(el => {
               return (
                 <NavLink to={"/collection/"+el.id} key={el.id}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
                   <div className='grid grid-cols-2'>
@@ -122,6 +143,35 @@ function Profile() {
                 </div></NavLink>)
             })}
             </div>
+            {collectionLimit < profile.collections.length &&
+              <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 ml-5 block hover:bg-blue-700' onClick={() => setCollectionLimit(val => val+10)}>See more</button>
+            }
+            </>
+          }
+          {profile.ratings.length > 0 &&
+            <>
+              <p className='text-slate-200 text-2xl ml-5 mt-16'>Recently rated</p>
+              <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
+                {recentlyrated.map((el,i) => 
+                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
+                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
+                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
+                </div></NavLink>)}
+              </div>
+            </>
+          }
+          {profile.reviews.length > 0 &&
+            <>
+              <p className='text-slate-200 text-2xl ml-5 mt-16'>Recent reviews</p>
+              <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
+                {recentreviews.map((el,i) => 
+                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
+                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
+                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
+                </div></NavLink>)}
+              </div>
             </>
           }
             </div>
