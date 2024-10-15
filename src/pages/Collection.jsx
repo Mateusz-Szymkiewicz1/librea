@@ -18,6 +18,7 @@ function Collection() {
   const [tags,setTags] = useState([])
   const [selectedTags,setSelectedTags] = useState([])
   const [sort, setSort] = useState("default")
+  const [bookCount, setBookCount] = useState(50)
   useEffect(() => {
     fetch("http://localhost:3000/tags").then(res => res.json()).then(res => {
       res.tags = JSON.parse(res.tags)
@@ -241,6 +242,26 @@ function Collection() {
       }),
     })
   }
+  var throttleTimer;
+  const throttle = (callback, time) => {
+    if (throttleTimer) return;
+    throttleTimer = true;
+    setTimeout(() => {
+      callback();
+      throttleTimer = false;
+    }, time);
+  };
+  const handleInfiniteScroll = () => {
+    throttle(() => {
+      const endOfPage = window.innerHeight + window.pageYOffset >= document.body.offsetHeight;
+      if (endOfPage) {
+        setBookCount(prevCount => prevCount + 50)
+      }
+    }, 1000);
+  };
+  useEffect(() => {
+    document.addEventListener('scroll', handleInfiniteScroll)
+  }, [])
   return (
     <>
       {collection &&
@@ -293,7 +314,7 @@ function Collection() {
                 }}
               />
             </div>
-          {filtered.map((el,i) => {
+          {filtered.slice(0, bookCount).map((el,i) => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
