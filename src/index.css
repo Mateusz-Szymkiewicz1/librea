@@ -63,3 +63,6 @@ border: 0;
 .highlightOption{
   @apply bg-neutral-500;
 }
+.p-button[aria-label="Upload"]{
+  display: none;
+}

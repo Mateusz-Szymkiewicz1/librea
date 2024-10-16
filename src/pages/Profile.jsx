@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useEffect } from "react"
 import NoMatch from "./NoMatch"
 import { NavLink } from "react-router-dom"
+import { FileUpload } from 'primereact/fileupload';
 
 function Profile() {
   const [profile, setProfile] = useState()
@@ -10,6 +11,7 @@ function Profile() {
   const [collectionLimit, setCollectionLimit] = useState(10)
   const [recentlyrated, setRecentlyrated] = useState([])
   const [recentreviews, setRecentreviews] = useState([])
+  const [changeProf, setChangeProf] = useState("opacity-0")
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -78,20 +80,41 @@ function Profile() {
       setLoading(false)
     })
   }, [])
+  const toggleAddProf = (e) => {
+    if(!user || user.login != profile.login) return
+    if(changeProf == "opacity-0"){
+      setChangeProf("opacity-100")
+    }else{
+      setChangeProf("opacity-0")
+    }
+  }
+  const closeProf = () => {
+    document.querySelector('.changeProfInput').classList.add("hidden")
+  }
+  const showProf = () => {
+    document.querySelector('.changeProfInput').classList.remove("hidden")
+  }
   return (
     <>
       <div className="px-5 mt-5">
         {profile &&
           <div className="px-5 mt-10 flex flex-col gap-5 sm:flex-row justify-center">
             <div className="flex flex-col bg-neutral-700 h-fit w-fit p-5 text-slate-200">
-                {profile.prof &&
-                  <img className="block h-52 w-52 cover-fit w-fit float-left" src={"/public/user_uploads/"+profile.prof}onError={(e) => {
-                  e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl ml-2">${profile.login.slice(0,1).toUpperCase()}</span>`
-                  }}></img>
-                }
-                {!profile.prof &&
-                  <span className="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl">{profile.login.slice(0,1).toUpperCase()}</span>
-                }
+                <div className="relative" onMouseEnter={toggleAddProf} onMouseLeave={toggleAddProf}>
+                  {profile.prof &&
+                    <img className="block h-52 w-52 cover-fit w-fit float-left" src={"/public/user_uploads/"+profile.prof}onError={(e) => {
+                    e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl ml-2">${profile.login.slice(0,1).toUpperCase()}</span>`
+                    }}></img>
+                  }
+                  {!profile.prof &&
+                    <span className="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl">{profile.login.slice(0,1).toUpperCase()}</span>
+                  }
+                  {user && user.login == profile.login &&
+                    <div onClick={showProf} style={{background: "rgb(60,60,60,0.7)"}} className={"changeProf cursor-pointer absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center "+changeProf}>
+                      <i className="fa fa-pencil text-4xl"></i>
+                    </div>
+                  }
+                </div>
                 <h1 className="text-4xl mt-3">{profile.login}</h1>
             </div>
             <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200">
@@ -174,6 +197,17 @@ function Profile() {
               </div>
             </>
           }
+            </div>
+            <div className="changeProfInput z-50 fixed hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+              <div className="bg-neutral-700 p-5 pb-8 text-white">
+                <div className="flex gap-10 justify-between">
+                  <h1 className="text-xl font-semibold">Change profile picture</h1>
+                  <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeProf}></i>
+                </div>
+                <div className="clear-both mt-5">
+                <FileUpload showuploadbutton="false" accept="image/*" maxFileSize={1000000} emptyTemplate={<p className="m-0">Upload an image.</p>}></FileUpload>
+              </div>
+              </div>
             </div>
           </div>
         }

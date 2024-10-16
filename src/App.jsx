@@ -10,6 +10,8 @@ import Search from './pages/Search.jsx';
 import Collection from './pages/Collection.jsx';
 import Profile from './pages/Profile.jsx';
 import { useLocation } from 'react-router-dom';
+import 'primereact/resources/themes/viva-dark/theme.css';
+import 'primereact/resources/primereact.min.css';
 
 function App() {
   const location = useLocation();

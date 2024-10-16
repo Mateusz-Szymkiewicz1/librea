@@ -29,6 +29,9 @@ function Header() {
       if(e.target.classList.contains("suggestion")){
         navigator("/book/"+e.target.dataset.book)
       }
+      if(!e.target.classList.contains("profMenu") && !document.querySelector(".dropdown_user").classList.contains("hidden")){
+        document.querySelector(".dropdown_user").classList.add("hidden")
+      }
       setAutofill([])
     })
   }, [])
@@ -94,12 +97,12 @@ function Header() {
               <div className="relative">
                 <span onClick={toggleDropdown} className="pr-5 block cursor-pointer">
                   {user.prof &&
-                    <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/"+user.prof} onError={(e) => {
-                    e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">${user.login.slice(0,1).toUpperCase()}</span>`
+                    <img className="block h-10 w-10 cover-fit w-fit float-left profMenu" src={"/public/user_uploads/"+user.prof} onError={(e) => {
+                    e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">${user.login.slice(0,1).toUpperCase()}</span>`
                     }}></img>
                   }
                   {!user.prof &&
-                    <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2">{user.login.slice(0,1).toUpperCase()}</span>
+                    <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">{user.login.slice(0,1).toUpperCase()}</span>
                   }
                 </span>
                 <div className="bg-neutral-700 border border-neutral-500 absolute top-16 right-5 p-2 w-32 hidden dropdown_user">
