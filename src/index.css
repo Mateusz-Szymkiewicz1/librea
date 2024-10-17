@@ -66,3 +66,6 @@ border: 0;
 .p-button[aria-label="Upload"]{
   display: none;
 }
+.p-badge-warning{
+  display: none;
+}

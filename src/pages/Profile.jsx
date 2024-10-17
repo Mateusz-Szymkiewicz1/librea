@@ -1,10 +1,11 @@
-import { useState } from "react"
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import NoMatch from "./NoMatch"
 import { NavLink } from "react-router-dom"
 import { FileUpload } from 'primereact/fileupload';
+import { useDecision } from "../components/useDecision";
 
 function Profile() {
+  const [msg, setMsg] = useState()
   const [profile, setProfile] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
@@ -13,6 +14,9 @@ function Profile() {
   const [recentreviews, setRecentreviews] = useState([])
   const [changeProf, setChangeProf] = useState("opacity-0")
   let search = window.location.href.split('/').at(-1)
+  const [newProf, setNewProf] = useState()
+  const [refresh, setRefresh] = useState(true)
+  const fileUploadRef = useRef(null);
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -79,10 +83,10 @@ function Profile() {
       }
       setLoading(false)
     })
-  }, [])
+  }, [refresh])
   const toggleAddProf = (e) => {
     if(!user || user.login != profile.login) return
-    if(changeProf == "opacity-0"){
+    if(e.type == "mouseenter"){
       setChangeProf("opacity-100")
     }else{
       setChangeProf("opacity-0")
@@ -90,9 +94,65 @@ function Profile() {
   }
   const closeProf = () => {
     document.querySelector('.changeProfInput').classList.add("hidden")
+    fileUploadRef.current.setFiles([])
   }
   const showProf = () => {
     document.querySelector('.changeProfInput').classList.remove("hidden")
+  }
+  const setProf = async (e) => {
+    if(!newProf){
+      setMsg({type: "error", text: "Choose a file first!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      const formData  = new FormData();
+    formData.append('login', profile.login);
+    formData.append('img', newProf[0]);
+    fetch("http://localhost:3000/setProf", {
+      credentials: 'include',
+      method: "POST",
+      body: formData
+    }).then(() => {
+      fileUploadRef.current.setFiles([])
+      closeProf()
+      setRefresh(!refresh)
+      setMsg({type: "msg", text: "You've just changed your profile picture!"})
+    })
+  }
+  const deleteProf = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/deleteProf", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          login: profile.login,
+          img: profile.prof
+        })
+      }).then(() => {
+        fileUploadRef.current.setFiles([])
+        closeProf()
+        setRefresh(!refresh)
+        setMsg({type: "msg", text: "You've just changed your profile picture!"})
+      })
   }
   return (
     <>
@@ -205,7 +265,9 @@ function Profile() {
                   <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeProf}></i>
                 </div>
                 <div className="clear-both mt-5">
-                <FileUpload showuploadbutton="false" accept="image/*" maxFileSize={1000000} emptyTemplate={<p className="m-0">Upload an image.</p>}></FileUpload>
+                <FileUpload ref={fileUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload an image.</p>} onSelect={(e) => setNewProf(e.files)} onClear={() => setNewProf([])} onRemove={() => setNewProf([])}></FileUpload>
+                <button onClick={setProf} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Set new picture</button>
+                <button onClick={deleteProf} className='bg-red-500 text-white px-7 text-lg p-3 mt-3 block hover:bg-red-600'>Delete your current picture</button>
               </div>
               </div>
             </div>
@@ -223,6 +285,22 @@ function Profile() {
         </div>
       }
       </div>
+      {msg &&
+      <>
+          <div className="fixed bottom-4 z-50 right-4 min-w-64">
+            <div className={"flex justify-between rounded-lg shadow-lg p-4 border "+(msg.type == "error" ? "bg-red-500 border-red-600" : "bg-green-500 border-green-600")}>
+                <p className="text-white text-lg mr-5 dark:text-slate-200">
+                { msg.text }
+                </p>
+                <button onClick={() => setMsg()} className="text-white dark:text-slate-200 focus:outline-none">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+          </div>
+        </>
+      }
     </>
   )
 }

@@ -42,7 +42,7 @@ function Header() {
       headers: {
         "Content-Type": "application/json",
       }
-    }).then(() => window.location.reload())
+    }).then(() => window.location.href = '/')
   }
   useEffect(() => {
     fetch("http://localhost:3000/login", {

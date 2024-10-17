@@ -9,7 +9,7 @@ var path = require ("path")
 var fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../../photos')
+    cb(null, '../public/user_uploads')
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
@@ -265,6 +265,25 @@ app.post('/collection_unlike', (req,res) => {
 app.post('/signout', (req,res) => {
   req.session.destroy()
   res.json("done")
+})
+
+app.post("/setProf", upload.single("img"), setProf);
+
+function setProf(req, res) {
+  if(!req.session.user) return
+  connection.query(`UPDATE users SET prof = ? WHERE login = ?`,[req.file.filename, req.body.login], (err, rows, fields) => {
+    res.json("done")
+  })
+}
+
+app.post('/deleteProf', (req,res) => {
+  if(!req.session.user) return
+  fs.unlink('../public/user_uploads/'+req.body.img, (err) => {
+    if (err) console.log("Was unable to delete the file")
+  })
+  connection.query(`UPDATE users SET prof = "" WHERE login = ?;`,[req.body.login], (err, rows, fields) => {
+    res.json("done")
+  })
 })
 
 app.listen(3000)
