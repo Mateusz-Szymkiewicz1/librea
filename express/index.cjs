@@ -234,6 +234,13 @@ app.post('/review_unlike', (req,res) => {
   })
 })
 
+app.post('/collection_delete', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM collections WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/collection_delete_book', (req,res) => {
   if(!req.session.user) return
   connection.query(`UPDATE collections SET books = ? WHERE id = ?;`,[JSON.stringify(req.body.books), req.body.collection], (err, rows, fields) => {
