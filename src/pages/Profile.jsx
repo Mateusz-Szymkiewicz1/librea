@@ -162,7 +162,7 @@ function Profile() {
             <div className="flex flex-col bg-neutral-700 h-fit w-fit p-5 text-slate-200">
                 <div className="relative" onMouseEnter={toggleAddProf} onMouseLeave={toggleAddProf}>
                   {profile.prof &&
-                    <img className="block h-52 w-52 cover-fit w-fit float-left" src={"/public/user_uploads/"+profile.prof}onError={(e) => {
+                    <img className="block h-52 w-52 cover-fit float-left" src={"/public/user_uploads/"+profile.prof}onError={(e) => {
                     e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl ml-2">${profile.login.slice(0,1).toUpperCase()}</span>`
                     }}></img>
                   }

@@ -97,7 +97,7 @@ function Header() {
               <div className="relative">
                 <span onClick={toggleDropdown} className="pr-5 block cursor-pointer">
                   {user.prof &&
-                    <img className="block h-10 w-10 cover-fit w-fit float-left profMenu" src={"/public/user_uploads/"+user.prof} onError={(e) => {
+                    <img className="block h-10 w-10 cover-fit float-left profMenu" src={"/public/user_uploads/"+user.prof} onError={(e) => {
                     e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">${user.login.slice(0,1).toUpperCase()}</span>`
                     }}></img>
                   }

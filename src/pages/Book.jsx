@@ -4,9 +4,10 @@ import { Rating } from 'react-simple-star-rating'
 import { NavLink } from "react-router-dom"
 import NoMatch from "./NoMatch"
 import ReactPaginate from 'react-paginate';
+import { useDecision } from "../components/useDecision"
 
 function Book() {
-  const book_id = window.location.href.split('/').at(-1)
+  const book_id = window.location.href.split('/').at(-1).split("#")[0]
   const [refresh, setRefresh] = useState(true)
   const [book, setBook] = useState({})
   const [rating, setRating] = useState(0)
@@ -147,6 +148,29 @@ function Book() {
       }
     })
   }
+  const deleteReview = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    fetch("http://localhost:3000/delete_review", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: review[0].id
+      })
+    }).then(() => {
+      setRefresh(!refresh)
+    })
+  }
   return (
     <>
       <div>
@@ -215,8 +239,9 @@ function Book() {
               {currentPage == 1 && review.map((el, i) => {
                 return (
                   <div className="bg-blue-950 p-5 text-white my-5" key={i}>
-                    <NavLink to={"/profile/"+el.user}>
-                    <h3 className="text-xl">
+                    <div className="flex justify-between">
+                    <NavLink to={"/profile/"+el.user} className="float-left">
+                    <h3 className="text-xl w-fit">
                       {el.prof &&
                         <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/"+el.prof} onError={(e) => {
                         e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
@@ -227,6 +252,8 @@ function Book() {
                       }
                       <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                     </h3></NavLink>
+                      <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteReview}></i></span>
+                    </div>
                     {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                     }

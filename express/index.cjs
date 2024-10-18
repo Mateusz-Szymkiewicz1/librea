@@ -212,6 +212,13 @@ app.post('/review', (req,res) => {
   })
 })
 
+app.post('/delete_review', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM reviews WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/new_collection', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO collections (user,name,books,description) VALUES ('${req.session.user}',?,?,?);`,[req.body.name,req.body.books, req.body.desc], (err, rows, fields) => {
