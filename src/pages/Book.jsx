@@ -116,8 +116,12 @@ function Book() {
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
             setUser(res2[0])
-            setRating(res2[0].ratings.find(x => x.book == book_id).rating)
-            setEditSpoiler(res2[0].reviews.find(x => x.book == book_id).spoiler)
+            if(res2[0].ratings.find(x => x.book == book_id)){
+              setRating(res2[0].ratings.find(x => x.book == book_id).rating)
+            }
+            if(res2[0].reviews.find(x => x.book == book_id)){
+              setEditSpoiler(res2[0].reviews.find(x => x.book == book_id).spoiler)
+            }
             setReview(res2[0].reviews.filter(x => x.book == book_id))
           }
         })

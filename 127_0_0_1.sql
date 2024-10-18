@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 14, 2024 at 07:24 PM
+-- Generation Time: Paź 18, 2024 at 08:52 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -71,8 +71,7 @@ CREATE TABLE `collections` (
 --
 
 INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`) VALUES
-(6, 'asd', 'asdasd', '[{\"id\":2},{\"id\":1},{\"id\":4},{\"id\":3}]', ''),
-(7, 'asd', 'French', '[{\"id\":1},{\"id\":2}]', 'fr fr');
+(6, 'asd', 'asdasd', '[{\"id\":2},{\"id\":1},{\"id\":4},{\"id\":3},{\"id\":6},{\"id\":5}]', '');
 
 -- --------------------------------------------------------
 
@@ -83,8 +82,8 @@ INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`) VALUES
 CREATE TABLE `likes` (
   `id` int(11) NOT NULL,
   `user` text NOT NULL,
-  `review` int(11) NOT NULL DEFAULT 0,
-  `collection` int(11) NOT NULL DEFAULT 0
+  `review` int(11) DEFAULT NULL,
+  `collection` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -92,7 +91,7 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`id`, `user`, `review`, `collection`) VALUES
-(42, 'asd', 0, 6);
+(42, 'asd', NULL, 6);
 
 -- --------------------------------------------------------
 
@@ -133,12 +132,12 @@ CREATE TABLE `reviews` (
 --
 
 INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
-(1, 'asd', 1, 'asdsvcxvcxv asd asdsvcxvcxv asd asdsvcxvcxv asd asdsvcxvcxv asdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxv asdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvsdasdsvcxvcxvasdasdsvcxvcxvdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxasdasdsvcxvcxvasdasdsvcxvcxvasdasdsvcxvcxv asd', 0),
 (6, 'fddf', 1, 'asdasdsa', 0),
 (7, 'yuuy', 1, 'sdfsdvbvc', 0),
 (8, 'vbnvbn', 1, 'gderret', 0),
 (9, 'gnbnvbn', 1, 'sdfsdfdsf', 0),
-(10, 'toopop', 1, 'asdasdasd', 0);
+(10, 'toopop', 1, 'asdasdasd', 0),
+(13, 'asd', 1, 'cvbvcc', 1);
 
 -- --------------------------------------------------------
 
@@ -157,7 +156,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('R-Yoz5b12LE6BR6WA4sUzYAHL0yy67en', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-15T21:00:39.271Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729026039);
+('1tej91GLfyGPopd2Mo-E-lFrkUfCzd4Y', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-19T16:58:12.673Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729357093);
 
 -- --------------------------------------------------------
 
@@ -196,7 +195,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `login`, `haslo`, `email`, `prof`) VALUES
-(1, 'asd', '$2a$10$o/eaYXmszOAk8F3oHXRzNeZaGzH0atmFpG.PRmq7vuSSxWr3Xowam', 'szymkiewiczmateusz1@gmail.com', ''),
+(1, 'asd', '$2a$10$o/eaYXmszOAk8F3oHXRzNeZaGzH0atmFpG.PRmq7vuSSxWr3Xowam', 'szymkiewiczmateusz1@gmail.com', '2230153dddfd1a96406dd811678dc5e01729196066059.jpg'),
 (2, 'qwerty', '$2a$10$hzi0yZyER4pXPMw1EB2R4umOcG1.plss1bgTc3Wd/iMb00fFOD8Y.', 'sfd@gmail.com', '');
 
 --
@@ -219,7 +218,10 @@ ALTER TABLE `collections`
 -- Indeksy dla tabeli `likes`
 --
 ALTER TABLE `likes`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `collection` (`collection`),
+  ADD KEY `review` (`review`),
+  ADD KEY `user` (`user`(768));
 
 --
 -- Indeksy dla tabeli `ratings`
@@ -249,7 +251,7 @@ ALTER TABLE `tags`
 -- Indeksy dla tabeli `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`,`login`(255)) USING BTREE;
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -265,13 +267,13 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `collections`
 --
 ALTER TABLE `collections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -283,7 +285,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -296,6 +298,17 @@ ALTER TABLE `tags`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `likes`
+--
+ALTER TABLE `likes`
+  ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
