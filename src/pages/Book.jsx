@@ -20,6 +20,8 @@ function Book() {
   const [pages, setPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
+  const [editReview, setEditReview] = useState("")
+  const [editSpoiler, setEditSpoiler] = useState("")
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -115,6 +117,7 @@ function Book() {
           if(!res2.text){
             setUser(res2[0])
             setRating(res2[0].ratings.find(x => x.book == book_id).rating)
+            setEditSpoiler(res2[0].reviews.find(x => x.book == book_id).spoiler)
             setReview(res2[0].reviews.filter(x => x.book == book_id))
           }
         })
@@ -170,6 +173,42 @@ function Book() {
     }).then(() => {
       setRefresh(!refresh)
     })
+  }
+  const closeEdit = () => {
+    document.querySelector('.edit').classList.add("hidden")
+  }
+  const showEdit = () => {
+    document.querySelector('.edit').classList.remove("hidden")
+  }
+  useEffect(() => {
+    if(review.length < 1) return
+    setEditReview(review[0].text)
+  }, [review])
+  const editReviewFun = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/edit_review", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: review[0].id,
+          text: editReview,
+          spoiler: editSpoiler
+        })
+      }).then(() => {
+        closeEdit()
+        setRefresh(!refresh)
+      })
   }
   return (
     <>
@@ -252,7 +291,7 @@ function Book() {
                       }
                       <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                     </h3></NavLink>
-                      <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteReview}></i></span>
+                      <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEdit}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteReview}></i></span>
                     </div>
                     {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
@@ -370,6 +409,27 @@ function Book() {
           </div>
         </>
       }
+      <div className="edit z-50 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Edit review</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEdit}></i>
+          </div>
+          <textarea value={editReview} onChange={(e) => setEditReview(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="What do you think?"/>
+          <div className="inline-flex mt-3 items-center">
+              <label className="flex items-center cursor-pointer relative mt-2">
+                <input checked={editSpoiler} onChange={(e) => setEditSpoiler(e.target.checked)} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
+                <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                  </svg>
+                </span>
+              </label>
+              <span className="text-white pl-2 pt-2">Mark as a spoiler</span>
+            </div> 
+        <button onClick={editReviewFun} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Edit</button>
+        </div>
+      </div>
     </>
   )
 }

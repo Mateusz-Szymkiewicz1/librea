@@ -212,6 +212,13 @@ app.post('/review', (req,res) => {
   })
 })
 
+app.post('/edit_review', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`UPDATE reviews SET text = ?, spoiler = ? WHERE id = ?`,[req.body.text,req.body.spoiler,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/delete_review', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM reviews WHERE id = ?`,[req.body.id], (err, rows, fields) => {
