@@ -23,6 +23,17 @@ function CollectionNew() {
     })
   }, [search])
   useEffect(() => {
+    fetch("http://localhost:3000/login", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(res => {
+      if(res.text){
+        window.location.href = "/"
+      }
+    })
     document.addEventListener("click", function(e){
       setAutofill([])
     })
@@ -60,6 +71,9 @@ function CollectionNew() {
       }),
     }).then(navigator("/"))
   }
+  const deleteBook = () => {
+    setBooks(books.filter(x => x.id != event.target.dataset.id))
+  }
   return (
     <>
       <div className="lg:mt-10 w-full lg:w-1/2 float-left p-2 sm:p-5">
@@ -73,7 +87,10 @@ function CollectionNew() {
           }
           {books.map(el => {
             return (
-              <span key={el.id} className="block text-white bg-neutral-600 p-3 border-b border-neutral-800 mb-2" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1"></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span>
+              <span key={el.id} className="block relative text-white bg-neutral-600 p-3 border-b border-neutral-800 mb-2" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1"></img>
+              <span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span>
+              <i className="fa fa-close text-red-500 font-bold text-2xl absolute right-3 top-5 cursor-pointer" data-id={el.id} onClick={deleteBook}></i>
+              </span>
             )
           })}
           <button className='bg-blue-600 text-white px-10 text-lg p-3 mt-16 block hover:bg-blue-700' onClick={createCollection}>Create collection</button>

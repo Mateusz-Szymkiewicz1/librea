@@ -288,7 +288,13 @@ function Collection() {
       {collection &&
       <>
         <div className="px-5 mt-10">
-          <h1 className="text-slate-200 text-3xl flex justify-between"><span>{collection.name}<i className="fa fa-pencil ml-2 text-amber-500 cursor-pointer text-2xl" onClick={showEdit}></i><i className="fa fa-trash ml-2 text-red-600 cursor-pointer text-2xl" onClick={deleteCollection}></i></span><div>
+          <h1 className="text-slate-200 text-3xl flex justify-between"><span>{collection.name}
+            {user && user.login == collection.user &&
+              <>
+              <i className="fa fa-pencil ml-2 text-amber-500 cursor-pointer text-2xl" onClick={showEdit}></i><i className="fa fa-trash ml-2 text-red-600 cursor-pointer text-2xl" onClick={deleteCollection}></i>
+              </>
+            }
+            </span><div>
             <span className="text-slate-200 text-2xl">{collection.likes}</span>
             {!user &&
               <NavLink to={"/login"}><i className="fa-regular ml-3 fa-heart text-2xl cursor-pointer"></i></NavLink>
