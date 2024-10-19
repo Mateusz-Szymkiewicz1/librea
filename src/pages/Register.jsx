@@ -36,6 +36,10 @@ function Register() {
       setError("Passwords aren't equal!")
       return;
     }
+    if(pass.length < 5){
+      setError("Password is too short!")
+      return;
+    }
     fetch("http://localhost:3000/register", {
       credentials: 'include',
       method: "POST",

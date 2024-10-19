@@ -136,6 +136,14 @@ app.post('/change_login', (req,res) => {
   })
 })
 
+app.post('/change_password', (req,res) => {
+  if(!req.session.user) return
+  const pass = req.body.new_pass;
+  const pass_hashed = bcrypt.hashSync(pass)
+  connection.query(`UPDATE users SET haslo = ? WHERE login = ?;`,[pass_hashed,req.session.user], (err2, rows2, fields2) => {
+    res.json("done")
+  })
+})
 
 app.post('/search', (req,res) => {
   let sort = "books.id ASC"

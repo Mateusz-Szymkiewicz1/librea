@@ -6,7 +6,9 @@ function Settings() {
   const [loading, setLoading] = useState(true)
   const [editLogin, setEditLogin] = useState("")
   const [editPass, setEditPass] = useState("")
+  const [editPass2, setEditPass2] = useState("")
   const [showPass, setShowPass] = useState(false)
+  const [showPass2, setShowPass2] = useState(false)
   const [msg, setMsg] = useState()
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -42,11 +44,23 @@ function Settings() {
       document.querySelector('#password').type = "password"
     }
   }
+  const togglePassword2 = (e) => {
+    setShowPass2(!showPass2)
+    if(document.querySelector('#password2').type == "password"){
+      document.querySelector('#password2').type = "text"
+    }else{
+      document.querySelector('#password2').type = "password"
+    }
+  }
   const changeLogin = async () => {
     if(!editLogin || editLogin == user.login){
       setMsg({type: "error", text: "Type in a new username first!"})
       return;
     }
+    if(!/^[A-Za-z0-9]+([A-Za-z0-9]*|[]?[A-Za-z0-9]+)*$/.test(editLogin)){
+      setMsg({type: "error",text: "Can't put special characters in the username!"})
+      return
+    } 
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
       const response = await useDecision().then(function () {
           document.querySelector(".decision").remove()
@@ -75,17 +89,58 @@ function Settings() {
         }).then(() => window.location.href = '/login')
       })
   }
+  const changePass = async () => {
+    if(!editPass || !editPass2){
+      setMsg({type: "error",text: "Type in your new password first!"})
+      return;
+    }
+    if(editPass != editPass2){
+      setMsg({type: "error",text: "The passwords are not the same!"})
+      return;
+    }
+    if(editPass.length < 5){
+      setMsg({type:"error", text: "Password is too short!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/change_password", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          new_pass: editPass
+        }),
+      }).then(res => {
+        fetch("http://localhost:3000/signout", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        }).then(() => window.location.href = '/login')
+      })
+  }
   return (
     <div className="ml-10 mt-10">
       {user &&
         <>
           <h1 className="text-3xl">Settings</h1>
           <p className="text-xl text-slate-200 mt-16">Account</p>
-          <div className="flex items-center flex-wrap mt-5">
+          <div className="flex flex-col flex-wrap mt-5">
           <input type="text" maxLength="50" onChange={(e) => setEditLogin(e.target.value)} className="mt-4 p-2 w-56 bg-neutral-600 rounded-md focus:outline-none mr-2" placeholder={user.login}></input>
-          <button onClick={changeLogin} className="bg-blue-500 p-2 mt-4 px-4 hover:bg-blue-600">Change username</button>
+          <button onClick={changeLogin} className="bg-blue-500 w-fit p-2 mt-4 px-4 hover:bg-blue-600">Change username</button>
           </div>
-          <div className="flex items-center mt-5 flex-wrap">
+          <div className="flex flex-col mt-5">
           <div className="relative w-fit mr-2">
             <input placeholder="********" id="password" type="password" onChange={(e) => setEditPass(e.target.value)} maxLength="100" className="mt-3 p-2 pr-10 w-50 bg-neutral-600 rounded-md focus:outline-none"></input>
             <button onClick={togglePassword} type="button" className="absolute inset-y-8 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none text-neutral-400">
@@ -103,7 +158,24 @@ function Settings() {
               </svg>
             </button>
         </div>
-        <button className="bg-blue-500 h-10 px-4 hover:bg-blue-600 mt-3">Change password</button>
+        <div className="relative w-fit mr-2">
+            <input placeholder="********" id="password2" type="password" onChange={(e) => setEditPass2(e.target.value)} maxLength="100" className="mt-3 p-2 pr-10 w-50 bg-neutral-600 rounded-md focus:outline-none"></input>
+            <button onClick={togglePassword2} type="button" className="absolute inset-y-8 end-0 flex items-center z-20 px-3 cursor-pointer rounded-e-md focus:outline-none text-neutral-400">
+              <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {!showPass2 && 
+                  <>
+                  <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                  <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                  <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                  <line x1="2" x2="22" y1="2" y2="22"></line>    
+                  </> 
+                }
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+        </div>
+        <button className="bg-blue-500 w-fit h-10 px-4 hover:bg-blue-600 mt-3" onClick={changePass}>Change password</button>
         </div>
         </>
       }
