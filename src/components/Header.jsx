@@ -80,9 +80,9 @@ function Header() {
           <NavLink to="/"><img src="/icon.png" className="h-16 sm:block hidden"></img></NavLink>   
           <div className="z-40 flex h-11 sm:w-96 w-50 gap-1 relative mr-2">
             <input onKeyUp={handleSearch} type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full outline-none h-11 bg-neutral-800 text-slate-200 text-sm px-3" />
-            <button type='button' className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4">
+            <NavLink className="h-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4" to={user ? "/explore" : "/login"}>
               <i className="fa fa-binoculars"></i>
-            </button>
+            </NavLink>
             <div className="absolute top-12 right-0 left-0 flex flex-col">
               {autofill.map(el => {
                 return (

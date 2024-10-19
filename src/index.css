@@ -28,7 +28,6 @@ font-size: 26px;
 font-weight: 600;
 }
 .decision button{
-border: 0;
   outline: none;
   height: 35px;
   width: 100px;
@@ -36,19 +35,13 @@ border: 0;
   margin-left: 10px;
   margin-top: 20px;
   cursor: pointer;
-  transition: 0.4s;
+  transition: 0.3s;
 }
 #button_nie{
-  background: #e74c3c;
-}
-.dark #button_nie{
-  background: #d63b2b;
+  @apply bg-red-500 hover:bg-red-600;
 }
 #button_tak{
-  background: #2ecc71;
-}
-.dark #button_tak{
-  background: #1dbb60;
+  @apply bg-blue-500 hover:bg-blue-600;
 }
 @keyframes slideInDown{0%{-webkit-transform:translate3d(0,-100%,0);transform:translate3d(0,-100%,0);visibility:visible}to{-webkit-transform:translateZ(0);transform:translateZ(0)}}
 

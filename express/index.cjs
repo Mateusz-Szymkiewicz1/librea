@@ -70,6 +70,14 @@ app.get('/book/:id', (req,res) => {
   })
 })
 
+app.get('/popular_books', (req,res) => {
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ratings FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id HAVING COUNT(ratings.id) > 0 ORDER BY COUNT(ratings.id) DESC LIMIT 10`, (err, rows, fields) => {
+    if(rows && rows.length > 0){
+      res.send(rows)
+    }
+  })
+})
+
 app.get('/collection/:id', (req,res) => {
   connection.query(`SELECT collections.*, COUNT(likes.id) AS likes FROM collections LEFT JOIN likes ON collections.id = likes.collection WHERE collections.id = ? GROUP BY collections.id`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
@@ -204,10 +212,10 @@ app.post('/login', (req,res) => {
         req.session.user = rows[0].login
         res.send({status: 200})
       }else{
-        res.send({ status: 0, text: "Niepoprawne dane logowania!"})
+        res.send({ status: 0, text: "Wrong username/password!"})
       }
     }else{
-      res.send({ status: 0, text: "Niepoprawne dane logowania!"})
+      res.send({ status: 0, text: "Wrong username/password!"})
     }
   })
 })

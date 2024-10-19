@@ -219,7 +219,7 @@ function Book() {
       <div>
           {book.id > 0 &&
             <>
-              <div className="sm:pl-10 pl-3">
+              <div className="sm:pl-5 pl-3">
               <img className="sm:mt-10 mt-5 float-left mr-10 h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
               <div className="float-left mt-10 mr-10 text-slate-200">
                 <h1 className="text-white text-4xl">{book.tytul}</h1>
@@ -245,7 +245,7 @@ function Book() {
               </div>
               <p className="clear-both text-slate-200 mr-16 py-10">{book.opis}</p>
               </div>
-              <div className="bg-neutral-600 sm:ml-10 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
+              <div className="bg-neutral-600 sm:ml-5 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
                 <h3 className="text-white text-xl font-semibold mb-2">What's <span className="font-bold">your</span> rating?</h3>
                 {!user &&
                   <p className="text-slate-200 pb-3">You need to be logged in to vote.</p>
@@ -261,7 +261,7 @@ function Book() {
                   iconsCount={10}
                 />
               </div>
-              <div className="sm:pl-10 pl-3 sm:pr-16 pr-3">
+              <div className="sm:pl-5 pl-3 sm:pr-16 pr-3">
               <h2 id="reviews" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
               <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
               <div className="inline-flex items-center">

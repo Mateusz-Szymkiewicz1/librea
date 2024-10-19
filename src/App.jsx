@@ -13,6 +13,7 @@ import { useLocation } from 'react-router-dom';
 import 'primereact/resources/themes/viva-dark/theme.css';
 import 'primereact/resources/primereact.min.css';
 import Settings from './pages/Settings.jsx';
+import Explore from './pages/Explore.jsx';
 
 function App() {
   const location = useLocation();
@@ -30,6 +31,7 @@ function App() {
             <Route path="/collection/new" element={<CollectionNew />} />
             <Route path="/collection/:id" element={<Collection key={location.pathname} />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/explore" element={<Explore />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
       </div>

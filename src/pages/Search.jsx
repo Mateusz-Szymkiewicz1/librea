@@ -36,7 +36,7 @@ function Search() {
   }, [])
   return (
     <>
-      <div className="sm:px-10 px-3 mt-10">
+      <div className="sm:px-5 px-3 mt-10">
         <h1 className="text-white text-3xl">Results for "{search}" ({wyniki.length}):</h1>
         {wyniki.length == 0 &&
           <h1 className="text-neutral-400 text-2xl pt-2">Sorry, we didn't find anything. Try searching something different</h1>

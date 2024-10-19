@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 19, 2024 at 05:00 PM
+-- Generation Time: Paź 19, 2024 at 07:54 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -20,6 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `librea`
 --
+DROP DATABASE IF EXISTS `librea`;
 CREATE DATABASE IF NOT EXISTS `librea` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `librea`;
 
@@ -152,7 +153,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('p1Hvi6pll_XIcuAWqFKzWw6907pOlD51', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-21T15:00:23.910Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729522824),
+('iGGIpBRpzl9xPCu9q1-7ak6vE-A-KKk5', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-21T15:17:59.352Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729523879),
 ('w55GXoOa4T_oNIQ8egf2xMBlZZSkdq74', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-21T14:00:24.186Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729519224);
 
 -- --------------------------------------------------------
@@ -191,7 +192,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`login`, `haslo`, `email`, `prof`) VALUES
-('asd', '$2a$10$o/eaYXmszOAk8F3oHXRzNeZaGzH0atmFpG.PRmq7vuSSxWr3Xowam', 'szymkiewiczmateusz1@gmail.com', '2230153dddfd1a96406dd811678dc5e01729196066059.jpg');
+('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '2230153dddfd1a96406dd811678dc5e01729196066059.jpg');
 
 --
 -- Indeksy dla zrzutów tabel
@@ -224,14 +225,16 @@ ALTER TABLE `likes`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user` (`user`);
+  ADD KEY `user` (`user`),
+  ADD KEY `book` (`book`);
 
 --
 -- Indeksy dla tabeli `reviews`
 --
 ALTER TABLE `reviews`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `user` (`user`);
+  ADD KEY `user` (`user`),
+  ADD KEY `book` (`book`);
 
 --
 -- Indeksy dla tabeli `sessions`
@@ -313,13 +316,15 @@ ALTER TABLE `likes`
 -- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
-  ADD CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`book`) REFERENCES `books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `reviews`
 --
 ALTER TABLE `reviews`
-  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`book`) REFERENCES `books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

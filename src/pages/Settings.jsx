@@ -131,12 +131,13 @@ function Settings() {
       })
   }
   return (
-    <div className="ml-10 mt-10">
+    <div className="ml-5 mt-10">
       {user &&
         <>
-          <h1 className="text-3xl">Settings</h1>
+          <h1 className="text-3xl"><i className="fa fa-cogs mr-3 text-blue-500"></i>Settings</h1>
           <p className="text-xl text-slate-200 mt-16">Account</p>
-          <div className="flex flex-col flex-wrap mt-5">
+          <div className="bg-neutral-900 p-5 w-fit mt-5">
+          <div className="flex flex-col flex-wrap">
           <input type="text" maxLength="50" onChange={(e) => setEditLogin(e.target.value)} className="mt-4 p-2 w-56 bg-neutral-600 rounded-md focus:outline-none mr-2" placeholder={user.login}></input>
           <button onClick={changeLogin} className="bg-blue-500 w-fit p-2 mt-4 px-4 hover:bg-blue-600">Change username</button>
           </div>
@@ -176,6 +177,7 @@ function Settings() {
             </button>
         </div>
         <button className="bg-blue-500 w-fit h-10 px-4 hover:bg-blue-600 mt-3" onClick={changePass}>Change password</button>
+        </div>
         </div>
         </>
       }
