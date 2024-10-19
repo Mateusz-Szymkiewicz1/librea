@@ -123,6 +123,20 @@ app.post('/user/:login', (req,res) => {
   })
 })
 
+app.post('/change_login', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT login FROM users WHERE users.login = ?`,[req.body.new_login], (err, rows, fields) => {
+    if(rows.length == 0){
+      connection.query(`UPDATE users SET login = ? WHERE login = ?;`,[req.body.new_login,req.session.user], (err2, rows2, fields2) => {
+        res.json("done")
+      })
+    }else{
+      res.json("Username is taken!")
+    }
+  })
+})
+
+
 app.post('/search', (req,res) => {
   let sort = "books.id ASC"
   if(req.body.sort == "author"){
