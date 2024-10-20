@@ -15,13 +15,14 @@ function Book() {
   const [review, setReview] = useState([])
   const [textarea, setTextarea] = useState("")
   const [spoiler, setSpoiler] = useState(false)
-  const [error, setError] = useState("")
+  const [msg, setMsg] = useState("")
   const [reviewCount, setReviewCount] = useState(0)
   const [pages, setPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [editReview, setEditReview] = useState("")
   const [editSpoiler, setEditSpoiler] = useState("")
+  const [newCollections, setNewCollections] = useState([])
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -68,11 +69,11 @@ function Book() {
   const handleReview = () => {
     if(!user) return
     if(review.length > 0){
-      setError("You have written a review already. You can edit it!")
+      setMsg({type:"error", text: "You have written a review already. You can edit it!"})
       return
     }
     if(textarea.length < 1){
-      setError("Don't send an empty review!")
+      setMsg({type:"error",text: "Don't send an empty review!"})
       return
     }else{
       fetch("http://localhost:3000/review", {
@@ -92,6 +93,7 @@ function Book() {
           document.querySelector("textarea").value = ""
           document.querySelector("input[type=checkbox]").checked = false
           setRefresh(!refresh)
+          setMsg({type:"msg",text:"Review published!"})
       })
     }
   }
@@ -176,6 +178,7 @@ function Book() {
       })
     }).then(() => {
       setRefresh(!refresh)
+      setMsg({type:"msg",text:"Review deleted!"})
     })
   }
   const closeEdit = () => {
@@ -184,11 +187,21 @@ function Book() {
   const showEdit = () => {
     document.querySelector('.edit').classList.remove("hidden")
   }
+  const closeAddToCollection = () => {
+    document.querySelector('.add_to_collection').classList.add("hidden")
+  }
+  const showAddToCollection = () => {
+    document.querySelector('.add_to_collection').classList.remove("hidden")
+  }
   useEffect(() => {
     if(review.length < 1) return
     setEditReview(review[0].text)
   }, [review])
   const editReviewFun = async () => {
+    if(editReview.length < 1){
+      setMsg({type:"error", text: "Write something!"})
+      return;
+    }
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
       const response = await useDecision().then(function () {
           document.querySelector(".decision").remove()
@@ -212,7 +225,23 @@ function Book() {
       }).then(() => {
         closeEdit()
         setRefresh(!refresh)
+        setMsg({type:"msg",text:"Review changed!"})
       })
+  }
+  const addToCollection = async () => {
+    if(newCollections.length == 0){
+      setMsg({type:"error", text: "Check something first!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
   }
   return (
     <>
@@ -244,6 +273,27 @@ function Book() {
                 </div>
               </div>
               <p className="clear-both text-slate-200 mr-16 py-10">{book.opis}</p>
+              {user && user.collections.length > 0 &&
+                <>
+                  <p className="text-xl mr-16 pb-10">
+                    {user.collections.find(x => x.books.includes(":"+book_id+"}")) &&
+                      <span className="mr-2">In your collections:</span>
+                    }    
+                    {user.collections.map((el,i) => {
+                      if(el.books.includes(":"+book_id+"}")){
+                        return(
+                          <span key={i}>
+                          <NavLink className="text-blue-500 underline" to={"/collection/"+el.id}><span>{el.name}</span></NavLink>
+                          <span>, </span>
+                          </span>
+                        )
+                      }
+                     })}</p>
+                  {user.collections.find(x => !x.books.includes(":"+book_id+"}")) &&
+                  <button onClick={showAddToCollection} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add to a collection</button>
+                  }
+                </>
+              }
               </div>
               <div className="bg-neutral-600 sm:ml-5 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
                 <h3 className="text-white text-xl font-semibold mb-2">What's <span className="font-bold">your</span> rating?</h3>
@@ -397,14 +447,14 @@ function Book() {
         </svg>
         </div>
       }
-      {error &&
+      {msg &&
       <>
           <div className="fixed bottom-4 z-50 right-4 min-w-64">
-            <div className="flex justify-between rounded-lg shadow-lg p-4 border bg-red-500 border border-red-600">
+            <div className={"flex justify-between rounded-lg shadow-lg p-4 border "+(msg.type == "error" ? "bg-red-500 border-red-600" : "bg-green-500 border-green-600")}>
                 <p className="text-white text-lg mr-5 dark:text-slate-200">
-                { error }
+                { msg.text }
                 </p>
-                <button onClick={() => setError("")} className="text-white dark:text-slate-200 focus:outline-none">
+                <button onClick={() => setMsg()} className="text-white dark:text-slate-200 focus:outline-none">
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -413,7 +463,9 @@ function Book() {
           </div>
         </>
       }
-      <div className="edit z-50 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+      {user &&
+      <>
+      <div className="edit z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
         <div className="bg-neutral-700 p-5 pb-8 text-white">
           <div className="flex justify-between">
             <h1 className="text-xl font-semibold">Edit review</h1>
@@ -434,6 +486,36 @@ function Book() {
         <button onClick={editReviewFun} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Edit</button>
         </div>
       </div>
+      <div className="add_to_collection z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+      <div className="bg-neutral-700 p-5 pb-8 text-white">
+        <div className="flex justify-between gap-5">
+          <h1 className="text-xl font-semibold">Add to collections</h1>
+          <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeAddToCollection}></i>
+        </div>
+      <div className="flex flex-col mt-4">
+        {user.collections.map((el,i) => {
+          if(!el.books.includes(":"+book_id+"}")){
+            return(
+              <div key={i} className="bg-neutral-600 p-3 flex justify-between mt-3">
+                <p className="text-xl">{el.name}</p>
+                <label className="flex items-center cursor-pointer relative mt-1">
+                <input onClick={(e) => e.target.checked ? newCollections.push(el.id) : setNewCollections(newCollections.filter(x => x != el.id))} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
+                <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
+                  </svg>
+                </span>
+              </label>
+              </div>
+            )
+          }
+        })}
+      </div>
+      <button onClick={addToCollection} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Add</button>
+      </div>
+    </div>
+    </>
+      }
     </>
   )
 }
