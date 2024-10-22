@@ -242,6 +242,22 @@ function Book() {
           return "stop"
       });
       if(response) return
+      newCollections.forEach(el => {
+        fetch("http://localhost:3000/collection_add_book", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            collection: el,
+            book: book_id
+          })
+        }).then(res => res.json()).then(res =>{
+          closeAddToCollection()
+          setRefresh(!refresh)
+        })
+      })
   }
   return (
     <>

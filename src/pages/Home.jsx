@@ -8,7 +8,11 @@ function Home() {
   const [recentlyrated, setRecentlyrated] = useState([])
   const [recentreviews, setRecentreviews] = useState([])
   const [loading, setLoading] = useState(true)
+  const [popular, setPopular] = useState([])
   useEffect(() => {
+    fetch("http://localhost:3000/popular_books").then(res => res.json()).then(res => {
+      setPopular([...res])
+    })
     fetch("http://localhost:3000/login", {
       credentials: 'include',
       method: "POST",
@@ -44,7 +48,8 @@ function Home() {
               res2[0].ratings.slice(-5).reverse().forEach(el => {
                 fetch("http://localhost:3000/book/"+el.book).then(res => res.json()).then(res => {
                   if(!res.text){
-                    setRecentlyrated([...recentlyrated, res[0]])
+                    recentlyrated.push(res[0])
+                    setRecentlyrated([...recentlyrated])
                   }
                 })
               })
@@ -103,6 +108,21 @@ function Home() {
             <i className="fa fa-binoculars text-3xl mb-3"></i>
             <p className='text-2xl'>Discover</p>
           </div>
+        </div>
+        <div className='ml-3 sm:ml-5'>
+        {popular.length > 0 &&
+            <>
+              <p className='text-slate-200 font-semibold text-2xl mt-16'>Popular recently</p>
+              <div className='flex flex-wrap gap-5 my-3 mb-20'>
+                {popular.map((el,i) => 
+                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
+                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
+                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
+                </div></NavLink>)}
+              </div>
+            </>
+          }
         </div>
       </div> }
       {!user && loading &&

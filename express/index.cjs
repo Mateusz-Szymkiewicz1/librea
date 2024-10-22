@@ -292,6 +292,18 @@ app.post('/collection_delete_book', (req,res) => {
   })
 })
 
+app.post('/collection_add_book', (req,res) => {
+  if(!req.session.user) return
+  let books = []
+  connection.query(`SELECT books FROM collections WHERE id = ?`,[req.body.collection], (err, rows, fields) => {
+    books = [...JSON.parse(rows[0].books)]
+    books.push({id: parseInt(req.body.book)})
+    connection.query(`UPDATE collections SET books = ? WHERE id = ?;`,[JSON.stringify(books), req.body.collection], (err, rows, fields) => {
+      res.json("done")
+    })
+  })
+})
+
 app.post('/collection_edit_info', (req,res) => {
   if(!req.session.user) return
   connection.query(`UPDATE collections SET name = ?, description = ? WHERE id = ?;`,[req.body.name,req.body.desc,req.body.collection], (err, rows, fields) => {
