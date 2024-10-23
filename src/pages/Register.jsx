@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 
-function Register() {
+function Register(props) {
   const navigate = useNavigate()
   const validateEmail = (email) => {
     return String(email)
@@ -17,27 +17,26 @@ function Register() {
   const [pass, setPass] = useState("")
   const [passrepeat, setPassrepeat] = useState("")
   const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
   const submit = (e) => {
     e.preventDefault();
     if(!pass || !passrepeat || !login || !email){
-      setError("Fill all the inputs!")
+      props.setToast({type:"error", text: "Fill all the inputs!"})
       return;
     }
     if(!/^[A-Za-z0-9]+([A-Za-z0-9]*|[]?[A-Za-z0-9]+)*$/.test(login)){
-      setError("Can't put special characters in the username!")
+      props.setToast({type:"error", text: "Can't put special characters in your name!"})
       return
     } 
     if(!validateEmail(email)){
-      setError("Invalid email!")
+      props.setToast({type:"error", text: "Invalid email!"})
       return
     }
     if(pass != passrepeat){
-      setError("Passwords aren't equal!")
+      props.setToast({type:"error", text: "Passwords arent equal!"})
       return;
     }
     if(pass.length < 5){
-      setError("Password is too short!")
+      props.setToast({type:"error", text: "Password is too short!"})
       return;
     }
     fetch("http://localhost:3000/register", {
@@ -51,7 +50,14 @@ function Register() {
         pass: pass,
         email: email
       }),
-    }).then(navigate("/login"))
+    }).then(res => res.json()).then(res => {
+      if(res.text){
+        props.setToast({type:"error", text: res.text})
+      }else{
+        props.setToast({type:"msg", text: "Success! Now log in!", stay: true})
+        navigate("/login")
+      }
+    })
   }
   const togglePassword = (e) => {
     setPass1(!pass1)
@@ -224,22 +230,6 @@ function Register() {
   </div>
 </div>
       </div>
-      {error &&
-      <>
-          <div className="fixed bottom-4 z-50 right-4 min-w-64">
-            <div className="flex justify-between rounded-lg shadow-lg p-4 border bg-red-500 border border-red-600">
-                <p className="text-white text-lg mr-5 dark:text-slate-200">
-                { error }
-                </p>
-                <button onClick={() => setError("")} className="text-white dark:text-slate-200 focus:outline-none">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-          </div>
-        </>
-      }
     </>
   )
 }

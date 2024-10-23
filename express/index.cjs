@@ -7,9 +7,9 @@ const multer = require("multer");
 var crypto = require ("crypto")
 var path = require ("path")
 var fs = require('fs');
-const storage = multer.diskStorage({
+const profs_storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../public/user_uploads')
+    cb(null, '../public/user_uploads/profs')
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
@@ -17,7 +17,18 @@ const storage = multer.diskStorage({
     });
   }
 });
-const upload = multer({ storage: storage, limits: {fieldSize: 50*1024*1024} });
+const covers_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../public/user_uploads/covers')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
+    });
+  }
+});
+const profs_upload = multer({ storage: profs_storage, limits: {fieldSize: 50*1024*1024} });
+const covers_upload = multer({ storage: covers_storage, limits: {fieldSize: 50*1024*1024} });
 MySQLStore = require('connect-mysql')(session)
 const app = express().use(express.json())
 
@@ -195,10 +206,22 @@ app.get('/search_autocomplete/:search', (req,res) => {
 })
 
 app.post('/register', (req,res) => {
-  const pass = req.body.pass;
-  const pass_hashed = bcrypt.hashSync(pass)
-  connection.query(`INSERT INTO users(login,haslo,email,prof) VALUES (?,?,?,"");`,[req.body.login,pass_hashed,req.body.email], (err, rows, fields) => {
-    res.json("done")
+  connection.query(`SELECT login FROM users WHERE login = ?;`,[req.body.login], (err, rows, fields) => {
+    if(rows.length > 0){
+      res.send({ status: 0, text: "Username taken!"})
+      return;
+    }
+    connection.query(`SELECT login FROM users WHERE email = ?;`,[req.body.email], (err, rows, fields) => {
+      if(rows.length > 0){
+        res.send({ status: 0, text: "E-mail already in use!"})
+        return;
+      }
+      const pass = req.body.pass;
+      const pass_hashed = bcrypt.hashSync(pass)
+      connection.query(`INSERT INTO users(login,haslo,email,prof) VALUES (?,?,?,"");`,[req.body.login,pass_hashed,req.body.email], (err, rows, fields) => {
+        res.json("done")
+      })
+    })
   })
 })
 
@@ -330,7 +353,7 @@ app.post('/signout', (req,res) => {
   res.json("done")
 })
 
-app.post("/setProf", upload.single("img"), setProf);
+app.post("/setProf", profs_upload.single("img"), setProf);
 
 function setProf(req, res) {
   if(!req.session.user) return
@@ -341,7 +364,7 @@ function setProf(req, res) {
 
 app.post('/deleteProf', (req,res) => {
   if(!req.session.user) return
-  fs.unlink('../public/user_uploads/'+req.body.img, (err) => {
+  fs.unlink('../public/user_uploads/profs/'+req.body.img, (err) => {
     if (err) console.log("Was unable to delete the file")
   })
   connection.query(`UPDATE users SET prof = "" WHERE login = ?;`,[req.body.login], (err, rows, fields) => {

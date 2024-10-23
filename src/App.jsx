@@ -14,26 +14,43 @@ import 'primereact/resources/themes/viva-dark/theme.css';
 import 'primereact/resources/primereact.min.css';
 import Settings from './pages/Settings.jsx';
 import Explore from './pages/Explore.jsx';
+import Toast from './components/Toast.jsx';
+import { useEffect, useState } from 'react';
 
 function App() {
+  const [msg,setMsg] = useState()
   const location = useLocation();
+  const closeToast = () => {
+    setMsg()
+  }
+  const setToast = (msg) => {
+    setMsg(msg)
+  }
+  useEffect(() => {
+    if(msg && !msg.stay){
+      setMsg()
+    }
+  }, [location])
   return (
     <>
       <div>
           <Header key={location.pathname} ></Header>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/book/:id" element={<Book key={location.pathname} />} />
+            <Route path="/login" element={<Login setToast={setToast} />} />
+            <Route path="/register" element={<Register setToast={setToast} />} />
+            <Route path="/book/:id" element={<Book key={location.pathname} setToast={setToast} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />
-            <Route path="/profile/:user" element={<Profile key={location.pathname} />} />
-            <Route path="/collection/new" element={<CollectionNew />} />
-            <Route path="/collection/:id" element={<Collection key={location.pathname} />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile/:user" element={<Profile key={location.pathname} setToast={setToast} />} />
+            <Route path="/collection/new" element={<CollectionNew setToast={setToast} />} />
+            <Route path="/collection/:id" element={<Collection key={location.pathname} setToast={setToast} />} />
+            <Route path="/settings" element={<Settings setToast={setToast} />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
+          {msg &&
+            <Toast msg={msg} closeToast={closeToast}></Toast>
+          }
       </div>
     </>
   )

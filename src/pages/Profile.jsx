@@ -4,8 +4,7 @@ import { NavLink } from "react-router-dom"
 import { FileUpload } from 'primereact/fileupload';
 import { useDecision } from "../components/useDecision";
 
-function Profile() {
-  const [msg, setMsg] = useState()
+function Profile(props) {
   const [profile, setProfile] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
@@ -65,8 +64,9 @@ function Profile() {
         if(res[0].ratings){
           res[0].ratings.slice(-5).reverse().forEach(el => {
             fetch("http://localhost:3000/book/"+el.book).then(res2 => res2.json()).then(res2 => {
-              if(!res2.text){
-                setRecentlyrated([...recentlyrated, res2[0]])
+              if(!res2.text && !recentlyrated.find(x => x.id == res2[0].id)){
+                recentlyrated.push(res2[0])
+                setRecentlyrated([...recentlyrated])
               }
             })
           })
@@ -74,7 +74,7 @@ function Profile() {
         if(res[0].reviews){
           res[0].reviews.slice(-5).reverse().forEach(el => {
             fetch("http://localhost:3000/book/"+el.book).then(res2 => res2.json()).then(res2 => {
-              if(!res2.text){
+              if(!res2.text && !recentreviews.find(x => x.id == res2[0].id)){
                 setRecentreviews([...recentreviews, res2[0]])
               }
             })
@@ -101,7 +101,7 @@ function Profile() {
   }
   const setProf = async (e) => {
     if(!newProf){
-      setMsg({type: "error", text: "Choose a file first!"})
+      props.setToast({type: "error", text: "Choose a file first!"})
       return;
     }
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
@@ -124,7 +124,7 @@ function Profile() {
       fileUploadRef.current.setFiles([])
       closeProf()
       setRefresh(!refresh)
-      setMsg({type: "msg", text: "You've just changed your profile picture!"})
+      props.setToast({type: "msg", text: "You've just changed your profile picture!"})
     })
   }
   const deleteProf = async () => {
@@ -151,7 +151,7 @@ function Profile() {
         fileUploadRef.current.setFiles([])
         closeProf()
         setRefresh(!refresh)
-        setMsg({type: "msg", text: "You've just changed your profile picture!"})
+        props.setToast({type: "msg", text: "You've just changed your profile picture!"})
       })
   }
   return (
@@ -162,7 +162,7 @@ function Profile() {
             <div className="flex flex-col bg-neutral-700 h-fit w-fit p-5 text-slate-200">
                 <div className="relative" onMouseEnter={toggleAddProf} onMouseLeave={toggleAddProf}>
                   {profile.prof &&
-                    <img className="block h-52 w-52 cover-fit float-left" src={"/public/user_uploads/"+profile.prof}onError={(e) => {
+                    <img className="block h-52 w-52 cover-fit float-left" src={"/public/user_uploads/profs/"+profile.prof}onError={(e) => {
                     e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold flex justify-center items-center h-24 w-24 md:h-52 md:w-52 text-2xl md:text-7xl ml-2">${profile.login.slice(0,1).toUpperCase()}</span>`
                     }}></img>
                   }
@@ -237,7 +237,7 @@ function Profile() {
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
                 {recentlyrated.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
-                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>
                   <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
                 </div></NavLink>)}
@@ -250,7 +250,7 @@ function Profile() {
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
                 {recentreviews.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
-                  <img className="h-72 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>
                   <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
                 </div></NavLink>)}
@@ -285,22 +285,6 @@ function Profile() {
         </div>
       }
       </div>
-      {msg &&
-      <>
-          <div className="fixed bottom-4 z-50 right-4 min-w-64">
-            <div className={"flex justify-between rounded-lg shadow-lg p-4 border "+(msg.type == "error" ? "bg-red-500 border-red-600" : "bg-green-500 border-green-600")}>
-                <p className="text-white text-lg mr-5 dark:text-slate-200">
-                { msg.text }
-                </p>
-                <button onClick={() => setMsg()} className="text-white dark:text-slate-200 focus:outline-none">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-          </div>
-        </>
-      }
     </>
   )
 }

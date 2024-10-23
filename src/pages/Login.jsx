@@ -2,19 +2,18 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
-  const navigate = useNavigate()
+function Login(props) {
+  const navigator = useNavigate()
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
   const submit = (e) => {
     e.preventDefault();
     if(!login || !password){
-      setError("Fill the inputs!")
+      props.setToast({type:"error", text:"Fill the inputs!"})
       return
     }
     if(!/^[A-Za-z0-9]+([A-Za-z0-9]*|[]?[A-Za-z0-9]+)*$/.test(login)){
-      setError("Can't put special characters in the username!")
+      props.setToast({type:"error", text:"Can't put special characters in your name!"})
       return
     } 
     fetch("http://localhost:3000/login", {
@@ -29,9 +28,10 @@ function Login() {
       }),
     }).then(res => res.json()).then(res => {
       if(res.status == 0){
-        setError(res.text)
+        props.setToast({type:"error", text: res.text})
       }else{
-        window.location.replace("/")
+        props.setToast({type:"text", text: "Success! Now you're logged in!", stay: true})
+        navigator("/")
       }
     })
   }
@@ -175,22 +175,6 @@ function Login() {
   </div>
 </div>
       </div>
-      {error &&
-      <>
-          <div className="fixed bottom-4 z-50 right-4 min-w-64">
-            <div className="flex justify-between rounded-lg shadow-lg p-4 border bg-red-500 border border-red-600">
-                <p className="text-white text-lg mr-5 dark:text-slate-200">
-                { error }
-                </p>
-                <button onClick={() => setError("")} className="text-white dark:text-slate-200 focus:outline-none">
-                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-          </div>
-        </>
-      }
     </>
   )
 }
