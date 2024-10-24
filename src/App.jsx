@@ -15,7 +15,9 @@ import 'primereact/resources/primereact.min.css';
 import Settings from './pages/Settings.jsx';
 import Explore from './pages/Explore.jsx';
 import Toast from './components/Toast.jsx';
+import Admin from './pages/Admin.jsx';
 import { useEffect, useState } from 'react';
+import NewBook from './pages/NewBook.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -46,6 +48,8 @@ function App() {
             <Route path="/collection/:id" element={<Collection key={location.pathname} setToast={setToast} />} />
             <Route path="/settings" element={<Settings setToast={setToast} />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/book/new" element={<NewBook setToast={setToast} />} />
+            <Route path="/admin" element={<Admin setToast={setToast} />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
           {msg &&

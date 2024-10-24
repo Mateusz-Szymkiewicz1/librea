@@ -31,7 +31,7 @@ function CollectionNew(props) {
       }
     }).then(res => res.json()).then(res => {
       if(res.text){
-        window.location.href = "/"
+        navigator("/")
       }else{
         setLoading(false)
       }

@@ -7,8 +7,20 @@ function Search() {
   const [sort, setSort] = useState("id")
   const [tags, setTags] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
+  const [user,setUser] = useState()
   let search = window.location.href.split('/').at(-1)
   useEffect(() => {
+    fetch("http://localhost:3000/login", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(res => {
+      if(!res.text){
+        setUser(res[0])
+      }
+    })
     fetch("http://localhost:3000/search", {
       credentials: 'include',
       method: "POST",
@@ -39,7 +51,15 @@ function Search() {
       <div className="sm:px-5 px-3 mt-10">
         <h1 className="text-white text-3xl">Results for "{search}" ({wyniki.length}):</h1>
         {wyniki.length == 0 &&
+          <>
           <h1 className="text-neutral-400 text-2xl pt-2">Sorry, we didn't find anything. Try searching something different</h1>
+          {user &&
+            <>
+            <p className="text-lg text-neutral-200 mt-5">No book you're looking for? Add a new one to our database!</p>
+            <NavLink to="/book/new"><button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700'><i className="fa-solid fa-file-circle-plus mr-3"></i>Add a book</button></NavLink>
+            </>
+          }
+          </>
         }
         <div className="my-6 flex flex-col">
           <div className="flex gap-3 flex-wrap">
