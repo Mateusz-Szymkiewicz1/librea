@@ -18,6 +18,7 @@ function NewBook(props) {
   const [cover, setCover] = useState([])
   const [waiting, setWaiting] = useState([])
   const [showWaiting, setShowWaiting] = useState(false)
+  const [refresh, setRefresh] = useState(false)
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -41,7 +42,7 @@ function NewBook(props) {
     }).then(res => res.json()).then(res => {
       setWaiting([...res])
     })
-  }, [])
+  }, [refresh])
   useEffect(() => {
     fetch("http://localhost:3000/tags").then(res => res.json()).then(res => {
       res.tags = JSON.parse(res.tags)
@@ -89,6 +90,31 @@ function NewBook(props) {
     }
     setShowWaiting(prev => !prev)
   }
+  const deleteSubmission = async () => {
+    const id = event.target.dataset.id
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/delete_submission", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id
+        })
+      }).then(() => {
+        setRefresh(prev => !prev)
+        props.setToast({type: "msg", text: "Deleted a submission!"})
+      })
+  }
   return (
     <>
       {!loading &&
@@ -104,7 +130,7 @@ function NewBook(props) {
               <div key={el.id} className="bg-neutral-600 text-white p-3 hover:bg-neutral-500 mx-2 sm:mx-5 mb-1 mt-1">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/covers/"+el.okladka} className="h-20 float-left mr-3 mb-2"></img>
                 <div>
-                <h2 className="text-2xl break-keep">{el.tytul}</h2>
+                <h2 className="text-2xl break-keep flex justify-between">{el.tytul}<span><i className="fa fa-pencil text-amber-500 mr-3" data-id={el.id}></i><i onClick={deleteSubmission} data-id={el.id} className="fa fa-trash text-red-500 cursor-pointer"></i></span></h2>
                 <p className="text-neutral-300 text-lg">{el.autor}</p>
                 <p className="text-neutral-300 text-lg">{el.rok}</p>
                 </div>

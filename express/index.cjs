@@ -348,6 +348,13 @@ app.post('/collection_unlike', (req,res) => {
   })
 })
 
+app.post('/delete_submission', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/signout', (req,res) => {
   req.session.destroy()
   res.json("done")
@@ -380,7 +387,6 @@ app.post('/waiting_submissions', (req,res) => {
     res.send(rows)
   })
 })
-
 
 app.post('/deleteProf', (req,res) => {
   if(!req.session.user) return

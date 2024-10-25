@@ -94,7 +94,7 @@ function Search() {
           {wyniki.map(el => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
-                <img src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
+                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep">{el.tytul}</h2>
                 <p className="text-neutral-300 text-lg">{el.autor}</p>
