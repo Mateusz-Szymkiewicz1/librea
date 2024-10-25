@@ -362,6 +362,26 @@ function setProf(req, res) {
   })
 }
 
+app.post("/add_book", covers_upload.single("img"), add_book);
+
+function add_book(req, res){
+  if(!req.session.user) return
+  if(!req.file){
+    req.file = {filename: ""}
+  }
+  connection.query(`INSERT INTO new_books(tytul,autor,rok,strony,opis,tagi,okladka,user,submit_date) VALUES(?,?,?,?,?,?,?,?,NOW())`,[req.body.title,req.body.author,req.body.year,req.body.pages,req.body.desc,req.body.tags,req.file.filename,req.session.user], (err, rows, fields) => {
+    res.json("done")
+  })
+};
+
+app.post('/waiting_submissions', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM new_books WHERE user = ?`,[req.session.user], (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
+
 app.post('/deleteProf', (req,res) => {
   if(!req.session.user) return
   fs.unlink('../public/user_uploads/profs/'+req.body.img, (err) => {
