@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 19, 2024 at 07:54 PM
+-- Generation Time: Paź 26, 2024 at 10:58 AM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -20,7 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `librea`
 --
-DROP DATABASE IF EXISTS `librea`;
 CREATE DATABASE IF NOT EXISTS `librea` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `librea`;
 
@@ -72,8 +71,8 @@ CREATE TABLE `collections` (
 --
 
 INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`) VALUES
-(6, 'asd', 'asdasd', '[{\"id\":2},{\"id\":1},{\"id\":4},{\"id\":3},{\"id\":6},{\"id\":5}]', ''),
-(10, 'asd', 'erree', '[{\"id\":6},{\"id\":2}]', 'asdasdasdasd');
+(6, 'asd', 'asdasd', '[{\"id\":1},{\"id\":4},{\"id\":6},{\"id\":5},{\"id\":2}]', ''),
+(10, 'asd', 'erree', '[{\"id\":6},{\"id\":2},{\"id\":1},{\"id\":5}]', 'asdasdasdasd');
 
 -- --------------------------------------------------------
 
@@ -93,7 +92,34 @@ CREATE TABLE `likes` (
 --
 
 INSERT INTO `likes` (`id`, `user`, `review`, `collection`) VALUES
-(42, 'asd', NULL, 6);
+(50, 'asd', NULL, 6);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `new_books`
+--
+
+CREATE TABLE `new_books` (
+  `id` int(11) NOT NULL,
+  `tytul` text NOT NULL,
+  `autor` text NOT NULL,
+  `rok` int(4) NOT NULL,
+  `strony` int(11) NOT NULL,
+  `opis` text NOT NULL,
+  `tagi` text NOT NULL,
+  `okladka` text NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `submit_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `new_books`
+--
+
+INSERT INTO `new_books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`, `okladka`, `user`, `submit_date`) VALUES
+(1, 'asdasd', 'asdasd', 2112, 121212, 'asdsadasdsad', '[\"horror\",\"thriller\"]', '', 'asd', '2024-10-25 19:54:10'),
+(2, 'sadsadasdaa', 'asdasd', 12, 12, 'asdasdsad', '[\"classics\"]', '', 'asd', '2024-10-25 19:54:41');
 
 -- --------------------------------------------------------
 
@@ -113,7 +139,11 @@ CREATE TABLE `ratings` (
 --
 
 INSERT INTO `ratings` (`id`, `user`, `book`, `rating`) VALUES
-(7, 'asd', 1, 10);
+(7, 'asd', 1, 10),
+(8, 'asd', 2, 10),
+(9, 'asd', 4, 7),
+(10, 'asd', 6, 9),
+(11, 'asd', 5, 10);
 
 -- --------------------------------------------------------
 
@@ -134,7 +164,7 @@ CREATE TABLE `reviews` (
 --
 
 INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
-(13, 'asd', 1, 'cvbvcc', 1);
+(18, 'asd', 1, 'asdasdasdas', 0);
 
 -- --------------------------------------------------------
 
@@ -153,8 +183,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('iGGIpBRpzl9xPCu9q1-7ak6vE-A-KKk5', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-21T15:17:59.352Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729523879),
-('w55GXoOa4T_oNIQ8egf2xMBlZZSkdq74', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-21T14:00:24.186Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1729519224);
+('pD-_6pU7XUr4sN4Y11P4mGFZyLMhHntL', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-27T18:17:30.026Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1730053050);
 
 -- --------------------------------------------------------
 
@@ -184,15 +213,21 @@ CREATE TABLE `users` (
   `login` varchar(50) NOT NULL,
   `haslo` text NOT NULL,
   `email` text NOT NULL,
-  `prof` text NOT NULL
+  `prof` text NOT NULL,
+  `admin` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`login`, `haslo`, `email`, `prof`) VALUES
-('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '2230153dddfd1a96406dd811678dc5e01729196066059.jpg');
+INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
+('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '5a4b2af2489d115707bca8ef8875444c1729932155803.webp', 1),
+('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0),
+('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0),
+('qweqweasd', '$2a$10$RaASisPr8CdrmAeQ2tKq1uN9jHy3N7fePZx01D.dc4XwjOLp/yaVm', 'asdasd@ASD.PL', '', 0),
+('qwerty', '$2a$10$JJX554Kbq5KenfL9sZoRwO9pf3egIxPQbS/rwX1.TWRSwQJ0irEJu', 'adasd@assdas.pl', '', 0),
+('werwet', '$2a$10$Bk24L8R8nLjih0OTVkExLuEKDT/diXFwUPw1zZS29P/D63WagXmbW', 'asdqwe@asdd.pl', '', 0);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -219,6 +254,13 @@ ALTER TABLE `likes`
   ADD KEY `collection` (`collection`),
   ADD KEY `review` (`review`),
   ADD KEY `user` (`user`) USING BTREE;
+
+--
+-- Indeksy dla tabeli `new_books`
+--
+ALTER TABLE `new_books`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`user`);
 
 --
 -- Indeksy dla tabeli `ratings`
@@ -268,25 +310,31 @@ ALTER TABLE `books`
 -- AUTO_INCREMENT for table `collections`
 --
 ALTER TABLE `collections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+
+--
+-- AUTO_INCREMENT for table `new_books`
+--
+ALTER TABLE `new_books`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -311,6 +359,12 @@ ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `likes_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `new_books`
+--
+ALTER TABLE `new_books`
+  ADD CONSTRAINT `new_books_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `ratings`

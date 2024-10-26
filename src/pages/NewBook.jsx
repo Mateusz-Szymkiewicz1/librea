@@ -19,6 +19,19 @@ function NewBook(props) {
   const [waiting, setWaiting] = useState([])
   const [showWaiting, setShowWaiting] = useState(false)
   const [refresh, setRefresh] = useState(false)
+
+  const editUploadRef = useRef(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editAuthor, setEditAuthor] = useState('')
+  const [editYear, setEditYear] = useState('')
+  const [editPages, setEditPages] = useState(0)
+  const [editDesc, setEditDesc] = useState('')
+  const [editCover, setEditCover] = useState([])
+  const [editCoverName, setEditCoverName] = useState([])
+  const [selectedEditTags, setSelectedEditTags] = useState([])
+  const [deletedCover, setDeletedCover] = useState(false)
+  const [editID, setEditID] = useState(0)
+
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -115,6 +128,79 @@ function NewBook(props) {
         props.setToast({type: "msg", text: "Deleted a submission!"})
       })
   }
+  const closeEdit = () => {
+    document.querySelector('.edit').classList.add("hidden")
+    setEditTitle("")
+    setEditAuthor("")
+    setEditYear("")
+    setEditPages(0)
+    setEditDesc("")
+    setSelectedEditTags([])
+    setEditCover([])
+    setEditCoverName("")
+    setDeletedCover(false)
+    setEditID(0)
+    editUploadRef.current.setFiles([])
+  }
+  const showEdit = () => {
+    document.querySelector('.edit').classList.remove("hidden")
+    let submission = waiting.find(x => x.id == event.target.dataset.id)
+    setEditTitle(submission.tytul)
+    setEditAuthor(submission.autor)
+    setEditYear(submission.rok)
+    setEditPages(submission.strony)
+    setEditDesc(submission.opis)
+    setSelectedEditTags([...JSON.parse(submission.tagi)])
+    setEditCoverName(submission.okladka)
+    setEditID(event.target.dataset.id)
+  }
+  const deleteCover = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    setDeletedCover(true)
+  }
+  const editSubmission = async () => {
+    if(!editTitle || !editAuthor || !editPages || !editYear){
+      props.setToast({type:"error", text: "Fill the required inputs!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      const formData  = new FormData();
+      formData.append('title', editTitle);
+      formData.append('author', editAuthor);
+      formData.append('year', editYear);
+      formData.append('pages', editPages);
+      formData.append('desc', editDesc);
+      formData.append('tags', JSON.stringify(selectedEditTags));
+      formData.append('img', editCover[0]);
+      formData.append('delete_cover', deletedCover);
+      formData.append('id', editID);
+      formData.append("old_cover", editCoverName)
+      fetch("http://localhost:3000/edit_submission", {
+        credentials: 'include',
+        method: "POST",
+        body: formData
+      }).then(() => {
+        setRefresh(prev => !prev)
+        closeEdit()
+        props.setToast({type: "msg", text: "Edited the submission!", stay: true})
+      })
+  }
   return (
     <>
       {!loading &&
@@ -130,7 +216,7 @@ function NewBook(props) {
               <div key={el.id} className="bg-neutral-600 text-white p-3 hover:bg-neutral-500 mx-2 sm:mx-5 mb-1 mt-1">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/covers/"+el.okladka} className="h-20 float-left mr-3 mb-2"></img>
                 <div>
-                <h2 className="text-2xl break-keep flex justify-between">{el.tytul}<span><i className="fa fa-pencil text-amber-500 mr-3" data-id={el.id}></i><i onClick={deleteSubmission} data-id={el.id} className="fa fa-trash text-red-500 cursor-pointer"></i></span></h2>
+                <h2 className="text-2xl break-keep flex justify-between">{el.tytul}<span><i data-id={el.id} onClick={showEdit} className="fa fa-pencil text-amber-500 mr-3 cursor-pointer"></i><i onClick={deleteSubmission} data-id={el.id} className="fa fa-trash text-red-500 cursor-pointer"></i></span></h2>
                 <p className="text-neutral-300 text-lg">{el.autor}</p>
                 <p className="text-neutral-300 text-lg">{el.rok}</p>
                 </div>
@@ -175,6 +261,50 @@ function NewBook(props) {
       </div>
       <div className="px-10 mt-5 w-1/2 float-left flex justify-center hidden lg:block">
         <img src="/collection.svg" className="h-[550px]"></img>
+      </div>
+      <div className="edit p-5 overflow-scroll z-50 hidden fixed top-0 max-h-full right-0 left-0 bg-neutral-800 flex justify-center" style={{background: "rgba(50,50,50,0.9)"}}>
+      <div className="bg-neutral-700 h-fit p-5 w-full md:w-1/2">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Edit submission</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEdit}></i>
+          </div>
+          <input value={editTitle} onChange={(e) => setEditTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>
+          <input value={editAuthor} onChange={(e) => setEditAuthor(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Author"/> 
+          <input value={editYear} onChange={(e) => setEditYear(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Year of first publish"/> 
+          <input value={editPages} min={0} onChange={(e) => setEditPages(e.target.value)} type="number" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white mb-5" placeholder="Number of pages"/> 
+          <Multiselect
+                isObject={false}
+                options={tags}
+                onSelect={(e) => setSelectedEditTags([...e])}
+                onRemove={(e) => setSelectedEditTags([...e])}
+                placeholder="Tags"
+                emptyRecordMsg="No tags found"
+                selectedValues={selectedEditTags}
+                style={{
+                  multiselectContainer: {
+                    background: "#525252",
+                    borderRadius: "10px",
+                    border: "2px solid #606060",
+                    padding: "3px",
+                    color: "#fff",
+                    paddingTop: "0"
+                  },
+                  searchBox: {
+                    border: 'none'
+                  }
+                }}
+              />
+          <textarea value={editDesc} onChange={(e) => setEditDesc(e.target.value)} className="bg-neutral-600 mt-5 border border-neutral-500 rounded w-full h-32 outline-none p-2" placeholder="Description"></textarea>
+          {editCoverName.length > 0 && !deletedCover &&
+            <>
+              <p className="mt-2 text-xl">Current cover:</p>
+              <button onClick={deleteCover} className='bg-blue-600 text-white px-5 p-3 my-1 block hover:bg-blue-700'><i className="fa fa-trash mr-2"></i>Delete</button>
+              <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/covers/"+editCoverName} className="h-24 mr-3 mb-5 mt-2"></img>
+            </>
+          }
+          <FileUpload className="mt-5 clear-both" ref={editUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload a new cover image.</p>} onSelect={(e) => setEditCover(e.files)} onClear={() => setEditCover([])} onRemove={() => setEditCover([])}></FileUpload>
+          <button onClick={editSubmission} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Edit submission</button>
+        </div>
       </div>
       </>
       }

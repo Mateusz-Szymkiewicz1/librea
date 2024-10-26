@@ -381,9 +381,29 @@ function add_book(req, res){
   })
 };
 
+app.post("/edit_submission", covers_upload.single("img"), edit_submission);
+
+function edit_submission(req, res){
+  if(!req.session.user) return
+  if(req.file || req.body.delete_cover == "true"){
+    fs.unlink('../public/user_uploads/covers/'+req.body.old_cover, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  if(!req.file && req.body.delete_cover == "false"){
+    req.file = {filename: req.body.old_cover}
+  }
+  if(!req.file && req.body.delete_cover == "true"){
+    req.file = {filename: ""}
+  }
+  connection.query(`UPDATE new_books SET tytul = ?, autor = ?, rok = ?, strony = ?, opis = ?, tagi = ?, okladka = ?, user = ? WHERE id = ?`,[req.body.title,req.body.author,req.body.year,req.body.pages,req.body.desc,req.body.tags,req.file.filename,req.session.user,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+};
+
 app.post('/waiting_submissions', (req,res) => {
   if(!req.session.user) return
-  connection.query(`SELECT * FROM new_books WHERE user = ?`,[req.session.user], (err, rows, fields) => {
+  connection.query(`SELECT * FROM new_books WHERE user = ? ORDER BY submit_date DESC`,[req.session.user], (err, rows, fields) => {
     res.send(rows)
   })
 })
