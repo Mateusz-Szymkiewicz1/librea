@@ -13,7 +13,7 @@ function NewBook(props) {
   const [title, setTitle] = useState("")
   const [author, setAuthor] = useState("")
   const [year, setYear] = useState("")
-  const [pages, setPages] = useState(0)
+  const [pages, setPages] = useState()
   const [desc, setDesc] = useState("")
   const [cover, setCover] = useState([])
   const [waiting, setWaiting] = useState([])
@@ -63,6 +63,10 @@ function NewBook(props) {
     })
   }, [])
   const submit = async () => {
+    if(waiting.length >= 10){
+      props.setToast({type: "error", text: "You already submited a few books. Now wait!"})
+      return;
+    }
     if(!title || !author || !year || !pages){
       props.setToast({type: "error", text: "Fill the required inputs!"})
       return;
@@ -89,8 +93,17 @@ function NewBook(props) {
         method: "POST",
         body: formData
       }).then(() => {
-        navigator('/')
-        props.setToast({type: "msg", text: "Your submission is now waiting to be accepted!", stay: true})
+        setRefresh(!refresh)
+        setTitle('')
+        setAuthor('')
+        setYear('')
+        setDesc('')
+        setPages()
+        setCover([])
+        setSelectedTags([])
+        fileUploadRef.current.setFiles([])
+        window.scrollTo(0,0);
+        props.setToast({type: "msg", text: "Your submission is now waiting to be accepted!"})
       })
   }
   const toggleWaiting = () => {
@@ -105,6 +118,7 @@ function NewBook(props) {
   }
   const deleteSubmission = async () => {
     const id = event.target.dataset.id
+    const submission = waiting.find(x => x.id == id)
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
       const response = await useDecision().then(function () {
           document.querySelector(".decision").remove()
@@ -121,7 +135,8 @@ function NewBook(props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: id
+          id: id,
+          img: submission.okladka
         })
       }).then(() => {
         setRefresh(prev => !prev)
@@ -229,15 +244,16 @@ function NewBook(props) {
           <div className="w-full lg:w-1/2 float-left p-2 sm:p-5">
         <div className="bg-neutral-700  h-full w-full p-5">
           <h1 className="text-white text-3xl">Add a new book</h1>
-          <input onChange={(e) => setTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>
-          <input onChange={(e) => setAuthor(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Author"/> 
-          <input onChange={(e) => setYear(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Year of first publish"/> 
-          <input min={0} onChange={(e) => setPages(e.target.value)} type="number" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white mb-5" placeholder="Number of pages"/> 
+          <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>
+          <input value={author} onChange={(e) => setAuthor(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Author"/> 
+          <input value={year} onChange={(e) => setYear(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Year of first publish"/> 
+          <input value={pages} min={0} onChange={(e) => setPages(e.target.value)} type="number" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white mb-5" placeholder="Number of pages"/> 
           <Multiselect
                 isObject={false}
                 options={tags}
                 onSelect={(e) => setSelectedTags([...e])}
                 onRemove={(e) => setSelectedTags([...e])}
+                selectedValues={selectedTags}
                 placeholder="Tags"
                 emptyRecordMsg="No tags found"
                 style={{
@@ -254,7 +270,7 @@ function NewBook(props) {
                   }
                 }}
               />
-          <textarea onChange={(e) => setDesc(e.target.value)} className="bg-neutral-600 mt-5 border border-neutral-500 rounded w-full h-32 outline-none p-2" placeholder="Description"></textarea>
+          <textarea value={desc} onChange={(e) => setDesc(e.target.value)} className="bg-neutral-600 mt-5 border border-neutral-500 rounded w-full h-32 outline-none p-2" placeholder="Description"></textarea>
           <FileUpload className="mt-5" ref={fileUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload a cover image.</p>} onSelect={(e) => setCover(e.files)} onClear={() => setCover([])} onRemove={() => setCover([])}></FileUpload>
           <button onClick={submit} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Submit a new book</button>
         </div>

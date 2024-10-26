@@ -106,7 +106,7 @@ app.get('/tags', (req,res) => {
 })
 
 app.post('/user/:login', (req,res) => {
-  connection.query(`SELECT login, prof FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
+  connection.query(`SELECT login, prof, admin FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
     if(rows && rows.length > 0){
       connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
         if(rows2){
@@ -350,6 +350,11 @@ app.post('/collection_unlike', (req,res) => {
 
 app.post('/delete_submission', (req,res) => {
   if(!req.session.user) return
+  if(req.body.img){
+    fs.unlink('../public/user_uploads/covers/'+req.body.img, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
   connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
     res.json("done")
   })
@@ -404,6 +409,13 @@ function edit_submission(req, res){
 app.post('/waiting_submissions', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM new_books WHERE user = ? ORDER BY submit_date DESC`,[req.session.user], (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
+app.post('/new_books', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM new_books ORDER BY submit_date ASC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
     res.send(rows)
   })
 })
