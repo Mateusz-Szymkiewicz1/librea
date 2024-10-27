@@ -413,6 +413,13 @@ app.post('/waiting_submissions', (req,res) => {
   })
 })
 
+app.post('/delete_waiting_submission', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/new_books', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM new_books ORDER BY submit_date ASC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {

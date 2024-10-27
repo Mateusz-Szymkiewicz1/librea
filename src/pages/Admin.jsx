@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
+import { useDecision } from "../components/useDecision"
 
 function Admin(props) {
   const navigator = useNavigate()
@@ -7,6 +8,7 @@ function Admin(props) {
   const [loading, setLoading] = useState(true)
   const [submissions, setSubmissions] = useState([])
   const [offset, setOffset] = useState(0)
+  const [refresh, setRefresh] = useState(false)
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -33,21 +35,54 @@ function Admin(props) {
         offset: offset
       })
     }).then(res => res.json()).then(res => {
-      res.forEach(el => {
-        if(!submissions.find(x => x.id == el.id)){
-          submissions.push(el)
-        }
-      })
-      setSubmissions([...submissions])
+      setSubmissions([])
+      setSubmissions([...res])
     })
-  }, [offset])
-  const expandDesc = () => {
-    
+  }, [offset, refresh])
+  const toggleDesc = () => {
+    const submission = submissions.find(x => x.id == event.target.dataset.id)
+    const p = event.target.parentElement.querySelector('.desc');
+    if(p.dataset.full == "no"){
+      p.innerText = submission.opis
+      event.target.innerText = "Hide"
+      p.dataset.full = "yes"
+    }else{
+      p.innerHTML = submission.opis.slice(0,200)+'...'
+      event.target.innerText = "Show"
+      p.dataset.full = "no"
+    }
+  }
+  const deleteSubmission = async () => {
+    const id = event.target.dataset.id
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    fetch("http://localhost:3000/delete_waiting_submission", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id
+      })
+    }).then(res => res.json()).then(res => {
+      setRefresh(prev => !prev)
+    })
+  }
+  const acceptSubmission = () => {
+
   }
   return (
     <>
       {!loading &&
-        <div className="mx-5 mt-10">
+        <div className="mx-5 my-10">
           <h1 className="text-3xl"><i className="fa fa-user-tie mr-3 text-blue-500"></i>Admin Panel</h1>
           {submissions.length > 0 &&
             <>
@@ -56,14 +91,30 @@ function Admin(props) {
               {submissions.map(el => {
                 return(
                   <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
-                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
+                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+el.okladka} className="h-48 sm:float-left mr-3 mb-2"></img>
                 <div>
-                <h2 className="text-2xl break-keep">{el.tytul}</h2>
+                <h2 className="text-2xl break-keep flex sm:justify-between">
+                  {el.tytul} 
+                  <span>
+                    <i onClick={deleteSubmission} data-id={el.id} className="fa fa-xmark mx-2 sm:mx-4 text-red-500 cursor-pointer"></i>
+                    <i onClick={acceptSubmission} data-id={el.id} className="fa cursor-pointer fa-check-to-slot text-green-400"></i>
+                  </span>
+                </h2>
                 <p className="text-neutral-300 text-lg">{el.autor}</p>
                 <p className="text-neutral-300 text-lg">{el.rok}</p>
                 <p className="text-neutral-300 text-lg">{el.strony} page(s)</p>
-                <p className="text-neutral-300 text-lg">User - <NavLink to={"/profile/"+el.user} className="text-blue-600">{el.user}</NavLink></p>
-                <p className="text-neutral-200 text-lg mt-3 pr-5" data-id={el.id}>{el.opis.slice(0,200)+"..."} <span className="text-blue-600 cursor-pointer" onClick={expandDesc}>Expand</span></p>
+                <div className="flex flex-wrap gap-2 my-2">
+                  {JSON.parse(el.tagi).map(tag => <span key={tag} className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">{tag}</span>)}
+                </div>
+                <p className="text-neutral-300 text-lg">User - <NavLink to={"/profile/"+el.user} className="text-blue-500">{el.user}</NavLink></p>
+                {el.opis.length > 0 &&
+                  <>
+                  <p data-full="no" className="desc text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.opis.slice(0,200)+"..."}</p>
+                  {el.opis.length > 200 &&
+                    <span className="text-blue-500 cursor-pointer mt-4" onClick={toggleDesc} data-id={el.id}>Show</span>
+                  }
+                  </>
+                }
                 </div>
               </div>
                 )

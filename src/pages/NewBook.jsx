@@ -98,7 +98,7 @@ function NewBook(props) {
         setAuthor('')
         setYear('')
         setDesc('')
-        setPages()
+        setPages(0)
         setCover([])
         setSelectedTags([])
         fileUploadRef.current.setFiles([])
