@@ -420,10 +420,28 @@ app.post('/delete_waiting_submission', (req,res) => {
   })
 })
 
+app.post('/approve_waiting_submission', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id])
+  if(req.body.cover){
+    var oldPath = '../public/user_uploads/covers/'+req.body.cover
+    var newPath = '../public/uploads/'+req.body.cover
+    fs.rename(oldPath, newPath, function (err) {
+      if (err) console.log(err)
+    })
+  }
+  connection.query(`INSERT INTO books (tytul,autor,rok,strony,opis,tagi,okladka) VALUES (?,?,?,?,?,?,?)`,[req.body.title,req.body.author,req.body.year,req.body.pages,req.body.desc,req.body.tags,req.body.cover], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/new_books', (req,res) => {
   if(!req.session.user) return
-  connection.query(`SELECT * FROM new_books ORDER BY submit_date ASC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
-    res.send(rows)
+  connection.query(`SELECT * FROM new_books ORDER BY submit_date ASC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+    connection.query(`SELECT COUNT(*) AS submissions FROM new_books`, (err2, rows2, fields2) => {
+      rows.unshift({submissions: rows2[0].submissions})
+      res.send(rows)
+    })
   })
 })
 

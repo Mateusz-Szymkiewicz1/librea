@@ -9,6 +9,7 @@ function Admin(props) {
   const [submissions, setSubmissions] = useState([])
   const [offset, setOffset] = useState(0)
   const [refresh, setRefresh] = useState(false)
+  const [numOfSubmissions, setNumOfSubmissions] = useState(0)
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -36,7 +37,8 @@ function Admin(props) {
       })
     }).then(res => res.json()).then(res => {
       setSubmissions([])
-      setSubmissions([...res])
+      setNumOfSubmissions(res[0].submissions)
+      setSubmissions([...res.slice(1, res.length)])
     })
   }, [offset, refresh])
   const toggleDesc = () => {
@@ -74,10 +76,41 @@ function Admin(props) {
       })
     }).then(res => res.json()).then(res => {
       setRefresh(prev => !prev)
+      props.setToast({type:"msg", text:"Deleted a submission!"})
     })
   }
-  const acceptSubmission = () => {
-
+  const acceptSubmission = async () => {
+    const id = event.target.dataset.id
+    const submission = submissions.find(x => x.id == id)
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/approve_waiting_submission", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          title: submission.tytul,
+          author: submission.autor,
+          year: submission.rok,
+          pages: submission.strony,
+          desc: submission.opis,
+          tags: submission.tagi,
+          cover: submission.okladka
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"Approved a submission!"})
+        setRefresh(prev => !prev)
+      })
   }
   return (
     <>
@@ -86,12 +119,12 @@ function Admin(props) {
           <h1 className="text-3xl"><i className="fa fa-user-tie mr-3 text-blue-500"></i>Admin Panel</h1>
           {submissions.length > 0 &&
             <>
-              <h1 className="text-2xl mt-10">Book submissions</h1>
+              <h1 className="text-2xl mt-10">Book submissions ({numOfSubmissions})</h1>
               <div className="flex flex-col">
               {submissions.map(el => {
                 return(
                   <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
-                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+el.okladka} className="h-48 sm:float-left mr-3 mb-2"></img>
+                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/covers/"+el.okladka} className="h-48 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep flex sm:justify-between">
                   {el.tytul} 
