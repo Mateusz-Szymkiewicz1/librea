@@ -40,7 +40,22 @@ function Admin(props) {
       setNumOfSubmissions(res[0].submissions)
       setSubmissions([...res.slice(1, res.length)])
     })
-  }, [offset, refresh])
+  }, [refresh])
+  useEffect(() => {
+    if(offset == 0) return
+    fetch("http://localhost:3000/new_books", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: offset
+      })
+    }).then(res => res.json()).then(res => {
+      setSubmissions(prev => prev.concat([...res.slice(1, res.length)]))
+    })
+  }, [offset])
   const toggleDesc = () => {
     const submission = submissions.find(x => x.id == event.target.dataset.id)
     const p = event.target.parentElement.querySelector('.desc');
@@ -112,6 +127,11 @@ function Admin(props) {
         setRefresh(prev => !prev)
       })
   }
+  const hideSuggestions = () => {
+    setOffset(0)
+    setRefresh(prev => !prev)
+    window.scrollTo(0,0)
+  }
   return (
     <>
       {!loading &&
@@ -152,6 +172,12 @@ function Admin(props) {
               </div>
                 )
               })}
+              {numOfSubmissions > offset+5 &&
+                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700">Show more</button>
+              }
+              {numOfSubmissions <= offset+5 && offset > 0 &&
+                <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700">Hide</button>
+              }
               </div>
             </>
           }
