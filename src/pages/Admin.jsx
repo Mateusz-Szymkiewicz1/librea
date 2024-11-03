@@ -169,14 +169,15 @@ function Admin(props) {
                   </>
                 }
                 </div>
+                <p className="text-neutral-200 mt-2">Submitted: {el.submit_date.split('T')[0]}</p>
               </div>
                 )
               })}
               {numOfSubmissions > offset+5 &&
-                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700">Show more</button>
+                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
               }
               {numOfSubmissions <= offset+5 && offset > 0 &&
-                <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700">Hide</button>
+                <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
             </>

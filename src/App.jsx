@@ -18,6 +18,7 @@ import Toast from './components/Toast.jsx';
 import Admin from './pages/Admin.jsx';
 import { useEffect, useState } from 'react';
 import NewBook from './pages/NewBook.jsx';
+import EditBook from './pages/EditBook.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -49,6 +50,7 @@ function App() {
             <Route path="/settings" element={<Settings setToast={setToast} />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/book/new" element={<NewBook setToast={setToast} />} />
+            <Route path="/book/edit/:id" element={<EditBook key={location.pathname} setToast={setToast} />} />
             <Route path="/admin" element={<Admin setToast={setToast} />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>

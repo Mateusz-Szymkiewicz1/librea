@@ -309,6 +309,12 @@ function Book(props) {
                   }
                 </>
               }
+              {user && user.admin == 1 &&
+                <div>
+                  <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3 block hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
+                  <button className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete book</button>
+                </div>
+              }
               </div>
               <div className="bg-neutral-600 sm:ml-5 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
                 <h3 className="text-white text-xl font-semibold mb-2">What's <span className="font-bold">your</span> rating?</h3>

@@ -27,8 +27,19 @@ const covers_storage = multer.diskStorage({
     });
   }
 });
+const books_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../public/uploads')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
+    });
+  }
+});
 const profs_upload = multer({ storage: profs_storage, limits: {fieldSize: 50*1024*1024} });
 const covers_upload = multer({ storage: covers_storage, limits: {fieldSize: 50*1024*1024} });
+const books_upload = multer({ storage: books_storage, limits: {fieldSize: 50*1024*1024} });
 MySQLStore = require('connect-mysql')(session)
 const app = express().use(express.json())
 
@@ -402,6 +413,26 @@ function edit_submission(req, res){
     req.file = {filename: ""}
   }
   connection.query(`UPDATE new_books SET tytul = ?, autor = ?, rok = ?, strony = ?, opis = ?, tagi = ?, okladka = ?, user = ? WHERE id = ?`,[req.body.title,req.body.author,req.body.year,req.body.pages,req.body.desc,req.body.tags,req.file.filename,req.session.user,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+};
+
+app.post("/edit_book", books_upload.single("img"), edit_book);
+
+function edit_book(req, res){
+  if(!req.session.user) return
+  if(req.file || req.body.delete_cover == "true"){
+    fs.unlink('../public/uploads/'+req.body.old_cover, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  if(!req.file && req.body.delete_cover == "false"){
+    req.file = {filename: req.body.old_cover}
+  }
+  if(!req.file && req.body.delete_cover == "true"){
+    req.file = {filename: ""}
+  }
+  connection.query(`UPDATE books SET tytul = ?, autor = ?, rok = ?, strony = ?, opis = ?, tagi = ?, okladka = ? WHERE id = ?`,[req.body.title,req.body.author,req.body.year,req.body.pages,req.body.desc,req.body.tags,req.file.filename,req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 };
