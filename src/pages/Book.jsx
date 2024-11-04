@@ -1,12 +1,13 @@
 import { createElement, useEffect } from "react"
 import { useState } from "react"
 import { Rating } from 'react-simple-star-rating'
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import NoMatch from "./NoMatch"
 import ReactPaginate from 'react-paginate';
 import { useDecision } from "../components/useDecision"
 
 function Book(props) {
+  const navigator = useNavigate()
   const book_id = window.location.href.split('/').at(-1).split("#")[0]
   const [refresh, setRefresh] = useState(true)
   const [book, setBook] = useState({})
@@ -258,6 +259,30 @@ function Book(props) {
         })
       })
   }
+  const deleteBook = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/delete_book", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: book_id
+        })
+      }).then(res => res.json()).then(res => {
+        navigator("/")
+        props.setToast({type:"msg", text:"Deleted a book!", stay: true})
+      })
+  }
   return (
     <>
       <div>
@@ -287,7 +312,7 @@ function Book(props) {
                   <a href="#reviews" className="text-md font-medium text-gray-900 underline hover:no-underline dark:text-white">{book.ilosc_recenzji} review(s)</a>
                 </div>
               </div>
-              <p className="clear-both text-slate-200 mr-16 py-10">{book.opis}</p>
+              <p className="clear-both text-slate-200 mr-16 py-10">{book.opis.length > 0 ? book.opis : "No description yet..."}</p>
               {user && user.collections.length > 0 &&
                 <>
                   <p className="text-xl mr-16 pb-10">
@@ -312,7 +337,7 @@ function Book(props) {
               {user && user.admin == 1 &&
                 <div>
                   <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3 block hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
-                  <button className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete book</button>
+                  <button className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700' onClick={deleteBook}><i className="fa fa-trash mr-3"></i>Delete book</button>
                 </div>
               }
               </div>

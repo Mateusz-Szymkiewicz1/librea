@@ -451,6 +451,13 @@ app.post('/delete_waiting_submission', (req,res) => {
   })
 })
 
+app.post('/delete_book', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/approve_waiting_submission', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id])

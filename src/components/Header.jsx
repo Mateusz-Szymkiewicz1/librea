@@ -86,7 +86,7 @@ function Header() {
             <div className="absolute top-12 right-0 left-0 flex flex-col">
               {autofill.map(el => {
                 return (
-                  <NavLink to={"/book/"+el.id} key={el.id}><span className="block suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1"></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span></NavLink>
+                  <NavLink to={"/book/"+el.id} key={el.id}><span className="block suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1" onError={(e) => e.target.src = "../../public/default.jpg"}></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span></NavLink>
                 )
               })}
             </div>
