@@ -27,22 +27,27 @@ function Home() {
           headers: {
             "Content-Type": "application/json",
           }
-        }).then(res2 => res2.json()).then(res2 => {
+        }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
             console.log(res2[0])
             setUser(res2[0])
             setLoading(false)
             if(res2[0].collections){
-              res2[0].collections.forEach(el => {
-                el.books = JSON.parse(el.books)
-                el.books.forEach(book => {
-                  fetch("http://localhost:3000/book/"+book.id).then(res => res.json()).then(res => {
-                    if(!res.text){
-                      book.okladka = res[0].okladka
+              let userCopy = structuredClone(res2[0]);
+              for (let collection of userCopy.collections) {
+                collection.books = JSON.parse(collection.books);
+                await Promise.all(
+                  collection.books.map(async (book) => {
+                    let res = await fetch("http://localhost:3000/book/" + book.id);
+                    let data = await res.json();
+                    if (!data.text) {
+                      book.okladka = data[0].okladka;
                     }
-                  })
                 })
+              ).then(() => {
+                setUser(structuredClone(userCopy))
               })
+              }
             }
             if(res2[0].ratings){
               res2[0].ratings.slice(-5).reverse().forEach(el => {
@@ -136,32 +141,32 @@ function Home() {
               return (
                 <NavLink to={"/collection/"+el.id} key={el.id}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
                   <div className='grid grid-cols-2'>
-                  <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[0].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[0].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   {el.books.length > 1 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[1].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[1].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   }
                   {el.books.length > 2 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[2].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[2].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   }
                   {el.books.length > 3 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[3].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[3].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   }
                   {el.books.length == 1 &&
                     <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
                     </>
                   }
                   {el.books.length == 2 &&
                     <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
                     </>
                   }
                   {el.books.length == 3 &&
                     <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
+                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
                     </>
                   }
                   </div>
@@ -178,7 +183,7 @@ function Home() {
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentlyrated.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>
                   <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
                 </div></NavLink>)}
@@ -191,7 +196,7 @@ function Home() {
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentreviews.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>
                   <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
                 </div></NavLink>)}
@@ -208,7 +213,7 @@ function Home() {
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {popular.map((el,i) => 
                 <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   <p className="text-white mt-3 text-xl">{el.tytul}</p>
                   <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
                 </div></NavLink>)}
