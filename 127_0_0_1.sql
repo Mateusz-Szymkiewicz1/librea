@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Paź 26, 2024 at 11:16 PM
+-- Generation Time: Cze 05, 2025 at 11:10 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -20,6 +20,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `librea`
 --
+DROP DATABASE IF EXISTS `librea`;
 CREATE DATABASE IF NOT EXISTS `librea` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `librea`;
 
@@ -46,7 +47,7 @@ CREATE TABLE `books` (
 
 INSERT INTO `books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`, `okladka`) VALUES
 (1, 'Lost Illusions', 'Honoré de Balzac', '1837', 623, 'Handsome would-be poet Lucien Chardon is poor and naive, but highly ambitious. Failing to make his name in his dull provincial hometown, he is taken up by a patroness, the captivating married woman Madame de Bargeton, and prepares to forge his way in the glamorous beau monde of Paris. But Lucien has entered a world far more dangerous than he realized, as Madame de Bargeton\'s reputation becomes compromised and the fickle, venomous denizens of the courts and salons conspire to keep him out of their ranks. Lucien eventually learns that, wherever he goes, talent counts for nothing in comparison to money, intrigue and unscrupulousness. Lost Illusions is one of the greatest novels in the rich procession of the Comedie humaine, Balzac\'s panoramic social and moral history of his times.', '[\"classics\"]', 'lost_illusions.png'),
-(2, 'Gone with the Wind', 'Margaret Mitchell', '1936', 1056, 'Scarlett O\'Hara, the beautiful, spoiled daughter of a well-to-do Georgia plantation owner, must use every means at her disposal to claw her way out of the poverty she finds herself in after Sherman\'s March to the Sea.', '[\"classics\"]', 'gone_with_the_wind.png'),
+(2, 'Gone with the Wind', 'Margaret Mitchell', '1936', 1056, 'Scarlett O\'Hara, the beautiful, spoiled daughter of a well-to-do Georgia plantation owner, must use every means at her disposal to claw her way out of the poverty she finds herself in after Sherman\'s March to the Sea.', '[\"classics\"]', '15cef3ae08914354ad9e5d9b9e55515e1730672127814.png'),
 (3, 'Crime and Punishment', 'Fyodor Dostoevsky', '1866', 671, 'Raskolnikov, a destitute and desperate former student, wanders through the slums of St Petersburg and commits a random murder without remorse or regret. He imagines himself to be a great man, a Napoleon: acting for a higher purpose beyond conventional moral law. But as he embarks on a dangerous game of cat and mouse with a suspicious police investigator, Raskolnikov is pursued by the growing voice of his conscience and finds the noose of his own guilt tightening around his neck. Only Sonya, a downtrodden sex worker, can offer the chance of redemption.', '[\"classics\"]', 'crime_and_punishment.png'),
 (4, 'The Metamorphosis', 'Franz Kafka', '1915', 201, 'It is the story of a young man who, transformed overnight into a giant beetle-like insect, becomes an object of disgrace to his family, an outsider in his own home, a quintessentially alienated man. A harrowing—though absurdly comic—meditation on human feelings of inadequacy, guilt, and isolation, The Metamorphosis has taken its place as one of the most widely read and influential works of twentieth-century fiction. As W.H. Auden wrote, \"Kafka is important to us because his predicament is the predicament of modern man.\"', '[\"classics\"]', 'metamorphosis.png'),
 (5, '1984', 'George Orwell', '1949', 368, 'A masterpiece of rebellion and imprisonment where war is peace freedom is slavery and Big Brother is watching. Thought Police, Big Brother, Orwellian - these words have entered our vocabulary because of George Orwell\'s classic dystopian novel 1984. The story of one man\'s Nightmare Odyssey as he pursues a forbidden love affair through a world ruled by warring states and a power structure that controls not only information but also individual thought and memory 1984 is a prophetic haunting tale More relevant than ever before 1984 exposes the worst crimes imaginable the destruction of truth freedom and individuality.', '[\"classics\"]', '1984.png'),
@@ -72,7 +73,10 @@ CREATE TABLE `collections` (
 
 INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`) VALUES
 (6, 'asd', 'asdasd', '[{\"id\":1},{\"id\":4},{\"id\":6},{\"id\":5},{\"id\":2}]', ''),
-(10, 'asd', 'erree', '[{\"id\":6},{\"id\":2},{\"id\":1},{\"id\":5}]', 'asdasdasdasd');
+(10, 'asd', 'erree', '[{\"id\":6},{\"id\":2},{\"id\":1},{\"id\":5}]', 'asdasdasdasd'),
+(14, 'asde', 'Orwell', '[{\"id\":6},{\"id\":5}]', 'ksiązki orwella. duh'),
+(15, 'asde', 'asdasd', '[{\"id\":1},{\"id\":4},{\"id\":3},{\"id\":5},{\"id\":2}]', ''),
+(16, 'asdfghjkl', 'asdasd', '[{\"id\":5}]', 'adsdas');
 
 -- --------------------------------------------------------
 
@@ -84,15 +88,17 @@ CREATE TABLE `likes` (
   `id` int(11) NOT NULL,
   `user` varchar(50) NOT NULL,
   `review` int(11) DEFAULT NULL,
-  `collection` int(11) DEFAULT NULL
+  `collection` int(11) DEFAULT NULL,
+  `quote` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `likes`
 --
 
-INSERT INTO `likes` (`id`, `user`, `review`, `collection`) VALUES
-(50, 'asd', NULL, 6);
+INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`) VALUES
+(50, 'asd', NULL, 6, NULL),
+(52, 'asdfghjkl', 20, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -118,7 +124,53 @@ CREATE TABLE `new_books` (
 --
 
 INSERT INTO `new_books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`, `okladka`, `user`, `submit_date`) VALUES
-(9, 'qweqwe', 'qweqwe', '123', 123, 'asdasdasdasdasd\r\nasd\r\nasd\r\n\r\nasd', '[\"thriller\",\"sci-fi\"]', '2173c0936da4adf6e2f42dfcd534d2231729957656441.webp', 'asd', '2024-10-26 15:48:10');
+(27, 'asd', 'asd', 'asd', 12, '', '[\"horror\"]', '', 'asd', '2024-11-02 19:17:21'),
+(28, 'asdasd', 'asdasd', 'asd', 12, '', '[]', '', 'asd', '2024-11-02 19:17:26'),
+(29, 'asdasd', 'asd', 'asd', 12, '', '[]', '', 'asd', '2024-11-02 19:17:39'),
+(30, 'asdasd', 'asd', '12', 12, '', '[]', '', 'asd', '2024-11-02 19:17:45'),
+(31, 'asd', 'asdasd', '12', 12, '', '[]', '', 'asd', '2024-11-02 19:17:50'),
+(32, 'adssad', 'asd', 'asd', 12, '', '[]', '', 'asd', '2024-11-02 19:17:56'),
+(33, 'asdasd', 'asd', '1', 12, '', '[]', '', 'asd', '2024-11-02 19:31:59'),
+(34, 'asd', 'asd', 'asd', 12, '', '[]', '', 'asd', '2024-11-02 19:32:05'),
+(36, 'asdasd', 'asdasd', 'asd', 12, '', '[]', '9d7b6d5a4b5fecf7e0d94028e79988041730668287010.webp', 'asd', '2024-11-03 21:11:27'),
+(37, 'asdasd', 'asd', '123123', 123, 'sadad', '[\"classics\"]', '', 'asdfghjkl', '2025-06-05 10:57:28');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `quotes`
+--
+
+CREATE TABLE `quotes` (
+  `id` int(11) NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `book` int(11) NOT NULL,
+  `text` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `quotes`
+--
+
+INSERT INTO `quotes` (`id`, `user`, `book`, `text`) VALUES
+(2, 'qweqwe', 1, 'asdasd'),
+(3, 'qweqwe', 1, 'qweqwe'),
+(4, 'qweqwe', 1, 'tytyty'),
+(5, 'qweqwe', 1, 'asdasd'),
+(6, 'qweqwe', 1, 'asdasd'),
+(7, 'qweqwe', 1, 'mnmnmn'),
+(8, 'qweqwe', 1, 'asdasd'),
+(9, 'qweqwe', 1, 'ghghghgh'),
+(10, 'qweqwe', 1, 'asdasd'),
+(11, 'qweqwe', 1, 'ererererer'),
+(12, 'qweqwe', 1, 'asdasd'),
+(13, 'qweqwe', 1, 'gfhdufa'),
+(14, 'qweqwe', 1, 'asdasd'),
+(15, 'qweqwe', 1, 'xcxcxcxc'),
+(16, 'qweqwe', 1, 'asdasd'),
+(17, 'qweqwe', 1, 'vbbvvb'),
+(18, 'asdfghjkl', 1, 'popopopo'),
+(19, 'asdfghjkl', 5, 'qweqwewqe');
 
 -- --------------------------------------------------------
 
@@ -163,7 +215,23 @@ CREATE TABLE `reviews` (
 --
 
 INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
-(18, 'asd', 1, 'asdasdasdas', 0);
+(18, 'asd', 1, 'asdasdasdas', 0),
+(20, 'werwet', 1, 'sdfdsfdsf', 0),
+(21, 'qweqweasd', 1, 'asdsadasdasd', 0),
+(22, 'qwerty', 1, 'asdasd', 0),
+(23, 'qweqwe', 1, 'asdasdads', 0),
+(24, 'asdqweqwe', 1, 'asdasdasdasd', 0),
+(25, 'asdqweqwe', 1, 'asdasdasd', 0),
+(26, 'asdqweqwe', 1, 'asdasdsad', 0),
+(27, 'qweqwe', 1, 'asdasdsadasd', 0),
+(28, 'qwerty', 1, 'asdasdasdasd', 0),
+(29, 'qwerty', 1, 'asdasdasd', 0),
+(30, 'qweqweasd', 1, 'asdasdsad', 0),
+(31, 'werwet', 1, 'asd', 0),
+(32, 'werwet', 1, 'qweqwe', 0),
+(33, 'qweqweasd', 1, 'asdasddsa', 0),
+(34, 'werwet', 1, 'asdsadasd', 0),
+(36, 'asdfghjkl', 1, 'asdsadsadsad', 1);
 
 -- --------------------------------------------------------
 
@@ -182,7 +250,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('pD-_6pU7XUr4sN4Y11P4mGFZyLMhHntL', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2024-10-27T18:17:30.026Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asd\"}', 1730053050);
+('CUorJVFw1fd0A8W7WGDoCeygtrcw3fpe', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-06-07T10:32:45.097Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1749292365);
 
 -- --------------------------------------------------------
 
@@ -222,6 +290,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
 ('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '5a4b2af2489d115707bca8ef8875444c1729932155803.webp', 1),
+('asde', '$2a$10$m/utAoIDf7knKdE9TJoNPu/n3MSg2fOkcSgN4Xdd2MPCatXE2tSH6', 'sadasdasd@asd.pl', '', 0),
+('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 0),
 ('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0),
 ('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0),
 ('qweqweasd', '$2a$10$RaASisPr8CdrmAeQ2tKq1uN9jHy3N7fePZx01D.dc4XwjOLp/yaVm', 'asdasd@ASD.PL', '', 0),
@@ -252,7 +322,8 @@ ALTER TABLE `likes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `collection` (`collection`),
   ADD KEY `review` (`review`),
-  ADD KEY `user` (`user`) USING BTREE;
+  ADD KEY `user` (`user`) USING BTREE,
+  ADD KEY `quote` (`quote`);
 
 --
 -- Indeksy dla tabeli `new_books`
@@ -260,6 +331,14 @@ ALTER TABLE `likes`
 ALTER TABLE `new_books`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user` (`user`);
+
+--
+-- Indeksy dla tabeli `quotes`
+--
+ALTER TABLE `quotes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`user`),
+  ADD KEY `book` (`book`);
 
 --
 -- Indeksy dla tabeli `ratings`
@@ -303,25 +382,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `collections`
 --
 ALTER TABLE `collections`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- AUTO_INCREMENT for table `new_books`
 --
 ALTER TABLE `new_books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT for table `quotes`
+--
+ALTER TABLE `quotes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -333,7 +418,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -357,13 +442,21 @@ ALTER TABLE `collections`
 ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `likes_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `likes_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `likes_ibfk_4` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `new_books`
 --
 ALTER TABLE `new_books`
   ADD CONSTRAINT `new_books_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `quotes`
+--
+ALTER TABLE `quotes`
+  ADD CONSTRAINT `quotes_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
+  ADD CONSTRAINT `quotes_ibfk_2` FOREIGN KEY (`book`) REFERENCES `books` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `ratings`

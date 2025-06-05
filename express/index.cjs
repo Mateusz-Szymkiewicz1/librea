@@ -84,7 +84,7 @@ app.get('/book/:id', (req,res) => {
     if(rows && rows.length == 1){
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 15 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
-        connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY quotes.id DESC LIMIT 15 OFFSET ${req.query.offset}`,[req.params.id], (err3, rows3, fields3) => {
+        connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY likes DESC LIMIT 5 OFFSET ${req.query.quote_offset}`,[req.params.id], (err3, rows3, fields3) => {
           rows[0].quotes = rows3
           res.send(rows)
         })
@@ -141,7 +141,7 @@ app.post('/user/:login', (req,res) => {
           rows[0].collections = rows4
         }
       })
-      connection.query(`SELECT * FROM likes,reviews,books WHERE likes.user = ? AND likes.review = reviews.id AND books.id = ?;`,[req.params.login, req.body.book], (err5, rows5, fields5) => {
+      connection.query(`SELECT likes.*, reviews.id, quotes.id FROM likes LEFT JOIN reviews ON likes.review = reviews.id LEFT JOIN quotes ON likes.quote = quotes.id WHERE likes.user = ? AND ((likes.review IS NOT NULL AND reviews.book = ?) OR (likes.quote IS NOT NULL AND quotes.book = ?));`,[req.params.login, req.body.book,req.body.book], (err5, rows5, fields5) => {
         if(rows5){
           rows[0].likes = rows5
         }
@@ -149,6 +149,11 @@ app.post('/user/:login', (req,res) => {
       connection.query(`SELECT * FROM likes WHERE likes.user = ? AND likes.collection = ?`,[req.params.login, req.body.collection], (err6, rows6, fields6) => {
         if(rows6){
           rows[0].collections_likes = rows6
+        }
+      })
+      connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.user = ? AND quotes.book = ? GROUP BY quotes.id ORDER BY quotes.id DESC`,[req.params.login,req.body.book], (err7, rows7, fields7) => {
+        if(rows7){
+          rows[0].quotes = rows7
         }
       })
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) WHERE reviews.user = ? GROUP BY reviews.id ORDER BY reviews.id DESC`,[req.params.login], (err3, rows3, fields3) => {
@@ -288,6 +293,14 @@ app.post('/review', (req,res) => {
   })
 })
 
+app.post('/add_quote', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO quotes (user,book,text) VALUES ('${req.session.user}',?,?);`,[req.body.book,req.body.text], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+
 app.post('/edit_review', (req,res) => {
   if(!req.session.user) return
   connection.query(`UPDATE reviews SET text = ?, spoiler = ? WHERE id = ?`,[req.body.text,req.body.spoiler,req.body.id], (err, rows, fields) => {
@@ -298,6 +311,13 @@ app.post('/edit_review', (req,res) => {
 app.post('/delete_review', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM reviews WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/delete_quote', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM quotes WHERE id = ?`,[req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })
@@ -320,6 +340,20 @@ app.post('/review_like', (req,res) => {
 app.post('/review_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND review = ?`,[req.body.review], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/quote_like', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO likes (user,quote) VALUES ('${req.session.user}',?);`,[req.body.quote], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/quote_unlike', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND quote = ?`,[req.body.quote], (err, rows, fields) => {
     res.json("done")
   })
 })

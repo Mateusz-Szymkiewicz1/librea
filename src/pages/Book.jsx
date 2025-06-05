@@ -17,12 +17,16 @@ function Book(props) {
   const [textarea, setTextarea] = useState("")
   const [spoiler, setSpoiler] = useState(false)
   const [reviewCount, setReviewCount] = useState(0)
+  const [quoteCount, setQuoteCount] = useState(0)
   const [pages, setPages] = useState(0)
+  const [quotePages, setQuotePages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
+  const [currentQuotePage, setCurrentQuotePage] = useState(1)
   const [loading, setLoading] = useState(true)
   const [editReview, setEditReview] = useState("")
   const [editSpoiler, setEditSpoiler] = useState("")
   const [newCollections, setNewCollections] = useState([])
+  const [newQuote, setNewQuote] = useState("")
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -63,6 +67,32 @@ function Book(props) {
       },
       body: JSON.stringify({
         review: e.target.dataset.review
+      }),
+    })
+  }
+  const likeQuote = (e) => {
+    let link = ""
+    if(e.target.classList.contains("fa-regular")){
+      e.target.classList.remove("fa-regular")
+      e.target.classList.add("fa-solid")
+      link = "quote_like"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes+1
+    }else{
+      e.target.classList.remove("fa-solid")
+      e.target.classList.add("fa-regular")
+      link = "quote_unlike"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes-1
+    }
+    fetch("http://localhost:3000/"+link, {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        quote: e.target.dataset.quote
       }),
     })
   }
@@ -129,12 +159,13 @@ function Book(props) {
         })
       }
     })
-    fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*15)).then(res => res.json()).then(res => {
+    fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*15)+"&quote_offset="+((currentQuotePage-1)*5)).then(res => res.json()).then(res => {
       if(res.status != 0){
         console.log(res[0])
         res[0].tagi = JSON.parse(res[0].tagi)
         setBook(res[0])
         setReviewCount(res[0].ilosc_recenzji)
+        setQuoteCount(res[0].ilosc_cytatow)
       }
       setLoading(false)
     })
@@ -146,6 +177,9 @@ function Book(props) {
   useEffect(() => {
     setPages(Math.ceil(reviewCount/15))
   }, [reviewCount])
+  useEffect(() => {
+    setQuotePages(Math.ceil(quoteCount/5))
+  }, [quoteCount])
   const pageChange = (e) => {
     let offset = (e.selected)*15
     setCurrentPage(e.selected+1)
@@ -154,6 +188,18 @@ function Book(props) {
         res[0].tagi = JSON.parse(res[0].tagi)
         setBook(res[0])
         document.querySelector("#reviews").scrollIntoView()
+      }
+    })
+  }
+  const quotePageChange = (e) => {
+    let offset = (currentPage-1)*15
+    setCurrentQuotePage(e.selected+1)
+    let quoteOffset = e.selected*5
+    fetch('http://localhost:3000/book/'+book_id+"?offset="+offset+"&quote_offset="+quoteOffset).then(res => res.json()).then(res => {
+      if(res.status != 0){
+        res[0].tagi = JSON.parse(res[0].tagi)
+        setBook(res[0])
+        document.querySelector("#quotes").scrollIntoView()
       }
     })
   }
@@ -181,11 +227,41 @@ function Book(props) {
       props.setToast({type:"msg",text:"Review deleted!"})
     })
   }
+  const deleteQuote = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    fetch("http://localhost:3000/delete_quote", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: e.target.dataset.quote
+      })
+    }).then(() => {
+      setRefresh(!refresh)
+      props.setToast({type:"msg",text:"Quote deleted!"})
+    })
+  }
   const closeEdit = () => {
     document.querySelector('.edit').classList.add("hidden")
   }
   const showEdit = () => {
     document.querySelector('.edit').classList.remove("hidden")
+  }
+  const closeNewQuote = () => {
+    document.querySelector('.new_quote').classList.add("hidden")
+  }
+  const showNewQuote = () => {
+    document.querySelector('.new_quote').classList.remove("hidden")
   }
   const closeAddToCollection = () => {
     document.querySelector('.add_to_collection').classList.add("hidden")
@@ -282,6 +358,24 @@ function Book(props) {
         navigator("/")
         props.setToast({type:"msg", text:"Deleted a book!", stay: true})
       })
+  }
+  const addQuote = async () => {
+    fetch("http://localhost:3000/add_quote", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        book: book_id,
+        text: newQuote
+      }),
+    }).then(res => res.json()).then(res => {
+        setNewQuote("")
+        closeNewQuote()
+        setRefresh(!refresh)
+        props.setToast({type:"msg", text:"Added a quote!"})
+    })
   }
   return (
     <>
@@ -487,13 +581,85 @@ function Book(props) {
               {book.ilosc_cytatow == 0 &&
                 <p className="text-xl dark:text-gray-300 mt-3">No quotes yet!</p>
               }
-              <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-4 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add a quote</button>
+              <button onClick={showNewQuote} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-4 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add a quote</button>
+              {user && user.quotes && currentQuotePage == 1 && user.quotes.map((el, i) => {
+                  return (
+                    <div className="bg-blue-950 p-5 text-white my-5 relative" key={el.id}>
+                      <p className="clear-both break-words text-xl pt-3">"{el.text}"</p>
+                        <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
+                        <span className="absolute top-3 right-5"><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteQuote} data-quote={el.id}></i></span>
+                      <div>
+                        {user && user.likes.find(x => x.quote == el.id) &&
+                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                        }
+                        {user && !user.likes.find(x => x.quote == el.id) &&
+                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                        }
+                        {!user &&
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-3 cursor-pointer"></i></NavLink>
+                        }
+                        <span className="pl-2 text-xl">{el.likes}</span>
+                      </div>
+                    </div>
+                  )
+              })}
+              {book.quotes && book.quotes.map((el, i) => {
+                  if(user && el.user == user.login) return
+                  return (
+                    <div className="bg-neutral-700 p-5 text-white my-5" key={el.id}>
+                      <p className="clear-both break-words  text-xl pt-3">"{el.text}"</p>
+                        <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
+                      <div>
+                        {user && user.likes.find(x => x.quote == el.id) &&
+                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                        }
+                        {user && !user.likes.find(x => x.quote == el.id) &&
+                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                        }
+                        {!user &&
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-3 cursor-pointer"></i></NavLink>
+                        }
+                        <span className="pl-2 text-xl">{el.likes}</span>
+                      </div>
+                    </div>
+                  )
+              })}
+              {quotePages > 1 &&
+                <>
+                  <ReactPaginate
+                    breakLabel="..."
+                    nextLabel="Next"
+                    pageRangeDisplayed={5}
+                    pageCount={quotePages}
+                    previousLabel="Previous"
+                    renderOnZeroPageCount={null}
+                    onPageChange={quotePageChange}
+                    className="flex gap-3 mb-10"
+                    nextLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-10 hover:bg-blue-600"
+                    previousLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-12 hover:bg-blue-600"
+                    pageLinkClassName="cursor-pointer bg-blue-500 block p-5 flex justify-center items-center w-8 text-slate-200 h-8 text-xl hover:bg-blue-600"
+                    activeClassName="brightness-125"
+                  />
+                </>
+              }
             </div>
           }
           {!book.id > 0 && !loading &&
             <NoMatch></NoMatch>
           }
       </div>
+      {
+        <div className="new_quote z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Add a quote</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeNewQuote}></i>
+          </div>
+          <textarea value={newQuote} onChange={(e) => setNewQuote(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg h-32 block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="You should probably write it here..."/>
+        <button onClick={addQuote} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Submit</button>
+        </div>
+      </div>
+      }
       {!book.id > 0 && loading &&
         <div role="status" className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-neutral-800 z-50">
         <svg aria-hidden="true" className="inline w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
