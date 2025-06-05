@@ -241,7 +241,7 @@ function NewBook(props) {
           }
           </>
         } 
-          <div className="w-full lg:w-1/2 float-left p-2 sm:p-5">
+          <div className="w-full lg:w-1/2 float-left p-2 sm:p-5 mb-28">
         <div className="bg-neutral-700  h-full w-full p-5">
           <h1 className="text-white text-3xl">Add a new book</h1>
           <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>

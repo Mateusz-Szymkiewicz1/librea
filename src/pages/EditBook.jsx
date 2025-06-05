@@ -20,6 +20,7 @@ function EditBook(props) {
   const [cover, setCover] = useState([])
   const [deletedCover, setDeletedCover] = useState(false)
   const [coverName, setCoverName] = useState([])
+  const [admin, setAdmin] = useState(false)
 
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -32,7 +33,20 @@ function EditBook(props) {
       if(res.text){
         navigator("/")
       }else{
-        setLoading(false)
+        fetch("http://localhost:3000/user/"+res, {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then(res => res.json()).then(res =>{
+          if(res[0].admin == 0){
+            navigator("/")
+          }else{
+            setAdmin(true)
+          }
+          setLoading(false)
+        })       
       }
     })
     fetch('http://localhost:3000/book/'+book_id+"?offset=0").then(res => res.json()).then(res => {
@@ -108,9 +122,9 @@ function EditBook(props) {
   }
   return (
     <>
-      {!loading &&
+      {!loading && admin &&
       <>
-          <div className="w-full lg:w-1/2 float-left p-2 sm:p-5">
+          <div className="w-full lg:w-1/2 float-left p-2 sm:p-5 mb-28">
         <div className="bg-neutral-700  h-full w-full p-5">
           <h1 className="text-white text-3xl">Edit book</h1>
           <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>

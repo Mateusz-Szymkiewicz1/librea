@@ -10,6 +10,8 @@ function Admin(props) {
   const [offset, setOffset] = useState(0)
   const [refresh, setRefresh] = useState(false)
   const [numOfSubmissions, setNumOfSubmissions] = useState(0)
+  const [admin, setAdmin] = useState(false)
+
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -21,7 +23,20 @@ function Admin(props) {
       if(res.text){
         navigator("/")
       }else{
-        setLoading(false)
+        fetch("http://localhost:3000/user/"+res, {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then(res => res.json()).then(res =>{
+          if(res[0].admin == 0){
+            navigator("/")
+          }else{
+            setAdmin(true)
+          }
+          setLoading(false)
+        })      
       }
     })
   }, [])
@@ -134,7 +149,7 @@ function Admin(props) {
   }
   return (
     <>
-      {!loading &&
+      {!loading && admin &&
         <div className="mx-5 my-10">
           <h1 className="text-3xl"><i className="fa fa-user-tie mr-3 text-blue-500"></i>Admin Panel</h1>
           {submissions.length > 0 &&

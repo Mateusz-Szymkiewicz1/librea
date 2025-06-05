@@ -1,4 +1,5 @@
 import Header from './components/Header.jsx'
+import Footer from './components/Footer.jsx'
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Book from './pages/Book.jsx';
@@ -57,6 +58,7 @@ function App() {
           {msg &&
             <Toast msg={msg} closeToast={closeToast}></Toast>
           }
+          <Footer></Footer>
       </div>
     </>
   )
