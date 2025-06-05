@@ -1,3 +1,4 @@
+import icon from '../../public/icon.png';
 function Footer() {
   const rok = new Date().getFullYear()
   return (
@@ -6,7 +7,7 @@ function Footer() {
         <div className="md:flex md:justify-between">
           <div className="mb-6 md:mb-0">
               <div className="flex items-center">
-                  <img src="icon.png" className="h-16" alt="Librea Logo" />
+                  <img src={icon} className="h-16" alt="Librea Logo" />
                   <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Librea</span>
               </div>
           </div>

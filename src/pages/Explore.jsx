@@ -5,6 +5,7 @@ function Explore() {
   const [user, setUser] = useState()
   const [loading, setLoading] = useState()
   const [popular, setPopular] = useState([])
+  const [newlyAdded, setNewlyAdded] = useState([])
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -33,9 +34,12 @@ function Explore() {
     fetch("http://localhost:3000/popular_books").then(res => res.json()).then(res => {
       setPopular([...res])
     })
+    fetch("http://localhost:3000/new_books").then(res => res.json()).then(res => {
+      setNewlyAdded([...res])
+    })
   }, [])
   return (
-    <div className="ml-5 mt-10">
+    <div className="mx-5 mt-10">
       {user &&
         <>
           <h1 className="text-3xl"><i className="fa fa-binoculars mr-3 text-blue-500"></i>Explore</h1>
@@ -52,6 +56,21 @@ function Explore() {
               </div>
             </>
           }
+          <div>
+                  {newlyAdded.length > 0 &&
+                      <>
+                        <p className='text-slate-200 font-semibold text-2xl mt-16'>Newly added</p>
+                        <div className='flex flex-wrap gap-5 my-3 mb-20'>
+                          {newlyAdded.map((el,i) => 
+                          <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
+                            <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
+                            <p className="text-white mt-3 text-xl">{el.tytul}</p>
+                            <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
+                          </div></NavLink>)}
+                        </div>
+                      </>
+                    }
+                  </div>
         </>
       }
       {!user && loading &&

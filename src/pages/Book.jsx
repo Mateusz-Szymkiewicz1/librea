@@ -129,7 +129,7 @@ function Book(props) {
         })
       }
     })
-    fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*50)).then(res => res.json()).then(res => {
+    fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*15)).then(res => res.json()).then(res => {
       if(res.status != 0){
         console.log(res[0])
         res[0].tagi = JSON.parse(res[0].tagi)
@@ -144,10 +144,10 @@ function Book(props) {
     setReviewCount(reviewCount-1)
   }, [review])
   useEffect(() => {
-    setPages(Math.ceil(reviewCount/50))
+    setPages(Math.ceil(reviewCount/15))
   }, [reviewCount])
   const pageChange = (e) => {
-    let offset = (e.selected)*50
+    let offset = (e.selected)*15
     setCurrentPage(e.selected+1)
     fetch('http://localhost:3000/book/'+book_id+"?offset="+offset).then(res => res.json()).then(res => {
       if(res.status != 0){
@@ -420,7 +420,7 @@ function Book(props) {
               {book.reviews.map((el, i) => {
                   if(user && el.user == user.login) return
                   return (
-                    <div className="bg-neutral-700 p-5 text-white my-5" key={i}>
+                    <div className="bg-neutral-700 p-5 text-white my-5" key={el.id}>
                       <NavLink to={"/profile/"+el.user}>
                       <h3 className="text-xl">
                         {el.prof && 
@@ -473,13 +473,22 @@ function Book(props) {
                 previousLabel="Previous"
                 renderOnZeroPageCount={null}
                 onPageChange={pageChange}
-                className="flex gap-3 ml-10 mb-10"
+                className="flex gap-3 sm:ml-5 ml-3 sm:mr-16 mr-3 mb-10"
                 nextLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-10 hover:bg-blue-600"
                 previousLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-12 hover:bg-blue-600"
                 pageLinkClassName="cursor-pointer bg-blue-500 block p-5 flex justify-center items-center w-8 text-slate-200 h-8 text-xl hover:bg-blue-600"
                 activeClassName="brightness-125"
               />
             </>
+          }
+          {
+            <div className="sm:ml-5 ml-3 sm:mr-16 mr-3">
+              <h2 id="quotes" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Quotes ({book.ilosc_cytatow})</h2>
+              {book.ilosc_cytatow == 0 &&
+                <p className="text-xl dark:text-gray-300 mt-3">No quotes yet!</p>
+              }
+              <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-4 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add a quote</button>
+            </div>
           }
           {!book.id > 0 && !loading &&
             <NoMatch></NoMatch>

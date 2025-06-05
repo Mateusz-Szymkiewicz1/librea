@@ -80,11 +80,14 @@ app.get('/book/:id', (req,res) => {
   }catch(e){
     res.send({ status: 0, text: "No matches found..."})
   }
-  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id  WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji, COUNT(DISTINCT quotes.id) AS ilosc_cytatow FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id LEFT JOIN quotes ON quotes.book = books.id WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 50 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
+      connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 15 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
-        res.send(rows)
+        connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY quotes.id DESC LIMIT 15 OFFSET ${req.query.offset}`,[req.params.id], (err3, rows3, fields3) => {
+          rows[0].quotes = rows3
+          res.send(rows)
+        })
       })
     }else{
       res.send({ status: 0, text: "No matches found..."})
@@ -99,6 +102,15 @@ app.get('/popular_books', (req,res) => {
     }
   })
 })
+
+app.get('/new_books', (req,res) => {
+  connection.query(`SELECT books.* FROM books ORDER BY books.id DESC LIMIT 10`, (err, rows, fields) => {
+    if(rows && rows.length > 0){
+      res.send(rows)
+    }
+  })
+})
+
 
 app.get('/collection/:id', (req,res) => {
   connection.query(`SELECT collections.*, COUNT(likes.id) AS likes FROM collections LEFT JOIN likes ON collections.id = likes.collection WHERE collections.id = ? GROUP BY collections.id`,[req.params.id], (err, rows, fields) => {
