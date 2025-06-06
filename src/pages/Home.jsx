@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import BookCard from '../components/BookCard.jsx';
+import CollectionCard from '../components/CollectionCard.jsx';
 
 function Home() {
   const navigate = useNavigate();
@@ -143,43 +144,9 @@ function Home() {
             <p className='text-slate-200 text-2xl ml-5 mt-16'>Your collections</p>
             <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Create a collection</button></NavLink>
             <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
-            {user.collections.map(el => {
-              return (
-                <NavLink to={"/collection/"+el.id} key={el.id}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <div className='grid grid-cols-2'>
-                  <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[0].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  {el.books.length > 1 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[1].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  }
-                  {el.books.length > 2 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[2].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  }
-                  {el.books.length > 3 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+el.books[3].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  }
-                  {el.books.length == 1 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    </>
-                  }
-                  {el.books.length == 2 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    </>
-                  }
-                  {el.books.length == 3 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="/default.jpg"></img>
-                    </>
-                  }
-                  </div>
-                  <p className="text-white mt-3 text-xl">{el.name}</p>
-                  <p className="text-slate-200 mt-1 text-lg">by: {el.user}</p>
-                </div></NavLink>)
-            })}
+            {user.collections.map(el =>
+              <CollectionCard collection={el} key={el.id}></CollectionCard>
+            )}
             </div>
             </>
           }

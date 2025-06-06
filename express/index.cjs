@@ -141,7 +141,7 @@ app.post('/user/:login', (req,res) => {
           rows[0].collections = rows4
         }
       })
-      connection.query(`SELECT likes.*, reviews.id, quotes.id FROM likes LEFT JOIN reviews ON likes.review = reviews.id LEFT JOIN quotes ON likes.quote = quotes.id WHERE likes.user = ? AND ((likes.review IS NOT NULL AND reviews.book = ?) OR (likes.quote IS NOT NULL AND quotes.book = ?));`,[req.params.login, req.body.book,req.body.book], (err5, rows5, fields5) => {
+      connection.query(`SELECT likes.* FROM likes LEFT JOIN reviews ON likes.review = reviews.id LEFT JOIN quotes ON likes.quote = quotes.id WHERE likes.user = ? AND ( ? IS NULL OR ((likes.review IS NOT NULL AND reviews.book = ?)OR (likes.quote IS NOT NULL AND quotes.book = ?)));`,[req.params.login, req.body.book,req.body.book,req.body.book], (err5, rows5, fields5) => {
         if(rows5){
           rows[0].likes = rows5
         }

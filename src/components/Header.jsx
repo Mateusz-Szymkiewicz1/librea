@@ -17,33 +17,9 @@ function Header() {
       return
     }
     fetch("http://localhost:3000/search_autocomplete/"+search).then(res => res.json()).then(res => {
-      if(res.text){
-        setAutofill([])
-      }else{
-        setAutofill([...res])
-      }
+      res.text ? setAutofill([]) : setAutofill([...res])
     })
   }, [search])
-  useEffect(() => {
-    document.addEventListener("click", function(e){
-      if(e.target.classList.contains("suggestion")){
-        navigator("/book/"+e.target.dataset.book)
-      }
-      if(!e.target.classList.contains("profMenu") && !document.querySelector(".dropdown_user").classList.contains("hidden")){
-        document.querySelector(".dropdown_user").classList.add("hidden")
-      }
-      setAutofill([])
-    })
-  }, [])
-  const wyloguj = () => {
-    fetch("http://localhost:3000/signout", {
-      credentials: 'include',
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }).then(() => window.location.href = '/')
-  }
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',
@@ -66,7 +42,25 @@ function Header() {
         })
       }
     })
+    document.addEventListener("click", function(e){
+      if(e.target.classList.contains("suggestion")){
+        navigator("/book/"+e.target.dataset.book)
+      }
+      if(!e.target.classList.contains("profMenu") && !document.querySelector(".dropdown_user").classList.contains("hidden")){
+        document.querySelector(".dropdown_user").classList.add("hidden")
+      }
+      setAutofill([])
+    })
   }, [])
+  const wyloguj = () => {
+    fetch("http://localhost:3000/signout", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(() => window.location.href = '/')
+  }
   const toggleDropdown = () => {
     if(document.querySelector(".dropdown_user").classList.contains("hidden")){
       document.querySelector(".dropdown_user").classList.remove("hidden")

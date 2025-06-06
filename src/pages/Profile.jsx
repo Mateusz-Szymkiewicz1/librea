@@ -4,6 +4,7 @@ import { NavLink } from "react-router-dom"
 import { FileUpload } from 'primereact/fileupload';
 import { useDecision } from "../components/useDecision";
 import BookCard from "../components/BookCard";
+import CollectionCard from "../components/CollectionCard";
 
 function Profile(props) {
   const [profile, setProfile] = useState()
@@ -77,7 +78,9 @@ function Profile(props) {
           res[0].reviews.slice(-5).reverse().forEach(el => {
             fetch("http://localhost:3000/book/"+el.book).then(res2 => res2.json()).then(res2 => {
               if(!res2.text && !recentreviews.find(x => x.id == res2[0].id)){
-                setRecentreviews([...recentreviews, res2[0]])
+                let obj = el;
+                obj.book = res2[0]
+                setRecentreviews([...recentreviews, obj])
               }
             })
           })
@@ -156,6 +159,32 @@ function Profile(props) {
         props.setToast({type: "msg", text: "You've just changed your profile picture!"})
       })
   }
+  const like = (e) => {
+    let link = ""
+    if(e.target.classList.contains("fa-regular")){
+      e.target.classList.remove("fa-regular")
+      e.target.classList.add("fa-solid")
+      link = "review_like"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes+1
+    }else{
+      e.target.classList.remove("fa-solid")
+      e.target.classList.add("fa-regular")
+      link = "review_unlike"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes-1
+    }
+    fetch("http://localhost:3000/"+link, {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        review: e.target.dataset.review
+      }),
+    })
+  }
   return (
     <>
       <div className="px-5 mt-5">
@@ -190,43 +219,9 @@ function Profile(props) {
             <>
             <p className='text-slate-200 text-2xl ml-5 mt-5'>Collections</p>
             <div className='flex flex-wrap gap-5 ml-5 my-3 mb-4'>
-            {profile.collections.slice(0,collectionLimit).map(el => {
-              return (
-                <NavLink to={"/collection/"+el.id} key={el.id}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
-                  <div className='grid grid-cols-2'>
-                  <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[0].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  {el.books.length > 1 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[1].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  }
-                  {el.books.length > 2 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[2].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  }
-                  {el.books.length > 3 &&
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src={"../../public/uploads/"+el.books[3].okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  }
-                  {el.books.length == 1 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    </>
-                  }
-                  {el.books.length == 2 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    </>
-                  }
-                  {el.books.length == 3 &&
-                    <>
-                    <img className="h-20 w-20 object-cover border border-neutral-500" src="../../public/default.jpg"></img>
-                    </>
-                  }
-                  </div>
-                  <p className="text-white mt-3 text-xl">{el.name}</p>
-                  <p className="text-slate-200 mt-1 text-lg">by: {el.user}</p>
-                </div></NavLink>)
-            })}
+            {profile.collections.slice(0,collectionLimit).map(el =>
+              <CollectionCard collection={el} key={el.id} light={true}></CollectionCard>
+            )}
             </div>
             {collectionLimit < profile.collections.length &&
               <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 ml-5 block hover:bg-blue-700' onClick={() => setCollectionLimit(val => val+10)}>See more</button>
@@ -254,12 +249,48 @@ function Profile(props) {
             <>
               <p className='text-slate-200 text-2xl ml-5 mt-16'>Recent reviews</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
-                {recentreviews.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                {recentreviews.map((el,i) => {
+                  return(
+                    <div className="bg-neutral-600 mr-5 w-full p-5 text-white my-5" key={el.id}>
+                                          <h3 className="text-xl">
+                                            {el.prof && 
+                                              <img className="block h-10 w-10 cover-fit w-fit float-left" src={"user_uploads/profs/"+el.prof} onError={(e) => {
+                                                e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
+                                                }}></img>
+                                            }
+                                            {!el.prof &&
+                                              <span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> 
+                                            }
+                                            <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
+                                          </h3>
+                                          {el.rating &&
+                                            <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
+                                          }
+                                          {el.spoiler == "0" &&
+                                            <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
+                                          }
+                                          {el.spoiler == "1" &&
+                                            <p className="clear-both text-xl pt-3 text-red-400">This review contains spoilers! <span className="underline cursor-pointer" onClick={() => {
+                                              recentreviews[i].spoiler = 0
+                                              setRecentreviews([...recentreviews])
+                                            }}>Reveal</span></p>
+                                          }
+                                          <p className="mt-3">On <NavLink className="text-blue-400 italic" to={"/book/"+el.book.id}>{el.book.tytul}</NavLink> by {el.book.autor}</p>
+                                          <div>
+                                            {user && user.likes.find(x => x.review == el.id) &&
+                                              <i onClick={like} className="fa-solid fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                                            }
+                                            {user && !user.likes.find(x => x.review == el.id) &&
+                                              <i onClick={like} className="fa-regular fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                                            }
+                                            {!user &&
+                                              <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-5 cursor-pointer"></i></NavLink>
+                                            }
+                                            <span className="pl-2 text-xl">{el.likes}</span>
+                                          </div>
+                                        </div>
+                  )
+                })}
               </div>
             </>
           }

@@ -1,5 +1,4 @@
-import { createElement, useEffect } from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Rating } from 'react-simple-star-rating'
 import { NavLink, useNavigate } from "react-router-dom"
 import NoMatch from "./NoMatch"
@@ -559,6 +558,7 @@ function Book(props) {
                   if(user && el.user == user.login) return
                   return (
                     <div className="bg-neutral-700 p-5 text-white my-5" key={el.id}>
+                      <div className="flex justify-between">
                       <NavLink to={"/profile/"+el.user}>
                       <h3 className="text-xl">
                         {el.prof && 
@@ -571,6 +571,8 @@ function Book(props) {
                         }
                         <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                       </h3></NavLink>
+                      <span><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                      </div>
                       {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                       }

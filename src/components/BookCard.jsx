@@ -3,11 +3,7 @@ function BookCard(props) {
   let book = props.book
   let light = props.light || false
   let bg, rating;
-  if(light){
-    bg = "bg-neutral-600 hover:bg-neutral-500"
-  }else{
-    bg = "bg-neutral-700 hover:bg-neutral-600"
-  }
+  light ? bg = "bg-neutral-600 hover:bg-neutral-500" : bg = "bg-neutral-700 hover:bg-neutral-600"
   book.ilosc_ocen == 0 ? rating = "None" : rating = (book.suma_ocen/book.ilosc_ocen).toFixed(1)
   return (
     <>
