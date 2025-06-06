@@ -3,6 +3,7 @@ import NoMatch from "./NoMatch"
 import { NavLink } from "react-router-dom"
 import { FileUpload } from 'primereact/fileupload';
 import { useDecision } from "../components/useDecision";
+import BookCard from "../components/BookCard";
 
 function Profile(props) {
   const [profile, setProfile] = useState()
@@ -33,6 +34,7 @@ function Profile(props) {
           }
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
+            console.log(res2[0])
             setUser(res2[0])
           }
         })
@@ -235,12 +237,16 @@ function Profile(props) {
             <>
               <p className='text-slate-200 text-2xl ml-5 mt-16'>Recently rated</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-10'>
-                {recentlyrated.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-600 hover:bg-neutral-500 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"../../public/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                {recentlyrated.map((el,i) => {
+                  let rating = profile.ratings.find(x => x.book == el.id).rating
+                  return(
+                    <div key={el.id} className="relative">
+                      <BookCard book={el} light={true}></BookCard>
+                      <span className="text-xl bg-neutral-700 p-3 absolute top-3 right-3 shadow rounded">{rating} <i className="fa fa-star text-yellow-300"></i></span>
+                    </div>
+                  )
+                  })
+                }
               </div>
             </>
           }

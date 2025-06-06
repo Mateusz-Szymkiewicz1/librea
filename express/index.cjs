@@ -96,7 +96,7 @@ app.get('/book/:id', (req,res) => {
 })
 
 app.get('/popular_books', (req,res) => {
-  connection.query(`SELECT books.*, COUNT(ratings.id) AS ratings FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id HAVING COUNT(ratings.id) > 0 ORDER BY COUNT(ratings.id) DESC LIMIT 10`, (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id HAVING COUNT(ratings.id) > 0 ORDER BY COUNT(ratings.id) DESC LIMIT 10`, (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }
@@ -104,7 +104,7 @@ app.get('/popular_books', (req,res) => {
 })
 
 app.get('/new_books', (req,res) => {
-  connection.query(`SELECT books.* FROM books ORDER BY books.id DESC LIMIT 10`, (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id ORDER BY books.id DESC LIMIT 10`, (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }

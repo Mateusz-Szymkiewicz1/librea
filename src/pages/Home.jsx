@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
+import BookCard from '../components/BookCard.jsx';
 
 function Home() {
   const navigate = useNavigate();
@@ -187,11 +188,8 @@ function Home() {
               <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recently rated</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentlyrated.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                  <BookCard book={el} key={el.id}></BookCard>
+                )}
               </div>
             </>
           }
@@ -200,11 +198,8 @@ function Home() {
               <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recent reviews</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentreviews.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                  <BookCard book={el} key={el.id}></BookCard>
+                )}
               </div>
             </>
           }
@@ -218,11 +213,8 @@ function Home() {
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Popular</p>
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {popular.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                  <BookCard book={el} key={el.id}></BookCard>
+                )}
               </div>
             </>
           }
@@ -233,11 +225,8 @@ function Home() {
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Newly added</p>
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {newlyAdded.map((el,i) => 
-                <NavLink to={"/book/"+el.id} key={i}><div className='bg-neutral-700 hover:bg-neutral-600 p-5'>
-                  <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
-                  <p className="text-white mt-3 text-xl">{el.tytul}</p>
-                  <p className="text-slate-200 mt-1 text-lg">{el.autor}</p>
-                </div></NavLink>)}
+                <BookCard book={el} key={el.id}></BookCard>
+                )}
               </div>
             </>
           }
