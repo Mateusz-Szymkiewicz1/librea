@@ -295,7 +295,14 @@ app.post('/review', (req,res) => {
 
 app.post('/add_quote', (req,res) => {
   if(!req.session.user) return
-  connection.query(`INSERT INTO quotes (user,book,text) VALUES ('${req.session.user}',?,?);`,[req.body.book,req.body.text], (err, rows, fields) => {
+  let quote = req.body.text
+  if(quote[0] == '"' || quote[0] == "'"){
+    quote = quote.substring(1)
+  }
+  if(quote[quote.length-1] == '"' || quote[quote.length-1] == "'"){
+    quote = quote.substring(0, quote.length-1)
+  }
+  connection.query(`INSERT INTO quotes (user,book,text) VALUES ('${req.session.user}',?,?);`,[req.body.book,quote], (err, rows, fields) => {
     res.json("done")
   })
 })
@@ -304,6 +311,20 @@ app.post('/add_quote', (req,res) => {
 app.post('/edit_review', (req,res) => {
   if(!req.session.user) return
   connection.query(`UPDATE reviews SET text = ?, spoiler = ? WHERE id = ?`,[req.body.text,req.body.spoiler,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/edit_quote', (req,res) => {
+  if(!req.session.user) return
+  let quote = req.body.text
+  if(quote[0] == '"' || quote[0] == "'"){
+    quote = quote.substring(1)
+  }
+  if(quote[quote.length-1] == '"' || quote[quote.length-1] == "'"){
+    quote = quote.substring(0, quote.length-1)
+  }
+  connection.query(`UPDATE quotes SET text = ? WHERE id = ?`,[quote,req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })

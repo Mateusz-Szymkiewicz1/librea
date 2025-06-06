@@ -27,6 +27,8 @@ function Book(props) {
   const [editSpoiler, setEditSpoiler] = useState("")
   const [newCollections, setNewCollections] = useState([])
   const [newQuote, setNewQuote] = useState("")
+  const [editQuote, setEditQuote] = useState("")
+  const [editedQuote, setEditedQuote] = useState()
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -263,6 +265,14 @@ function Book(props) {
   const showNewQuote = () => {
     document.querySelector('.new_quote').classList.remove("hidden")
   }
+   const closeEditQuote = () => {
+    document.querySelector('.edit_quote').classList.add("hidden")
+  }
+  const showEditQuote = (e) => {
+    document.querySelector('.edit_quote').classList.remove("hidden")
+    setEditQuote(e.target.dataset.text)
+    setEditedQuote(e.target.dataset.quote)
+  }
   const closeAddToCollection = () => {
     document.querySelector('.add_to_collection').classList.add("hidden")
   }
@@ -273,6 +283,36 @@ function Book(props) {
     if(review.length < 1) return
     setEditReview(review[0].text)
   }, [review])
+  const editQuoteFun = async () => {
+    if(editQuote.length < 1){
+      props.setToast({type:"error", text: "Write something!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/edit_quote", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editedQuote,
+          text: editQuote
+        })
+      }).then(() => {
+        closeEditQuote()
+        setRefresh(!refresh)
+        props.setToast({type:"msg",text:"Quote changed!"})
+      })
+  }
   const editReviewFun = async () => {
     if(editReview.length < 1){
       props.setToast({type:"error", text: "Write something!"})
@@ -360,6 +400,10 @@ function Book(props) {
       })
   }
   const addQuote = async () => {
+    if(newQuote.length < 1){
+      props.setToast({type:"error",text: "Write something!"})
+      return
+    }
     fetch("http://localhost:3000/add_quote", {
       credentials: 'include',
       method: "POST",
@@ -587,7 +631,7 @@ function Book(props) {
                     <div className="bg-blue-950 p-5 text-white my-5 relative" key={el.id}>
                       <p className="clear-both break-words text-xl pt-3">"{el.text}"</p>
                         <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
-                        <span className="absolute top-3 right-5"><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteQuote} data-quote={el.id}></i></span>
+                        <span className="absolute top-3 right-5"><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEditQuote} data-text={el.text} data-quote={el.id}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteQuote} data-quote={el.id}></i></span>
                       <div>
                         {user && user.likes.find(x => x.quote == el.id) &&
                           <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
@@ -657,6 +701,18 @@ function Book(props) {
           </div>
           <textarea value={newQuote} onChange={(e) => setNewQuote(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg h-32 block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="You should probably write it here..."/>
         <button onClick={addQuote} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Submit</button>
+        </div>
+      </div>
+      }
+      {user &&
+        <div className="edit_quote z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Edit a quote</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEditQuote}></i>
+          </div>
+          <textarea value={editQuote} onChange={(e) => setEditQuote(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg h-32 block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="You should probably write it here..."/>
+        <button onClick={editQuoteFun} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Submit</button>
         </div>
       </div>
       }

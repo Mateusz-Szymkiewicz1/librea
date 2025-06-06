@@ -141,7 +141,7 @@ function Home() {
           {user.collections.length > 0 &&
             <>
             <p className='text-slate-200 text-2xl ml-5 mt-16'>Your collections</p>
-            <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'>Create a collection</button></NavLink>
+            <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Create a collection</button></NavLink>
             <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
             {user.collections.map(el => {
               return (
