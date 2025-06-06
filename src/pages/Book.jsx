@@ -421,6 +421,7 @@ function Book(props) {
     })
   }
   const toggleDropdown = async (e) => {
+    e.stopPropagation()
     const menu = e.target.parentElement.parentElement.parentElement.querySelector('.drop_menu')
     document.querySelectorAll('.drop_menu').forEach(el => {
       if(!el.classList.contains("hidden") && el != menu){
@@ -433,6 +434,37 @@ function Book(props) {
       menu.classList.add("hidden")
     }
   }
+  const report = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/report", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: e.target.dataset.id,
+          type: e.target.dataset.type
+        })
+      }).then(res => res.json()).then(res => {
+          props.setToast({type:"msg", text:"Sent a report!"})
+      })
+  }
+  useEffect((e) => {
+    document.addEventListener("click", function(e){
+      document.querySelectorAll('.drop_menu').forEach(el => {
+        el.classList.add("hidden")
+      })
+    })
+  }, [])
   return (
     <>
       <div>
@@ -486,7 +518,7 @@ function Book(props) {
               }
               {user && user.admin == 1 &&
                 <div>
-                  <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3 block hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
+                  <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3  hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
                   <button className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700' onClick={deleteBook}><i className="fa fa-trash mr-3"></i>Delete book</button>
                 </div>
               }
@@ -589,11 +621,11 @@ function Book(props) {
                       }
                       </div>
                       {user &&
-                      <div className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
+                      <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
                         {user.admin &&
                           <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" onClick={deleteReview} data-review={el.id}>Delete</p>
                         }
-                        <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer">Report</p>
+                        <p data-id={el.id} data-type={"review"} onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer">Report</p>
                       </div>
                       }
                       {el.rating &&

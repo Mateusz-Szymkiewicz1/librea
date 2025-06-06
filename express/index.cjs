@@ -293,6 +293,13 @@ app.post('/review', (req,res) => {
   })
 })
 
+app.post('/report', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO reports (user_reporting,date,${req.body.type}) VALUES ('${req.session.user}',NOW(),?);`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/add_quote', (req,res) => {
   if(!req.session.user) return
   let quote = req.body.text
