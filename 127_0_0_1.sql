@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 05, 2025 at 11:10 PM
+-- Generation Time: Cze 06, 2025 at 11:04 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -98,7 +98,8 @@ CREATE TABLE `likes` (
 
 INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`) VALUES
 (50, 'asd', NULL, 6, NULL),
-(52, 'asdfghjkl', 20, NULL, NULL);
+(52, 'asdfghjkl', 20, NULL, NULL),
+(67, 'asdfghjkl', NULL, NULL, 19);
 
 -- --------------------------------------------------------
 
@@ -170,7 +171,7 @@ INSERT INTO `quotes` (`id`, `user`, `book`, `text`) VALUES
 (16, 'qweqwe', 1, 'asdasd'),
 (17, 'qweqwe', 1, 'vbbvvb'),
 (18, 'asdfghjkl', 1, 'popopopo'),
-(19, 'asdfghjkl', 5, 'qweqwewqe');
+(19, 'asdfghjkl', 5, 'qweqweqweqwe');
 
 -- --------------------------------------------------------
 
@@ -194,7 +195,24 @@ INSERT INTO `ratings` (`id`, `user`, `book`, `rating`) VALUES
 (8, 'asd', 2, 10),
 (9, 'asd', 4, 7),
 (10, 'asd', 6, 9),
-(11, 'asd', 5, 10);
+(11, 'asd', 5, 10),
+(12, 'asdfghjkl', 5, 8),
+(13, 'asdfghjkl', 1, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `reports`
+--
+
+CREATE TABLE `reports` (
+  `id` int(11) NOT NULL,
+  `user_reporting` varchar(50) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `review` int(11) NOT NULL,
+  `quote` int(11) NOT NULL,
+  `user` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -230,8 +248,7 @@ INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
 (31, 'werwet', 1, 'asd', 0),
 (32, 'werwet', 1, 'qweqwe', 0),
 (33, 'qweqweasd', 1, 'asdasddsa', 0),
-(34, 'werwet', 1, 'asdsadasd', 0),
-(36, 'asdfghjkl', 1, 'asdsadsadsad', 1);
+(37, 'asdfghjkl', 1, 'asdasdasdsad', 0);
 
 -- --------------------------------------------------------
 
@@ -291,7 +308,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
 ('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '5a4b2af2489d115707bca8ef8875444c1729932155803.webp', 1),
 ('asde', '$2a$10$m/utAoIDf7knKdE9TJoNPu/n3MSg2fOkcSgN4Xdd2MPCatXE2tSH6', 'sadasdasd@asd.pl', '', 0),
-('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 0),
+('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 1),
 ('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0),
 ('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0),
 ('qweqweasd', '$2a$10$RaASisPr8CdrmAeQ2tKq1uN9jHy3N7fePZx01D.dc4XwjOLp/yaVm', 'asdasd@ASD.PL', '', 0),
@@ -349,6 +366,16 @@ ALTER TABLE `ratings`
   ADD KEY `book` (`book`);
 
 --
+-- Indeksy dla tabeli `reports`
+--
+ALTER TABLE `reports`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_reporting` (`user_reporting`),
+  ADD KEY `user` (`user`),
+  ADD KEY `quote` (`quote`),
+  ADD KEY `review` (`review`);
+
+--
 -- Indeksy dla tabeli `reviews`
 --
 ALTER TABLE `reviews`
@@ -394,7 +421,7 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `new_books`
@@ -406,19 +433,25 @@ ALTER TABLE `new_books`
 -- AUTO_INCREMENT for table `quotes`
 --
 ALTER TABLE `quotes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `reports`
+--
+ALTER TABLE `reports`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `tags`
@@ -464,6 +497,15 @@ ALTER TABLE `quotes`
 ALTER TABLE `ratings`
   ADD CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`book`) REFERENCES `books` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `reports`
+--
+ALTER TABLE `reports`
+  ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reports_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `reports_ibfk_3` FOREIGN KEY (`user_reporting`) REFERENCES `users` (`login`),
+  ADD CONSTRAINT `reports_ibfk_4` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `reviews`

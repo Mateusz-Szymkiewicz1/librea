@@ -204,7 +204,7 @@ function Book(props) {
       }
     })
   }
-  const deleteReview = async () => {
+  const deleteReview = async (e) => {
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
       const response = await useDecision().then(function () {
           document.querySelector(".decision").remove()
@@ -221,7 +221,7 @@ function Book(props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        id: review[0].id
+        id: e.target.dataset.review
       })
     }).then(() => {
       setRefresh(!refresh)
@@ -420,6 +420,19 @@ function Book(props) {
         props.setToast({type:"msg", text:"Added a quote!"})
     })
   }
+  const toggleDropdown = async (e) => {
+    const menu = e.target.parentElement.parentElement.parentElement.querySelector('.drop_menu')
+    document.querySelectorAll('.drop_menu').forEach(el => {
+      if(!el.classList.contains("hidden") && el != menu){
+      el.classList.add("hidden")
+    }
+    })
+    if(menu.classList.contains("hidden")){
+      menu.classList.remove("hidden")
+    }else{
+      menu.classList.add("hidden")
+    }
+  }
   return (
     <>
       <div>
@@ -528,7 +541,7 @@ function Book(props) {
                       }
                       <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                     </h3></NavLink>
-                      <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEdit}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteReview}></i></span>
+                      <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEdit}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteReview} data-review={el.id}></i></span>
                     </div>
                     {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
@@ -557,7 +570,7 @@ function Book(props) {
               {book.reviews.map((el, i) => {
                   if(user && el.user == user.login) return
                   return (
-                    <div className="bg-neutral-700 p-5 text-white my-5" key={el.id}>
+                    <div className="bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
                       <div className="flex justify-between">
                       <NavLink to={"/profile/"+el.user}>
                       <h3 className="text-xl">
@@ -571,8 +584,18 @@ function Book(props) {
                         }
                         <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                       </h3></NavLink>
-                      <span><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                      {user &&
+                      <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                      }
                       </div>
+                      {user &&
+                      <div className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
+                        {user.admin &&
+                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" onClick={deleteReview} data-review={el.id}>Delete</p>
+                        }
+                        <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer">Report</p>
+                      </div>
+                      }
                       {el.rating &&
                         <p className="text-2xl font-bold clear-both pt-3">{el.rating}/10</p>
                       }
