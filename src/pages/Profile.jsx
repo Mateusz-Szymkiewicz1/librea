@@ -185,6 +185,48 @@ function Profile(props) {
       }),
     })
   }
+   const toggleDropdown = async (e) => {
+    e.stopPropagation()
+    const menu = e.target.parentElement.parentElement.parentElement.querySelector('.drop_menu')
+    if(menu.classList.contains("hidden")){
+      menu.classList.remove("hidden")
+    }else{
+      menu.classList.add("hidden")
+    }
+  }
+  useEffect((e) => {
+      document.addEventListener("click", function(e){
+        document.querySelector('.drop_menu').classList.add("hidden")
+      })
+    }, [])
+    const report = async (e) => {
+        if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+          const response = await useDecision().then(function () {
+              document.querySelector(".decision").remove()
+              return
+          }, function () {
+              document.querySelector(".decision").remove()
+              return "stop"
+          });
+          if(response) return
+          fetch("http://localhost:3000/report", {
+            credentials: 'include',
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: profile.login,
+              type: "user"
+            })
+          }).then(res => res.json()).then(res => {
+              if(res == "already reported"){
+                props.setToast({type:"error", text:"Already reported!"})
+              }else{
+                props.setToast({type:"msg", text:"Sent a report!"})
+              }
+          })
+      }
   return (
     <>
       <div className="px-5 mt-5">
@@ -208,7 +250,20 @@ function Profile(props) {
                 </div>
                 <h1 className="text-4xl mt-3">{profile.login}</h1>
             </div>
-            <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200">
+            <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200 relative">
+            <span className="absolute top-3 right-5">
+                          {user &&
+                            <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                          }
+                        </span>
+            {user &&
+                      <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 top-14 hidden">
+                        {user.admin != 0 &&
+                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-ban mr-2"></i>Ban</p>
+                        }
+                        <p onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
+                      </div>
+                      }
             {profile.collections.length == 0 &&
             <>
               <p className='text-slate-200 text-2xl ml-5 mt-5'>Collections</p>

@@ -7,9 +7,12 @@ function Admin(props) {
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
   const [submissions, setSubmissions] = useState([])
+  const [reports, setReports] = useState([])
   const [offset, setOffset] = useState(0)
+  const [reportOffset, setReportOffset] = useState(0)
   const [refresh, setRefresh] = useState(false)
   const [numOfSubmissions, setNumOfSubmissions] = useState(0)
+  const [numOfReports, setNumOfReports] = useState(0)
   const [admin, setAdmin] = useState(false)
 
   useEffect(() => {
@@ -55,6 +58,20 @@ function Admin(props) {
       setNumOfSubmissions(res[0].submissions)
       setSubmissions([...res.slice(1, res.length)])
     })
+    fetch("http://localhost:3000/new_reports", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: reportOffset
+      })
+    }).then(res => res.json()).then(res => {
+      setReports([])
+      setNumOfReports(res[0].reports)
+      setReports([...res.slice(1, res.length)])
+    })
   }, [refresh])
   useEffect(() => {
     if(offset == 0) return
@@ -71,6 +88,21 @@ function Admin(props) {
       setSubmissions(prev => prev.concat([...res.slice(1, res.length)]))
     })
   }, [offset])
+  useEffect(() => {
+    if(reportOffset == 0) return
+    fetch("http://localhost:3000/new_reports", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: reportOffset
+      })
+    }).then(res => res.json()).then(res => {
+      setReports(prev => prev.concat([...res.slice(1, res.length)]))
+    })
+  }, [reportOffset])
   const toggleDesc = () => {
     const submission = submissions.find(x => x.id == event.target.dataset.id)
     const p = event.target.parentElement.querySelector('.desc');
@@ -147,6 +179,77 @@ function Admin(props) {
     setRefresh(prev => !prev)
     window.scrollTo(0,0)
   }
+  const hideReports = () => {
+    setReportOffset(0)
+    setRefresh(prev => !prev)
+    document.querySelector("#reports").scrollIntoView()
+  }
+  const dismiss = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/delete_report", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: e.target.dataset.id
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"Dismissed!"})
+        setRefresh(prev => !prev)
+      })
+  }
+  const ban = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    const report = reports.find(x => x.id == e.target.dataset.id)
+    if(report.user){
+      fetch("http://localhost:3000/ban_user", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: report.user
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"User banned!"})
+        setRefresh(prev => !prev)
+      })
+    }else{
+      fetch("http://localhost:3000/admin_delete", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: report.quote ? report.quote.id : report.review.id,
+          type: report.quote ? "quote" : "review"
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"Content deleted!"})
+        setRefresh(prev => !prev)
+      })
+    }
+  }
   return (
     <>
       {!loading && admin &&
@@ -193,6 +296,52 @@ function Admin(props) {
               }
               {numOfSubmissions <= offset+5 && offset > 0 &&
                 <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+              }
+              </div>
+              <h1 className="text-2xl mt-16" id="reports">Reports ({numOfReports})</h1>
+              <div className="flex flex-col">
+              {reports.map(el => {
+                return(
+                  <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+                <div>
+                <h2 className="text-2xl break-keep flex sm:justify-between">
+                  {el.quote && <p>Type: Quote</p>}
+                  {el.review && <p>Type: Review</p>}
+                  {el.user && <p>Type: User - <NavLink className="italic text-blue-400" target="_blank" to={"/profile/"+el.user}>{el.user}</NavLink></p>}
+                  <span>
+                    <i onClick={ban} data-id={el.id} className="fa fa-xmark mx-2 sm:mx-4 text-red-500 cursor-pointer">
+                      {el.user &&
+                        <span data-id={el.id} className="font-mono align-text-top ml-1">Ban</span>
+                      }
+                      {!el.user &&
+                        <span data-id={el.id} className="font-mono align-text-top ml-1">Delete</span>
+                      }
+                    </i>
+                    <i onClick={dismiss} data-id={el.id} className="fa cursor-pointer fa-check-to-slot text-green-400"><span data-id={el.id} className="font-mono align-text-top ml-1">Dismiss</span></i>
+                  </span>
+                </h2>
+                </div>
+                {el.review &&
+                  <>
+                  <p className="text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.review.text}</p>
+                  <p className="text-neutral-200 mt-2">Written by <NavLink target="_blank" to={"/profile/"+el.review.user} className="italic text-blue-400">{el.review.user}</NavLink> on <NavLink target="_blank" to={"/book/"+el.review.book.id} className="italic text-blue-400">{el.review.book.tytul}</NavLink> by {el.review.book.autor}</p>
+                  </>
+                }
+                {el.quote &&
+                  <>
+                  <p className="text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.quote.text}</p>
+                  <p className="text-neutral-200 mt-2">Written by <NavLink target="_blank" to={"/profile/"+el.quote.user} className="italic text-blue-400">{el.quote.user}</NavLink> on <NavLink target="_blank" to={"/book/"+el.quote.book.id} className="italic text-blue-400">{el.quote.book.tytul}</NavLink> by {el.quote.book.autor}</p>
+                  </>
+                }
+                <p className="text-neutral-200 mt-5">Submitted: {el.date.split('T')[0]} by <NavLink target="_blank" to={"/profile/"+el.user_reporting} className="italic text-blue-400">{el.user_reporting}</NavLink></p>
+              </div>
+                )
+              })}
+              {numOfReports > reportOffset+5 &&
+                <button onClick={() => setReportOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+              }
+              {numOfReports <= reportOffset+5 && reportOffset > 0 &&
+                <button onClick={hideReports} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
             </>

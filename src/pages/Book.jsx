@@ -455,7 +455,11 @@ function Book(props) {
           type: e.target.dataset.type
         })
       }).then(res => res.json()).then(res => {
-          props.setToast({type:"msg", text:"Sent a report!"})
+          if(res == "already reported"){
+            props.setToast({type:"error", text:"Already reported!"})
+          }else{
+            props.setToast({type:"msg", text:"Sent a report!"})
+          }
       })
   }
   useEffect((e) => {
@@ -622,10 +626,10 @@ function Book(props) {
                       </div>
                       {user &&
                       <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
-                        {user.admin &&
-                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" onClick={deleteReview} data-review={el.id}>Delete</p>
+                        {user.admin != 0 &&
+                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" onClick={deleteReview} data-review={el.id}><i className="fa fa-trash mr-2"></i>Delete</p>
                         }
-                        <p data-id={el.id} data-type={"review"} onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer">Report</p>
+                        <p data-id={el.id} data-type={"review"} onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
                       </div>
                       }
                       {el.rating &&
@@ -707,9 +711,22 @@ function Book(props) {
               {book.quotes && book.quotes.map((el, i) => {
                   if(user && el.user == user.login) return
                   return (
-                    <div className="bg-neutral-700 p-5 text-white my-5" key={el.id}>
+                    <div className="bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
                       <p className="clear-both break-words  text-xl pt-3">"{el.text}"</p>
                         <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
+                        <span className="absolute top-3 right-5">
+                          {user &&
+                            <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                          }
+                        </span>
+                      {user &&
+                      <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 top-14 hidden">
+                        {user.admin != 0 &&
+                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" onClick={deleteQuote} data-quote={el.id}><i className="fa fa-trash mr-2"></i>Delete</p>
+                        }
+                        <p data-id={el.id} data-type={"quote"} onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
+                      </div>
+                      }
                       <div>
                         {user && user.likes.find(x => x.quote == el.id) &&
                           <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>

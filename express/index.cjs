@@ -234,6 +234,11 @@ app.get('/search_autocomplete/:search', (req,res) => {
 })
 
 app.post('/register', (req,res) => {
+  connection.query(`SELECT * FROM banned WHERE email = ?;`,[req.body.email], (err, rows, fields) => {
+    if(rows.length > 0){
+      res.send({ status: 0, text: "Username with this e-mail is banned!"})
+      return;
+    }
   connection.query(`SELECT login FROM users WHERE login = ?;`,[req.body.login], (err, rows, fields) => {
     if(rows.length > 0){
       res.send({ status: 0, text: "Username taken!"})
@@ -251,6 +256,7 @@ app.post('/register', (req,res) => {
       })
     })
   })
+    })
 })
 
 app.post('/login', (req,res) => {
@@ -295,8 +301,14 @@ app.post('/review', (req,res) => {
 
 app.post('/report', (req,res) => {
   if(!req.session.user) return
-  connection.query(`INSERT INTO reports (user_reporting,date,${req.body.type}) VALUES ('${req.session.user}',NOW(),?);`,[req.body.id], (err, rows, fields) => {
-    res.json("done")
+  connection.query(`SELECT * FROM reports WHERE user_reporting = '${req.session.user}' AND ${req.body.type} = ?`,[req.body.id], (err, rows, fields) => {
+    if(rows.length == 0){
+      connection.query(`INSERT INTO reports (user_reporting,date,${req.body.type}) VALUES ('${req.session.user}',NOW(),?);`,[req.body.id], (err, rows, fields) => {
+        res.json("done")
+      })
+    }else{
+      res.json("already reported")
+    }
   })
 })
 
@@ -532,6 +544,30 @@ app.post('/delete_book', (req,res) => {
   })
 })
 
+app.post('/delete_report', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM reports WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/admin_delete', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM ${req.body.type}s WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/ban_user', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM users WHERE login = ?`,[req.body.user], (err, rows, fields) => {
+    connection.query(`DELETE FROM users WHERE login = ?`,[req.body.user], (err2, rows2, fields2) => {})
+    connection.query(`INSERT INTO banned(email) VALUES (?);`,[rows[0].email], (err3, rows3, fields3) => {
+        res.json("done")
+    })
+  })
+})
+
 app.post('/approve_waiting_submission', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id])
@@ -553,6 +589,36 @@ app.post('/new_books', (req,res) => {
     connection.query(`SELECT COUNT(*) AS submissions FROM new_books`, (err2, rows2, fields2) => {
       rows.unshift({submissions: rows2[0].submissions})
       res.send(rows)
+    })
+  })
+})
+
+app.post('/new_reports', async(req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM reports ORDER BY date ASC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+    connection.query(`SELECT COUNT(*) AS reports FROM reports`, async (err2, rows2, fields2) => {
+      rows.unshift({reports: rows2[0].reports})
+      const enhancedRows = await Promise.all(rows.map(async (el) => {
+        if (el.reports) return el;
+        const getQueryResult = (query) => {
+          return new Promise((resolve, reject) => {
+            connection.query(query, (err, results) => {
+              if (err) return reject(err);
+              resolve(results[0]);
+            });
+          });
+        };
+        if (el.quote) {
+          el.quote = await getQueryResult(`SELECT * FROM quotes WHERE quotes.id = ${el.quote}`);
+          el.quote.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.quote.book}`);
+        }
+        if (el.review) {
+          el.review = await getQueryResult(`SELECT * FROM reviews WHERE reviews.id = ${el.review}`);
+          el.review.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.review.book}`);
+        }
+        return el;
+    }));
+    res.send(enhancedRows);
     })
   })
 })
