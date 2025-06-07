@@ -17,6 +17,7 @@ function Register(props) {
   const [pass, setPass] = useState("")
   const [passrepeat, setPassrepeat] = useState("")
   const [email, setEmail] = useState("")
+  const [agreed, setAgreed] = useState(false)
   const submit = (e) => {
     e.preventDefault();
     if(!pass || !passrepeat || !login || !email){
@@ -37,6 +38,10 @@ function Register(props) {
     }
     if(pass.length < 5){
       props.setToast({type:"error", text: "Password is too short!"})
+      return;
+    }
+    if(!agreed){
+      props.setToast({type:"error", text: "Agree to our terms of service!"})
       return;
     }
     fetch("http://localhost:3000/register", {
@@ -78,7 +83,7 @@ function Register(props) {
   return (
     <>
       <div className="h-screen w-full flex flex-col justify-center items-center">
-      <div className="flex -mt-14">
+      <div className="flex mt-2">
   <div className="hidden lg:flex items-center bg-neutral-600 justify-center flex-1 text-slate-200">
     <div className="max-w-md text-center">
       <svg xmlns="http://www.w3.org/2000/svg" width="524.67004" height="531.39694" className="w-full" alt="https://undraw.co/illustrations" title="https://undraw.co/illustrations" viewBox="0 0 524.67004 531.39694" xmlnsXlink="http://www.w3.org/1999/xlink">
@@ -218,6 +223,10 @@ function Register(props) {
     </button>
   </div>
         </div>
+        <div className="flex items-center mb-4">
+    <input onChange={() => setAgreed(prev => !prev)} checked={agreed} id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm dark:bg-gray-700 dark:border-gray-600"></input>
+    <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree to librea's <span className="text-blue-400 cursor-pointer italic">Terms of service</span></label>
+</div>
         <div>
           <button onClick={submit} className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none transition">Sign Up</button>
         </div>

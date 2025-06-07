@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import NoMatch from "./NoMatch"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import { FileUpload } from 'primereact/fileupload';
 import { useDecision } from "../components/useDecision";
 import BookCard from "../components/BookCard";
 import CollectionCard from "../components/CollectionCard";
 
 function Profile(props) {
+  const navigator = useNavigate()
   const [profile, setProfile] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
@@ -227,6 +228,30 @@ function Profile(props) {
               }
           })
       }
+      const ban = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/ban_user", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user: profile.login
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"User banned!", stay: true})
+        navigator("/")
+      })
+  }
   return (
     <>
       <div className="px-5 mt-5">
@@ -259,7 +284,7 @@ function Profile(props) {
             {user &&
                       <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 top-14 hidden">
                         {user.admin != 0 &&
-                          <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-ban mr-2"></i>Ban</p>
+                          <p onClick={ban} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-ban mr-2"></i>Ban</p>
                         }
                         <p onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
                       </div>
