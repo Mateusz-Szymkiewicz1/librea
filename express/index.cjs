@@ -299,6 +299,15 @@ app.post('/review', (req,res) => {
   })
 })
 
+app.post('/like_notification', (req,res) => {
+  if(!req.session.user) return
+  let text = `${req.session.user} has liked your ${req.body.type}.`
+  connection.query(`INSERT INTO notifications (type,text,user,${req.body.type},like_from) VALUES ('like',?,?,?,?);`,[text,req.body.user,req.body.id,req.session.user], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+
 app.post('/report', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM reports WHERE user_reporting = '${req.session.user}' AND ${req.body.type} = ?`,[req.body.id], (err, rows, fields) => {

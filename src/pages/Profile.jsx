@@ -277,7 +277,7 @@ function Profile(props) {
             </div>
             <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200 relative">
             <span className="absolute top-3 right-5">
-                          {user &&
+                          {user && user.login != profile.login &&
                             <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
                           }
                         </span>

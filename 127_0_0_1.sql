@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 07, 2025 at 06:11 PM
+-- Generation Time: Cze 11, 2025 at 09:31 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -40,7 +40,8 @@ CREATE TABLE `banned` (
 --
 
 INSERT INTO `banned` (`id`, `email`) VALUES
-(1, 'asdqwe@asdd.pl');
+(1, 'asdqwe@asdd.pl'),
+(2, 'asdasd@ASD.PL');
 
 -- --------------------------------------------------------
 
@@ -156,6 +157,23 @@ INSERT INTO `new_books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`
 -- --------------------------------------------------------
 
 --
+-- Struktura tabeli dla tabeli `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `id` int(11) NOT NULL,
+  `type` text NOT NULL,
+  `text` text NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `quote` int(11) DEFAULT NULL,
+  `review` int(11) DEFAULT NULL,
+  `collection` int(11) DEFAULT NULL,
+  `like_from` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabeli dla tabeli `quotes`
 --
 
@@ -257,7 +275,6 @@ CREATE TABLE `reviews` (
 
 INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
 (18, 'asd', 1, 'asdasdasdas', 0),
-(21, 'qweqweasd', 1, 'asdsadasdasd', 0),
 (22, 'qwerty', 1, 'asdasd', 0),
 (23, 'qweqwe', 1, 'asdasdads', 0),
 (24, 'asdqweqwe', 1, 'asdasdasdasd', 0),
@@ -266,8 +283,6 @@ INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
 (27, 'qweqwe', 1, 'asdasdsadasd', 0),
 (28, 'qwerty', 1, 'asdasdasdasd', 0),
 (29, 'qwerty', 1, 'asdasdasd', 0),
-(30, 'qweqweasd', 1, 'asdasdsad', 0),
-(33, 'qweqweasd', 1, 'asdasddsa', 0),
 (37, 'asdfghjkl', 1, 'asdasdasdsad', 0);
 
 -- --------------------------------------------------------
@@ -287,7 +302,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('M7S9SKP9GXHOBF8J97LeT9geXScwT2Xh', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-06-09T16:09:38.231Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1749485378);
+('uX-grihqtJGLQPHgjHggBcirFnDf60oe', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-06-13T19:02:46.539Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1749841367);
 
 -- --------------------------------------------------------
 
@@ -327,12 +342,12 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
 ('asd', '$2a$10$.6Zg8omFEdIqD.ySEyqeQ.T91jaLJqjAbezBw18konuODn9jhMm8G', 'szymkiewiczmateusz1@gmail.com', '5a4b2af2489d115707bca8ef8875444c1729932155803.webp', 1),
+('asdasd123', '$2a$10$dkX97ELCaPX10e/Nz8qMR.G.BJT1p5CuYPmMNmCPB.egHc/dOE05u', 'asd46asd@sddsf.pl', '', 0),
 ('asdasd12e', '$2a$10$H6.Dwy7jXjV14s4IeuTi0.rAPpV9yFEuWejjPJza0C/muASqlSw96', 'asdqwe@asasddd.pl', '', 0),
 ('asde', '$2a$10$m/utAoIDf7knKdE9TJoNPu/n3MSg2fOkcSgN4Xdd2MPCatXE2tSH6', 'sadasdasd@asd.pl', '', 0),
 ('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 1),
 ('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0),
 ('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0),
-('qweqweasd', '$2a$10$RaASisPr8CdrmAeQ2tKq1uN9jHy3N7fePZx01D.dc4XwjOLp/yaVm', 'asdasd@ASD.PL', '', 0),
 ('qwerty', '$2a$10$JJX554Kbq5KenfL9sZoRwO9pf3egIxPQbS/rwX1.TWRSwQJ0irEJu', 'adasd@assdas.pl', '', 0);
 
 --
@@ -374,6 +389,17 @@ ALTER TABLE `likes`
 ALTER TABLE `new_books`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user` (`user`);
+
+--
+-- Indeksy dla tabeli `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`user`),
+  ADD KEY `quote` (`quote`),
+  ADD KEY `review` (`review`),
+  ADD KEY `collection` (`collection`),
+  ADD KEY `like_from` (`like_from`);
 
 --
 -- Indeksy dla tabeli `quotes`
@@ -435,7 +461,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `banned`
 --
 ALTER TABLE `banned`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `books`
@@ -460,6 +486,12 @@ ALTER TABLE `likes`
 --
 ALTER TABLE `new_books`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `quotes`
@@ -515,6 +547,16 @@ ALTER TABLE `likes`
 --
 ALTER TABLE `new_books`
   ADD CONSTRAINT `new_books_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_4` FOREIGN KEY (`like_from`) REFERENCES `users` (`login`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_5` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `quotes`

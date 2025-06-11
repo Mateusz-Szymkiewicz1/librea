@@ -533,7 +533,7 @@ function Book(props) {
                   <p className="text-slate-200 pb-3">You need to be logged in to vote.</p>
                 }
                 {rating != 0 &&
-                  <p className="text-slate-200">Your carrent rating: {rating}</p>
+                  <p className="text-slate-200">Your current rating: {rating}</p>
                 }
                 <Rating
                   onClick={handleRating}
