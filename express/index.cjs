@@ -299,15 +299,6 @@ app.post('/review', (req,res) => {
   })
 })
 
-app.post('/like_notification', (req,res) => {
-  if(!req.session.user) return
-  let text = `${req.session.user} has liked your ${req.body.type}.`
-  connection.query(`INSERT INTO notifications (type,text,user,${req.body.type},like_from) VALUES ('like',?,?,?,?);`,[text,req.body.user,req.body.id,req.session.user], (err, rows, fields) => {
-    res.json("done")
-  })
-})
-
-
 app.post('/report', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM reports WHERE user_reporting = '${req.session.user}' AND ${req.body.type} = ?`,[req.body.id], (err, rows, fields) => {
@@ -378,32 +369,52 @@ app.post('/new_collection', (req,res) => {
   })
 })
 
+function like_notification(user_session,type,user,id){
+  let text = `${user_session} has liked your ${type}.`
+  connection.query(`INSERT INTO notifications (type,text,user,${type},like_from) VALUES ('like',?,?,?,?);`,[text,user,id,user_session], (err, rows, fields) => {})
+}
+
+function unlike_notification(user_session,type,user,id){
+  connection.query(`DELETE FROM notifications WHERE user = ? AND like_from = ? AND ${type} = ?`,[user,user_session,id], (err, rows, fields) => {})
+}
 
 app.post('/review_like', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO likes (user,review) VALUES ('${req.session.user}',?);`,[req.body.review], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM reviews WHERE reviews.id = ?`,[req.body.review], (err2, rows2, fields2) => {
+      like_notification(req.session.user,"review",rows2[0].user,req.body.review)
+      res.json("done")
+    })
   })
 })
 
 app.post('/review_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND review = ?`,[req.body.review], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM reviews WHERE reviews.id = ?`,[req.body.review], (err2, rows2, fields2) => {
+      unlike_notification(req.session.user,"review",rows2[0].user,req.body.review)
+      res.json("done")
+    })
   })
 })
 
 app.post('/quote_like', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO likes (user,quote) VALUES ('${req.session.user}',?);`,[req.body.quote], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM quotes WHERE quotes.id = ?`,[req.body.quote], (err2, rows2, fields2) => {
+      like_notification(req.session.user,"quote",rows2[0].user,req.body.quote)
+      res.json("done")
+    })
   })
 })
 
 app.post('/quote_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND quote = ?`,[req.body.quote], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM quotes WHERE quotes.id = ?`,[req.body.quote], (err2, rows2, fields2) => {
+      unlike_notification(req.session.user,"quote",rows2[0].user,req.body.quote)
+      res.json("done")
+    })
   })
 })
 
@@ -443,14 +454,20 @@ app.post('/collection_edit_info', (req,res) => {
 app.post('/collection_like', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO likes (user,collection) VALUES ('${req.session.user}',?);`,[req.body.collection], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM collections WHERE collections.id = ?`,[req.body.collection], (err2, rows2, fields2) => {
+      like_notification(req.session.user,"collection",rows2[0].user,req.body.collection)
+      res.json("done")
+    })
   })
 })
 
 app.post('/collection_unlike', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND collection = ?`,[req.body.collection], (err, rows, fields) => {
-    res.json("done")
+    connection.query(`SELECT user FROM collections WHERE collections.id = ?`,[req.body.collection], (err2, rows2, fields2) => {
+      unlike_notification(req.session.user,"collection",rows2[0].user,req.body.collection)
+      res.json("done")
+    })
   })
 })
 
@@ -531,6 +548,36 @@ function edit_book(req, res){
     res.json("done")
   })
 };
+
+app.post('/header_notifications', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your review') AS text, user, NULL AS quote, review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND review IS NOT NULL GROUP BY user, review UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your quote') AS text, user, quote AS quote, NULL AS review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND quote IS NOT NULL GROUP BY user, quote UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your collection') AS text, user, NULL AS quote, NULL AS review, collection, like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND collection IS NOT NULL GROUP BY user, collection UNION ALL SELECT id, seen, type, text, user, quote, review, collection, like_from, date AS latest_time FROM notifications WHERE type = 'warning' AND user = ? ORDER BY latest_time DESC LIMIT 100;`,[req.body.user,req.body.user,req.body.user,req.body.user], async (err, rows, fields) => {
+    const enhancedRows = await Promise.all(rows.map(async (el) => {
+        if(el.type == "warning") return
+        const getQueryResult = (query) => {
+          return new Promise((resolve, reject) => {
+            connection.query(query, (err, results) => {
+              if (err) return reject(err);
+              resolve(results[0]);
+            });
+          });
+        };
+        if (el.quote) {
+          el.quote = await getQueryResult(`SELECT * FROM quotes WHERE quotes.id = ${el.quote}`);
+          el.quote.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.quote.book}`);
+        }
+        if (el.review) {
+          el.review = await getQueryResult(`SELECT * FROM reviews WHERE reviews.id = ${el.review}`);
+          el.review.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.review.book}`);
+        }
+        if (el.collection) {
+          el.collection = await getQueryResult(`SELECT * FROM collections WHERE collections.id = ${el.collection}`);
+        }
+        return el;
+    }));
+    res.send(enhancedRows)
+  })
+})
 
 app.post('/waiting_submissions', (req,res) => {
   if(!req.session.user) return
@@ -638,6 +685,20 @@ app.post('/deleteProf', (req,res) => {
     if (err) console.log("Was unable to delete the file")
   })
   connection.query(`UPDATE users SET prof = "" WHERE login = ?;`,[req.body.login], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/mark_as_seen', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`UPDATE notifications SET seen = 1 WHERE user = ? AND ${req.body.type} = ?;`,[req.session.user,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/delete_notification', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM notifications WHERE user = ? AND ${req.body.type} = ?;`,[req.session.user,req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })

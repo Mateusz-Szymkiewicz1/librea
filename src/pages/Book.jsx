@@ -538,7 +538,7 @@ function Book(props) {
                 <Rating
                   onClick={handleRating}
                   readonly={!user}
-                  SVGclassName="inline h-6 sm:h-8 gap-0 md:h-16"
+                  SVGclassName="inline h-6 sm:h-8 gap-0 w-8 sm:w-10 mt-3"
                   initialValue={rating}
                   iconsCount={10}
                 />

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 11, 2025 at 09:31 PM
+-- Generation Time: Cze 16, 2025 at 02:48 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -117,7 +117,10 @@ CREATE TABLE `likes` (
 
 INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`) VALUES
 (50, 'asd', NULL, 6, NULL),
-(67, 'asdfghjkl', NULL, NULL, 19);
+(67, 'asdfghjkl', NULL, NULL, 19),
+(83, 'asdfghjkl', NULL, 16, NULL),
+(84, 'qwertyuiop', 37, NULL, NULL),
+(85, 'qwertyuiop', NULL, 16, NULL);
 
 -- --------------------------------------------------------
 
@@ -168,8 +171,19 @@ CREATE TABLE `notifications` (
   `quote` int(11) DEFAULT NULL,
   `review` int(11) DEFAULT NULL,
   `collection` int(11) DEFAULT NULL,
-  `like_from` varchar(50) DEFAULT NULL
+  `like_from` varchar(50) DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `seen` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `type`, `text`, `user`, `quote`, `review`, `collection`, `like_from`, `date`, `seen`) VALUES
+(12, 'like', 'asdfghjkl has liked your collection.', 'asdfghjkl', NULL, NULL, 16, 'asdfghjkl', '2025-06-16 11:52:59', 0),
+(13, 'like', 'qwertyuiop has liked your review.', 'asdfghjkl', NULL, 37, NULL, 'qwertyuiop', '2025-06-16 11:54:01', 0),
+(14, 'like', 'qwertyuiop has liked your collection.', 'asdfghjkl', NULL, NULL, 16, 'qwertyuiop', '2025-06-16 11:54:05', 0);
 
 -- --------------------------------------------------------
 
@@ -229,7 +243,7 @@ INSERT INTO `ratings` (`id`, `user`, `book`, `rating`) VALUES
 (9, 'asd', 4, 7),
 (10, 'asd', 6, 9),
 (11, 'asd', 5, 10),
-(12, 'asdfghjkl', 5, 8),
+(12, 'asdfghjkl', 5, 9),
 (13, 'asdfghjkl', 1, 3);
 
 -- --------------------------------------------------------
@@ -302,7 +316,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('uX-grihqtJGLQPHgjHggBcirFnDf60oe', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-06-13T19:02:46.539Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1749841367);
+('96uj83q86xVDK_UY9RiqU6kOwXWPzAZE', '{\"cookie\":{\"originalMaxAge\":172799999,\"expires\":\"2025-06-18T11:54:13.799Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1750247654);
 
 -- --------------------------------------------------------
 
@@ -348,7 +362,8 @@ INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
 ('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 1),
 ('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0),
 ('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0),
-('qwerty', '$2a$10$JJX554Kbq5KenfL9sZoRwO9pf3egIxPQbS/rwX1.TWRSwQJ0irEJu', 'adasd@assdas.pl', '', 0);
+('qwerty', '$2a$10$JJX554Kbq5KenfL9sZoRwO9pf3egIxPQbS/rwX1.TWRSwQJ0irEJu', 'adasd@assdas.pl', '', 0),
+('qwertyuiop', '$2a$10$Gz3EIkl1L0uUjBMcFCyD9e/JusVN4RAykjh74f35OGzsOGMhHBl96', 'qwertyuiop@sd.pl', '', 0);
 
 --
 -- Indeksy dla zrzutów tabel
@@ -479,7 +494,7 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
 
 --
 -- AUTO_INCREMENT for table `new_books`
@@ -491,7 +506,7 @@ ALTER TABLE `new_books`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `quotes`
