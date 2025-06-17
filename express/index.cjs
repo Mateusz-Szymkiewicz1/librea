@@ -579,6 +579,45 @@ app.post('/header_notifications', (req,res) => {
   })
 })
 
+app.post('/notifications', (req,res) => {
+  if(!req.session.user) return
+  let offset = ""
+  if(req.body.offset != 0){
+    offset = "OFFSET "+req.body.offset
+  }
+  let num = 0;
+  connection.query(`SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your review') AS text, user, NULL AS quote, review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND review IS NOT NULL GROUP BY user, review UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your quote') AS text, user, quote AS quote, NULL AS review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND quote IS NOT NULL GROUP BY user, quote UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your collection') AS text, user, NULL AS quote, NULL AS review, collection, like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND collection IS NOT NULL GROUP BY user, collection UNION ALL SELECT id, seen, type, text, user, quote, review, collection, like_from, date AS latest_time FROM notifications WHERE type = 'warning' AND user = ? ORDER BY latest_time DESC`,[req.body.user,req.body.user,req.body.user,req.body.user], async (err, rows, fields) => {
+    num = rows.length
+      connection.query(`SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your review') AS text, user, NULL AS quote, review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND review IS NOT NULL GROUP BY user, review UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your quote') AS text, user, quote AS quote, NULL AS review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND quote IS NOT NULL GROUP BY user, quote UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your collection') AS text, user, NULL AS quote, NULL AS review, collection, like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND collection IS NOT NULL GROUP BY user, collection UNION ALL SELECT id, seen, type, text, user, quote, review, collection, like_from, date AS latest_time FROM notifications WHERE type = 'warning' AND user = ? ORDER BY latest_time DESC LIMIT 10 ${offset};`,[req.body.user,req.body.user,req.body.user,req.body.user], async (err, rows, fields) => {
+    const enhancedRows = await Promise.all(rows.map(async (el) => {
+        if(el.type == "warning") return
+        const getQueryResult = (query) => {
+          return new Promise((resolve, reject) => {
+            connection.query(query, (err, results) => {
+              if (err) return reject(err);
+              resolve(results[0]);
+            });
+          });
+        };
+        if (el.quote) {
+          el.quote = await getQueryResult(`SELECT * FROM quotes WHERE quotes.id = ${el.quote}`);
+          el.quote.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.quote.book}`);
+        }
+        if (el.review) {
+          el.review = await getQueryResult(`SELECT * FROM reviews WHERE reviews.id = ${el.review}`);
+          el.review.book = await getQueryResult(`SELECT * FROM books WHERE books.id = ${el.review.book}`);
+        }
+        if (el.collection) {
+          el.collection = await getQueryResult(`SELECT * FROM collections WHERE collections.id = ${el.collection}`);
+        }
+        return el;
+    }));
+    enhancedRows.unshift(num)
+    res.send(enhancedRows)
+  })
+    })
+})
+
 app.post('/waiting_submissions', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM new_books WHERE user = ? ORDER BY submit_date DESC`,[req.session.user], (err, rows, fields) => {

@@ -8,6 +8,8 @@ function Header() {
   const [notificationsNotSeen, setNotificationsNotSeen] = useState(0)
   const [search, setSearch] = useState("")
   const [autofill, setAutofill] = useState([])
+  let path = window.location
+  path = path.href.split("/")[3]
   const handleSearch = (e) => {
     if(e.keyCode == 13){
       navigator("/search/"+search)
@@ -50,7 +52,6 @@ function Header() {
                   user: res2[0].login
                 }),
               }).then(res => res.json()).then(res => {
-                  console.log(res)
                   res.forEach(el => {
                     if(el.seen == 0){
                       if(notificationsNotSeen > 98){
@@ -160,7 +161,7 @@ function Header() {
             {user &&
               <>
               <div className="relative flex">
-                <span onClick={toggleDropdown} className="block cursor-pointer">
+                <span onClick={toggleDropdown} className={path != "notifications" ? "block cursor-pointer" : "block cursor-pointer pr-5"}>
                   {user.prof &&
                     <img className="block h-10 w-10 cover-fit float-left profMenu" src={"/public/user_uploads/profs/"+user.prof} onError={(e) => {
                     e.target.parentElement.innerHTML = `<span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">${user.login.slice(0,1).toUpperCase()}</span>`
@@ -170,13 +171,15 @@ function Header() {
                     <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">{user.login.slice(0,1).toUpperCase()}</span>
                   }
                 </span>
+                {path != "notifications" &&
                 <span onClick={toggleNotifications} className="pr-5 block relative cursor-pointer notifMenu">
                   <i className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 fa fa-bell notifMenu"></i>
                   {notificationsNotSeen > 0 &&
                   <span className="absolute top-0 left-0 inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium transform translate-x-1/2 bg-red-500 text-white">{notificationsNotSeen}</span>
                   }
                 </span>
-                <div className="bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-16 p-2 w-40 hidden dropdown_user">
+                }
+                <div className={path != "notifications" ? "bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-16 p-2 w-40 hidden dropdown_user" : "bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-5 p-2 w-40 hidden dropdown_user"}>
                   <NavLink to={"profile/"+user.login} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-user mr-2"></i>Profile</p></NavLink>
                   <NavLink to="/book/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-file-circle-plus mr-2"></i>Add a book</p></NavLink>
                   {user.admin == 1 &&
