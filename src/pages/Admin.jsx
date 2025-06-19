@@ -7,12 +7,15 @@ function Admin(props) {
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
   const [submissions, setSubmissions] = useState([])
+  const [authorSubmissions, setAuthorSubmissions] = useState([])
   const [reports, setReports] = useState([])
   const [offset, setOffset] = useState(0)
   const [reportOffset, setReportOffset] = useState(0)
+  const [authorOffset, setAuthorOffset] = useState(0)
   const [refresh, setRefresh] = useState(false)
   const [numOfSubmissions, setNumOfSubmissions] = useState(0)
   const [numOfReports, setNumOfReports] = useState(0)
+  const [numOfAuthorSubmissions, setNumOfAuthorSubmissions] = useState(0)
   const [admin, setAdmin] = useState(false)
 
   useEffect(() => {
@@ -72,6 +75,20 @@ function Admin(props) {
       setNumOfReports(res[0].reports)
       setReports([...res.slice(1, res.length)])
     })
+    fetch("http://localhost:3000/new_authors", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: authorOffset
+      })
+    }).then(res => res.json()).then(res => {
+      setAuthorSubmissions([])
+      setNumOfAuthorSubmissions(res[0].submissions)
+      setAuthorSubmissions([...res.slice(1, res.length)])
+    })
   }, [refresh])
   useEffect(() => {
     if(offset == 0) return
@@ -88,6 +105,21 @@ function Admin(props) {
       setSubmissions(prev => prev.concat([...res.slice(1, res.length)]))
     })
   }, [offset])
+   useEffect(() => {
+    if(authorOffset == 0) return
+    fetch("http://localhost:3000/new_authors", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: authorOffset
+      })
+    }).then(res => res.json()).then(res => {
+      setAuthorSubmissions(prev => prev.concat([...res.slice(1, res.length)]))
+    })
+  }, [authorOffset])
   useEffect(() => {
     if(reportOffset == 0) return
     fetch("http://localhost:3000/new_reports", {
@@ -116,6 +148,19 @@ function Admin(props) {
       p.dataset.full = "no"
     }
   }
+  const toggleAuthorDesc = () => {
+    const submission = authorSubmissions.find(x => x.id == event.target.dataset.id)
+    const p = event.target.parentElement.querySelector('.desc');
+    if(p.dataset.full == "no"){
+      p.innerText = submission.description
+      event.target.innerText = "Hide"
+      p.dataset.full = "yes"
+    }else{
+      p.innerHTML = submission.description.slice(0,200)+'...'
+      event.target.innerText = "Show"
+      p.dataset.full = "no"
+    }
+  }
   const deleteSubmission = async () => {
     const id = event.target.dataset.id
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
@@ -128,6 +173,31 @@ function Admin(props) {
       });
       if(response) return
     fetch("http://localhost:3000/delete_waiting_submission", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: id
+      })
+    }).then(res => res.json()).then(res => {
+      setRefresh(prev => !prev)
+      props.setToast({type:"msg", text:"Deleted a submission!"})
+    })
+  }
+  const deleteAuthorSubmission = async () => {
+    const id = event.target.dataset.id
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    fetch("http://localhost:3000/delete_author_submission", {
       credentials: 'include',
       method: "POST",
       headers: {
@@ -174,8 +244,44 @@ function Admin(props) {
         setRefresh(prev => !prev)
       })
   }
+   const acceptAuthorSubmission = async () => {
+    const id = event.target.dataset.id
+    const submission = authorSubmissions.find(x => x.id == id)
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/approve_waiting_author_submission", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+          names: submission.names,
+          birth: submission.birth,
+          death: submission.death,
+          desc: submission.description,
+          photo: submission.photo,
+        })
+      }).then(res => res.json()).then(res => {
+        props.setToast({type:"msg", text:"Approved a submission!"})
+        setRefresh(prev => !prev)
+      })
+  }
   const hideSuggestions = () => {
     setOffset(0)
+    setRefresh(prev => !prev)
+    window.scrollTo(0,0)
+  }
+  const hideAuthorSuggestions = () => {
+    setAuthorOffset(0)
     setRefresh(prev => !prev)
     window.scrollTo(0,0)
   }
@@ -298,6 +404,50 @@ function Admin(props) {
                 <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
+            </>
+          }
+          {authorSubmissions.length > 0 &&
+            <>
+              <h1 className="text-2xl mt-10">Author submissions ({numOfAuthorSubmissions})</h1>
+              <div className="flex flex-col">
+              {authorSubmissions.map(el => {
+                return(
+                  <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+                <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/authors/"+el.photo} className="h-48 sm:float-left mr-3 mb-2"></img>
+                <div>
+                <h2 className="text-2xl break-keep flex sm:justify-between">
+                  {el.names} 
+                  <span>
+                    <i onClick={deleteAuthorSubmission} data-id={el.id} className="fa fa-xmark mx-2 sm:mx-4 text-red-500 cursor-pointer"></i>
+                    <i onClick={acceptAuthorSubmission} data-id={el.id} className="fa cursor-pointer fa-check-to-slot text-green-400"></i>
+                  </span>
+                </h2>
+                <p className="text-neutral-300 text-lg">{el.birth} - {el.death}</p>
+                <p className="text-neutral-300 text-lg">User - <NavLink to={"/profile/"+el.user} className="text-blue-500">{el.user}</NavLink></p>
+                {el.description.length > 0 &&
+                  <>
+                  <p data-full="no" className="desc text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.description.slice(0,200)+"..."}</p>
+                  {el.description.length > 200 &&
+                    <span className="text-blue-500 cursor-pointer mt-4" onClick={toggleAuthorDesc} data-id={el.id}>Show</span>
+                  }
+                  </>
+                }
+                </div>
+                <p className="text-neutral-200 mt-2">Submitted: {el.submit_date.split('T')[0]}</p>
+              </div>
+                )
+              })}
+              {numOfAuthorSubmissions > authorOffset+5 &&
+                <button onClick={() => setAuthorOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+              }
+              {numOfAuthorSubmissions <= authorOffset+5 && authorOffset > 0 &&
+                <button onClick={hideAuthorSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+              }
+              </div>
+            </>
+          }
+          {reports.length > 0 &&
+              <>
               <h1 className="text-2xl mt-16" id="reports">Reports ({numOfReports})</h1>
               <div className="flex flex-col">
               {reports.map(el => {
@@ -344,7 +494,7 @@ function Admin(props) {
                 <button onClick={hideReports} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
-            </>
+              </>
           }
         </div>
       }

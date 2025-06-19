@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Cze 16, 2025 at 02:48 PM
+-- Generation Time: Cze 19, 2025 at 08:42 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -20,9 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Database: `librea`
 --
-DROP DATABASE IF EXISTS `librea`;
 CREATE DATABASE IF NOT EXISTS `librea` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `librea`;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `authors`
+--
+
+CREATE TABLE `authors` (
+  `id` int(11) NOT NULL,
+  `birth` text NOT NULL,
+  `death` text NOT NULL,
+  `description` text NOT NULL,
+  `photo` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `authors_aliases`
+--
+
+CREATE TABLE `authors_aliases` (
+  `id` int(11) NOT NULL,
+  `name` text NOT NULL,
+  `author` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -118,9 +143,35 @@ CREATE TABLE `likes` (
 INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`) VALUES
 (50, 'asd', NULL, 6, NULL),
 (67, 'asdfghjkl', NULL, NULL, 19),
-(83, 'asdfghjkl', NULL, 16, NULL),
 (84, 'qwertyuiop', 37, NULL, NULL),
-(85, 'qwertyuiop', NULL, 16, NULL);
+(85, 'qwertyuiop', NULL, 16, NULL),
+(110, 'asdfghjkl', 37, NULL, NULL),
+(111, 'asdfghjkl', NULL, NULL, 18),
+(112, 'asdfghjkl', NULL, 16, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `new_authors`
+--
+
+CREATE TABLE `new_authors` (
+  `id` int(11) NOT NULL,
+  `birth` text NOT NULL,
+  `death` text NOT NULL,
+  `description` text NOT NULL,
+  `photo` text NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `submit_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `names` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `new_authors`
+--
+
+INSERT INTO `new_authors` (`id`, `birth`, `death`, `description`, `photo`, `user`, `submit_date`, `names`) VALUES
+(6, '676767', '676767', 'french shi (fuzz) (french huzz)', '5e559eee0dbf5f88c51e4f4e2ffb74381750358408081.jpg', 'asdfghjkl', '2025-06-19 16:33:04', 'Honore de Balzac');
 
 -- --------------------------------------------------------
 
@@ -155,7 +206,8 @@ INSERT INTO `new_books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`
 (33, 'asdasd', 'asd', '1', 12, '', '[]', '', 'asd', '2024-11-02 19:31:59'),
 (34, 'asd', 'asd', 'asd', 12, '', '[]', '', 'asd', '2024-11-02 19:32:05'),
 (36, 'asdasd', 'asdasd', 'asd', 12, '', '[]', '9d7b6d5a4b5fecf7e0d94028e79988041730668287010.webp', 'asd', '2024-11-03 21:11:27'),
-(37, 'asdasd', 'asd', '123123', 123, 'sadad', '[\"classics\"]', '', 'asdfghjkl', '2025-06-05 10:57:28');
+(37, 'asdasd', 'asd', '123123', 123, 'sadad', '[\"classics\"]', '', 'asdfghjkl', '2025-06-05 10:57:28'),
+(38, 'asd', 'asd', 'asd', 12323, '', '[]', '0ffd533dd127c9876d39a3ce9c108e661750357031653.png', 'asdfghjkl', '2025-06-19 18:17:11');
 
 -- --------------------------------------------------------
 
@@ -175,15 +227,6 @@ CREATE TABLE `notifications` (
   `date` timestamp NOT NULL DEFAULT current_timestamp(),
   `seen` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `notifications`
---
-
-INSERT INTO `notifications` (`id`, `type`, `text`, `user`, `quote`, `review`, `collection`, `like_from`, `date`, `seen`) VALUES
-(12, 'like', 'asdfghjkl has liked your collection.', 'asdfghjkl', NULL, NULL, 16, 'asdfghjkl', '2025-06-16 11:52:59', 0),
-(13, 'like', 'qwertyuiop has liked your review.', 'asdfghjkl', NULL, 37, NULL, 'qwertyuiop', '2025-06-16 11:54:01', 0),
-(14, 'like', 'qwertyuiop has liked your collection.', 'asdfghjkl', NULL, NULL, 16, 'qwertyuiop', '2025-06-16 11:54:05', 0);
 
 -- --------------------------------------------------------
 
@@ -316,7 +359,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('96uj83q86xVDK_UY9RiqU6kOwXWPzAZE', '{\"cookie\":{\"originalMaxAge\":172799999,\"expires\":\"2025-06-18T11:54:13.799Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1750247654);
+('2P8HChqOorqg8rhjDD7J90L9SGxZi7fv', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-06-21T12:05:00.892Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1750507501);
 
 -- --------------------------------------------------------
 
@@ -370,6 +413,19 @@ INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`) VALUES
 --
 
 --
+-- Indeksy dla tabeli `authors`
+--
+ALTER TABLE `authors`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeksy dla tabeli `authors_aliases`
+--
+ALTER TABLE `authors_aliases`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `author` (`author`);
+
+--
 -- Indeksy dla tabeli `banned`
 --
 ALTER TABLE `banned`
@@ -397,6 +453,12 @@ ALTER TABLE `likes`
   ADD KEY `review` (`review`),
   ADD KEY `user` (`user`) USING BTREE,
   ADD KEY `quote` (`quote`);
+
+--
+-- Indeksy dla tabeli `new_authors`
+--
+ALTER TABLE `new_authors`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indeksy dla tabeli `new_books`
@@ -473,6 +535,18 @@ ALTER TABLE `users`
 --
 
 --
+-- AUTO_INCREMENT for table `authors`
+--
+ALTER TABLE `authors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `authors_aliases`
+--
+ALTER TABLE `authors_aliases`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `banned`
 --
 ALTER TABLE `banned`
@@ -494,19 +568,25 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+
+--
+-- AUTO_INCREMENT for table `new_authors`
+--
+ALTER TABLE `new_authors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `new_books`
 --
 ALTER TABLE `new_books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `quotes`
@@ -541,6 +621,12 @@ ALTER TABLE `tags`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `authors_aliases`
+--
+ALTER TABLE `authors_aliases`
+  ADD CONSTRAINT `authors_aliases_ibfk_1` FOREIGN KEY (`author`) REFERENCES `authors` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `collections`

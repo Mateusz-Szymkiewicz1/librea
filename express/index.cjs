@@ -37,9 +37,31 @@ const books_storage = multer.diskStorage({
     });
   }
 });
+const waiting_authors_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../public/user_uploads/authors')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
+    });
+  }
+});
+const authors_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../public/uploads/authors')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
+    });
+  }
+});
 const profs_upload = multer({ storage: profs_storage, limits: {fieldSize: 50*1024*1024} });
 const covers_upload = multer({ storage: covers_storage, limits: {fieldSize: 50*1024*1024} });
 const books_upload = multer({ storage: books_storage, limits: {fieldSize: 50*1024*1024} });
+const waiting_authors_upload = multer({ storage: waiting_authors_storage, limits: {fieldSize: 50*1024*1024} });
+const authors_upload = multer({ storage: authors_storage, limits: {fieldSize: 50*1024*1024} });
 MySQLStore = require('connect-mysql')(session)
 const app = express().use(express.json())
 
@@ -483,6 +505,18 @@ app.post('/delete_submission', (req,res) => {
   })
 })
 
+app.post('/delete_author_submission', (req,res) => {
+  if(!req.session.user) return
+  if(req.body.img){
+    fs.unlink('../public/user_uploads/authors/'+req.body.img, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  connection.query(`DELETE FROM new_authors WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/signout', (req,res) => {
   req.session.destroy()
   res.json("done")
@@ -509,6 +543,18 @@ function add_book(req, res){
   })
 };
 
+app.post("/add_author", waiting_authors_upload.single("img"), add_author);
+
+function add_author(req, res){
+  if(!req.session.user) return
+  if(!req.file){
+    req.file = {filename: ""}
+  }
+  connection.query(`INSERT INTO new_authors(birth,death,description,photo,user,names) VALUES(?,?,?,?,?,?)`,[req.body.birth,req.body.death,req.body.desc,req.file.filename,req.session.user,req.body.names], (err, rows, fields) => {
+    res.json("done")
+  })
+};
+
 app.post("/edit_submission", covers_upload.single("img"), edit_submission);
 
 function edit_submission(req, res){
@@ -528,6 +574,27 @@ function edit_submission(req, res){
     res.json("done")
   })
 };
+
+app.post("/edit_author_submission", waiting_authors_upload.single("img"), edit_author_submission);
+
+function edit_author_submission(req, res){
+  if(!req.session.user) return
+  if(req.file || req.body.delete_photo == "true"){
+    fs.unlink('../public/user_uploads/authors/'+req.body.old_photo, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  if(!req.file && req.body.delete_photo == "false"){
+    req.file = {filename: req.body.old_photo}
+  }
+  if(!req.file && req.body.delete_photo == "true"){
+    req.file = {filename: ""}
+  }
+  connection.query(`UPDATE new_authors SET birth = ?, death = ?, description = ?, photo = ?, user = ?, names = ? WHERE id = ?`,[req.body.birth,req.body.death,req.body.desc,req.file.filename,req.session.user,req.body.names,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+};
+
 
 app.post("/edit_book", books_upload.single("img"), edit_book);
 
@@ -625,9 +692,23 @@ app.post('/waiting_submissions', (req,res) => {
   })
 })
 
+app.post('/waiting_author_submissions', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM new_authors WHERE user = ? ORDER BY submit_date DESC`,[req.session.user], (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
 app.post('/delete_waiting_submission', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM new_books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/delete_author_submission', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM new_authors WHERE id = ?`,[req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })
@@ -678,6 +759,27 @@ app.post('/approve_waiting_submission', (req,res) => {
   })
 })
 
+app.post('/approve_waiting_author_submission', (req,res) => {
+  if(!req.session.user) return
+  let names = req.body.names.split(',')
+  connection.query(`DELETE FROM new_authors WHERE id = ?`,[req.body.id])
+  if(req.body.photo){
+    var oldPath = '../public/user_uploads/authors/'+req.body.photo
+    var newPath = '../public/uploads/authors/'+req.body.photo
+    fs.rename(oldPath, newPath, function (err) {
+      if (err) console.log(err)
+    })
+  }
+  connection.query(`INSERT INTO authors (birth,death,description,photo) VALUES (?,?,?,?);`,[req.body.birth,req.body.death,req.body.desc,req.body.photo], (err, rows, fields) => {
+    let row_id = rows.insertId
+    names.forEach(name => {
+      connection.query(`INSERT INTO authors_aliases (name,author) VALUES (?,?);`,[name,row_id], (err, rows, fields) => {
+      })
+    })
+    res.json("done")
+  })
+})
+
 app.post('/new_books', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM new_books ORDER BY submit_date ASC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
@@ -687,6 +789,17 @@ app.post('/new_books', (req,res) => {
     })
   })
 })
+
+app.post('/new_authors', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM new_authors ORDER BY submit_date ASC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+    connection.query(`SELECT COUNT(*) AS submissions FROM new_authors`, (err2, rows2, fields2) => {
+      rows.unshift({submissions: rows2[0].submissions})
+      res.send(rows)
+    })
+  })
+})
+
 
 app.post('/new_reports', async(req,res) => {
   if(!req.session.user) return
