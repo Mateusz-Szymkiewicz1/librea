@@ -22,6 +22,7 @@ import NewBook from './pages/NewBook.jsx';
 import EditBook from './pages/EditBook.jsx';
 import Notifications from './pages/Notifications.jsx';
 import NewAuthor from './pages/NewAuthor.jsx';
+import Author from './pages/Author.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -46,6 +47,7 @@ function App() {
             <Route path="/login" element={<Login setToast={setToast} />} />
             <Route path="/register" element={<Register setToast={setToast} />} />
             <Route path="/book/:id" element={<Book key={location.pathname} setToast={setToast} />} />
+            <Route path="/author/:id" element={<Author key={location.pathname} setToast={setToast} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />
             <Route path="/profile/:user" element={<Profile key={location.pathname} setToast={setToast} />} />
             <Route path="/notifications/:user" element={<Notifications key={location.pathname} setToast={setToast} />} />

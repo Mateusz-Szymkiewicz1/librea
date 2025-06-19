@@ -680,7 +680,7 @@ function Book(props) {
               />
             </>
           }
-          {
+          {book.id > 0 &&
             <div className="sm:ml-5 ml-3 sm:mr-16 mr-3">
               <h2 id="quotes" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Quotes ({book.ilosc_cytatow})</h2>
               {book.ilosc_cytatow == 0 &&

@@ -96,6 +96,16 @@ const connection = mysql.createConnection({
   database: 'librea'
 })
 
+app.post('/author/:id', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM authors WHERE id = ?`,[req.params.id], (err, rows, fields) => {
+    connection.query(`SELECT * FROM authors_aliases WHERE author = ?`,[req.params.id], (err2, rows2, fields2) => {
+      rows[0].names = rows2
+      res.send(rows)
+    })
+  })
+})
+
 app.get('/book/:id', (req,res) => {
   try{
     parseInt(req.query.offset)
