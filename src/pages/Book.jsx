@@ -478,7 +478,12 @@ function Book(props) {
               <img className="sm:mt-10 mt-5 float-left mr-10 h-96 border border-neutral-700 shadow-lg" src={"../../public/uploads/"+book.okladka} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
               <div className="float-left mt-10 mr-10 text-slate-200">
                 <h1 className="text-white text-4xl">{book.tytul}</h1>
-                <p className="text-white text-2xl mt-3 text-neutral-300">{book.autor}</p>
+                {book.author.length > 0 &&
+                  <NavLink to={"/author/"+book.author[0].author}><p className="text-blue-500 text-2xl mt-3">{book.autor}</p></NavLink>
+                }
+                {book.author.length == 0 &&
+                  <p className="text-white text-2xl mt-3">{book.autor}</p>
+                }
                 <p className="text-white text-xl mt-1 text-neutral-400">{book.rok}</p>
                 <p className="text-white text-xl mt-1 text-neutral-400 mb-2">Page count: {book.strony}</p>
                 <div className="flex flex-wrap gap-2">

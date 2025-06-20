@@ -99,10 +99,17 @@ const connection = mysql.createConnection({
 app.post('/author/:id', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM authors WHERE id = ?`,[req.params.id], (err, rows, fields) => {
+    if(rows && rows.length == 1){
     connection.query(`SELECT * FROM authors_aliases WHERE author = ?`,[req.params.id], (err2, rows2, fields2) => {
-      rows[0].names = rows2
-      res.send(rows)
+      rows[0].names = rows2.map(a => a.name);
+      connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE books.autor IN (?) GROUP BY books.id WITH ROLLUP`,[rows[0].names], (err3, rows3, fields3) => {
+        rows[0].books = rows3
+        res.send(rows)
+      })
     })
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
   })
 })
 
@@ -112,13 +119,16 @@ app.get('/book/:id', (req,res) => {
   }catch(e){
     res.send({ status: 0, text: "No matches found..."})
   }
-  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen, COUNT(DISTINCT reviews.id) AS ilosc_recenzji, COUNT(DISTINCT quotes.id) AS ilosc_cytatow FROM books LEFT JOIN ratings ON ratings.book = books.id LEFT JOIN reviews ON reviews.book = books.id LEFT JOIN quotes ON quotes.book = books.id WHERE books.id = ? GROUP BY books.id;`,[req.params.id], (err, rows, fields) => {
+  connection.query(`SELECT b.*, IFNULL(r.rating_count, 0) AS ilosc_ocen, IFNULL(r.rating_sum, 0) AS suma_ocen, IFNULL(rv.review_count, 0) AS ilosc_recenzji, IFNULL(q.quote_count, 0) AS ilosc_cytatow FROM books b LEFT JOIN ( SELECT book, COUNT(*) AS rating_count, SUM(rating) AS rating_sum FROM ratings GROUP BY book ) r ON r.book = b.id LEFT JOIN ( SELECT book, COUNT(*) AS review_count FROM reviews GROUP BY book ) rv ON rv.book = b.id LEFT JOIN ( SELECT book, COUNT(*) AS quote_count FROM quotes GROUP BY book ) q ON q.book = b.id WHERE b.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating, users.prof FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) LEFT JOIN users ON users.login = reviews.user WHERE reviews.book = ? GROUP BY reviews.id ORDER BY reviews.id DESC LIMIT 15 OFFSET ${req.query.offset}`,[req.params.id], (err2, rows2, fields2) => {
         rows[0].reviews = rows2
         connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY likes DESC LIMIT 5 OFFSET ${req.query.quote_offset}`,[req.params.id], (err3, rows3, fields3) => {
           rows[0].quotes = rows3
-          res.send(rows)
+          connection.query(`SELECT * FROM authors_aliases WHERE name = ?`,[rows[0].autor], (err4, rows4, fields4) => {
+            rows[0].author = rows4
+            res.send(rows)
+          })
         })
       })
     }else{
@@ -128,7 +138,7 @@ app.get('/book/:id', (req,res) => {
 })
 
 app.get('/popular_books', (req,res) => {
-  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id HAVING COUNT(ratings.id) > 0 ORDER BY COUNT(ratings.id) DESC LIMIT 10`, (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, IFNULL(SUM(ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id HAVING ilosc_ocen > 0 ORDER BY ilosc_ocen DESC LIMIT 10`, (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }
@@ -136,7 +146,7 @@ app.get('/popular_books', (req,res) => {
 })
 
 app.get('/new_books', (req,res) => {
-  connection.query(`SELECT books.*, COUNT(DISTINCT ratings.id) AS ilosc_ocen, IFNULL(SUM(DISTINCT ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id ORDER BY books.id DESC LIMIT 10`, (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, IFNULL(SUM(ratings.rating), 0) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id GROUP BY books.id ORDER BY books.id DESC LIMIT 10`, (err, rows, fields) => {
     if(rows && rows.length > 0){
       res.send(rows)
     }
@@ -726,6 +736,13 @@ app.post('/delete_author_submission', (req,res) => {
 app.post('/delete_book', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM books WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/delete_author', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM authors WHERE id = ?`,[req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })
