@@ -22,7 +22,7 @@ function Author(props) {
     }).then(res => res.json()).then(res => {
       console.log(res[0])
       if(!res.text){
-        if(res.books){
+        if(res[0].books){
         res[0].all_ratings = res[0].books[res[0].books.length-1].ilosc_ocen
         res[0].sum_all_ratings = res[0].books[res[0].books.length-1].suma_ocen
         res[0].books.pop()

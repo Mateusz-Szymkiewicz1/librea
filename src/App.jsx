@@ -23,6 +23,7 @@ import EditBook from './pages/EditBook.jsx';
 import Notifications from './pages/Notifications.jsx';
 import NewAuthor from './pages/NewAuthor.jsx';
 import Author from './pages/Author.jsx';
+import EditAuthor from './pages/EditAuthor.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -58,6 +59,7 @@ function App() {
             <Route path="/book/new" element={<NewBook setToast={setToast} />} />
             <Route path="/author/new" element={<NewAuthor setToast={setToast} />} />
             <Route path="/book/edit/:id" element={<EditBook key={location.pathname} setToast={setToast} />} />
+            <Route path="/author/edit/:id" element={<EditAuthor key={location.pathname} setToast={setToast} />} />
             <Route path="/admin" element={<Admin setToast={setToast} />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>

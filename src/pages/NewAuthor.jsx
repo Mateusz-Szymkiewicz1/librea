@@ -171,15 +171,15 @@ function NewAuthor(props) {
     setDeletedPhoto(true)
   }
   const editSubmission = async () => {
-    let no_name = false;
-    editNames.forEach(el => {
+    let no_name = 0;
+    names.forEach(el => {
       el = el.trim()
       if(el.length < 1 || el.replace(" ", "").length < 1){
-        no_name = true;
+        no_name = no_name+1;
         return
       }
     })
-    if(no_name){
+    if(no_name == names.length){
       props.setToast({type: "error", text: "Fill the necessary fields!"})
       return
     }
@@ -211,6 +211,12 @@ function NewAuthor(props) {
         props.setToast({type: "msg", text: "Edited the submission!", stay: true})
       })
   }
+  const deleteName = (index) => {
+    setNames((prev) => prev.filter((_, i) => i !== index));
+  };
+  const deleteEditName = (index) => {
+    setEditNames((prev) => prev.filter((_, i) => i !== index));
+  };
   return (
     <>
       {!loading &&
@@ -240,7 +246,17 @@ function NewAuthor(props) {
           <h1 className="text-white text-3xl">Add a new author</h1>
           {names.map((el, i) => {
             return(
-              <input key={i} onChange={(e) => names[i] = e.target.value} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white name1" placeholder="Name"/>
+              <div key={i} className="relative">
+              <input value={el} 
+                onChange={(e) => {
+                  const updated = [...names];
+                  updated[i] = e.target.value;
+                  setNames(updated);
+                }} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block p-2.5 w-full bg-neutral-600 border-blue-500 placeholder-gray-400 text-white name1" placeholder="Name"/>
+              {i != 0 &&
+                  <i onClick={() => deleteName(i)} className="fa fa-x absolute top-3 right-3 text-red-500 cursor-pointer"></i>
+              }
+              </div>
             )
           })}
           <button onClick={(e) => setNames(names.concat([""]))} className='bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>
@@ -262,7 +278,17 @@ function NewAuthor(props) {
           </div>
           {editNames.map((el, i) => {
             return(
-              <input key={i} defaultValue={el} onChange={(e) => editNames[i] = e.target.value} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white name1" placeholder="Name"/>
+              <div key={i} className="relative">
+              <input value={el} 
+                onChange={(e) => {
+                  const updated = [...editNames];
+                  updated[i] = e.target.value;
+                  setEditNames(updated);
+                }} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block p-2.5 w-full bg-neutral-600 border-blue-500 placeholder-gray-400 text-white name1" placeholder="Name"/>
+              {i != 0 &&
+                  <i onClick={() => deleteEditName(i)} className="fa fa-x absolute top-3 right-3 text-red-500 cursor-pointer"></i>
+              }
+              </div>
             )
           })}
           <button onClick={(e) => setEditNames(editNames.concat([""]))} className='bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>

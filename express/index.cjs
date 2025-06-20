@@ -636,6 +636,33 @@ function edit_book(req, res){
   })
 };
 
+app.post("/edit_author", authors_upload.single("img"), edit_author);
+
+function edit_author(req, res){
+  if(!req.session.user) return
+  if(req.file || req.body.delete_photo == "true"){
+    fs.unlink('../public/uploads/authors/'+req.body.old_photo, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  if(!req.file && req.body.delete_photo == "false"){
+    req.file = {filename: req.body.old_photo}
+  }
+  if(!req.file && req.body.delete_photo == "true"){
+    req.file = {filename: ""}
+  }
+  let names = req.body.names.split(',')
+  connection.query(`UPDATE authors SET birth = ?, death = ?, description = ?, photo = ? WHERE id = ?`,[req.body.birth,req.body.death,req.body.desc,req.file.filename,req.body.id], (err, rows, fields) => {
+    connection.query(`DELETE FROM authors_aliases WHERE author = ?`,[req.body.id], (err, rows, fields) => {
+      names.forEach(name => {
+        connection.query(`INSERT INTO authors_aliases (name,author) VALUES (?,?);`,[name,req.body.id], (err, rows, fields) => {
+        })
+      })
+      res.json("done")
+    })
+  })
+};
+
 app.post('/header_notifications', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your review') AS text, user, NULL AS quote, review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND review IS NOT NULL GROUP BY user, review UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your quote') AS text, user, quote AS quote, NULL AS review, NULL AS collection, GROUP_CONCAT(like_from) AS like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND quote IS NOT NULL GROUP BY user, quote UNION ALL SELECT id,seen, 'like' AS type, CONCAT(COUNT(*), ' people liked your collection') AS text, user, NULL AS quote, NULL AS review, collection, like_from, MAX(date) AS latest_time FROM notifications WHERE type = 'like' AND user = ? AND collection IS NOT NULL GROUP BY user, collection UNION ALL SELECT id, seen, type, text, user, quote, review, collection, like_from, date AS latest_time FROM notifications WHERE type = 'warning' AND user = ? ORDER BY latest_time DESC LIMIT 100;`,[req.body.user,req.body.user,req.body.user,req.body.user], async (err, rows, fields) => {
