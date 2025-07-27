@@ -97,7 +97,6 @@ const connection = mysql.createConnection({
 })
 
 app.post('/author/:id', (req,res) => {
-  if(!req.session.user) return
   connection.query(`SELECT * FROM authors WHERE id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
     connection.query(`SELECT * FROM authors_aliases WHERE author = ?`,[req.params.id], (err2, rows2, fields2) => {
@@ -412,11 +411,13 @@ app.post('/new_collection', (req,res) => {
 })
 
 function like_notification(user_session,type,user,id){
+  if(user_session == user) return
   let text = `${user_session} has liked your ${type}.`
   connection.query(`INSERT INTO notifications (type,text,user,${type},like_from) VALUES ('like',?,?,?,?);`,[text,user,id,user_session], (err, rows, fields) => {})
 }
 
 function unlike_notification(user_session,type,user,id){
+  if(user_session == user) return
   connection.query(`DELETE FROM notifications WHERE user = ? AND like_from = ? AND ${type} = ?`,[user,user_session,id], (err, rows, fields) => {})
 }
 

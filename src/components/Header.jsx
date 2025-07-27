@@ -123,6 +123,7 @@ function Header() {
                   id: e.currentTarget.dataset.id
                 }),
               })
+    setNotificationsNotSeen(prev => prev-1)
   }
   const delete_notification = (e) => {
     e.preventDefault()
@@ -139,6 +140,7 @@ function Header() {
                   id: e.currentTarget.dataset.id
                 }),
               })
+      setNotificationsNotSeen(prev => prev-1)
   }
   return (
     <>
@@ -243,7 +245,7 @@ function Header() {
               </>
             }
             {!user &&
-              <NavLink to="/login"><span className="pr-5 block"><i className="fa fa-user bg-blue-500 hover:bg-blue-600 py-3.5 px-2 text-md ml-2 sm:px-4"></i></span></NavLink>
+              <NavLink to="/login"><span className="pr-5 block"><i className="fa fa-user bg-blue-500 hover:bg-blue-600 py-3.5 text-md ml-2 px-4"></i></span></NavLink>
             }
           </div>
       </div>

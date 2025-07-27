@@ -5,6 +5,7 @@ import Home from './pages/Home.jsx';
 import Book from './pages/Book.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import TOS from './pages/TOS.jsx';
 import NoMatch from './pages/NoMatch.jsx';
 import CollectionNew from './pages/CollectionNew.jsx';
 import Search from './pages/Search.jsx';
@@ -47,6 +48,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login setToast={setToast} />} />
             <Route path="/register" element={<Register setToast={setToast} />} />
+            <Route path="/tos" element={<TOS />} />
             <Route path="/book/:id" element={<Book key={location.pathname} setToast={setToast} />} />
             <Route path="/author/:id" element={<Author key={location.pathname} setToast={setToast} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />

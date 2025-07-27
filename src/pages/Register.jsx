@@ -225,7 +225,7 @@ function Register(props) {
         </div>
         <div className="flex items-center mb-4">
     <input onChange={() => setAgreed(prev => !prev)} checked={agreed} id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm dark:bg-gray-700 dark:border-gray-600"></input>
-    <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree to librea's <span className="text-blue-400 cursor-pointer italic">Terms of service</span></label>
+    <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">I agree to librea's <NavLink className="text-blue-400 cursor-pointer italic" to="/tos" target="blank">Terms of service</NavLink></label>
 </div>
         <div>
           <button onClick={submit} className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 focus:outline-none transition">Sign Up</button>
