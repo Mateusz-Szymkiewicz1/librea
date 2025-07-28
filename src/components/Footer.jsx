@@ -1,3 +1,4 @@
+import { NavLink } from 'react-router-dom';
 import icon from '../../public/icon.png';
 function Footer() {
   const rok = new Date().getFullYear()
@@ -16,7 +17,7 @@ function Footer() {
                   <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Follow us</h2>
                   <ul className="text-gray-500 dark:text-gray-400 font-medium">
                       <li className="mb-4">
-                          <a href="#" className="hover:underline">Github</a>
+                          <a href="https://github.com/Mateusz-Szymkiewicz1/librea" target='blank' className="hover:underline">Github</a>
                       </li>
                       <li>
                           <a href="#" className="hover:underline">Twitter</a>
@@ -38,10 +39,10 @@ function Footer() {
                   <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
                   <ul className="text-gray-500 dark:text-gray-400 font-medium">
                       <li className="mb-4">
-                          <a href="#" className="hover:underline">Privacy Policy</a>
+                          <NavLink to="/tos" target='blank' className="hover:underline">Privacy Policy</NavLink>
                       </li>
                       <li>
-                          <a href="#" className="hover:underline">Terms &amp; Conditions</a>
+                          <NavLink to="/tos" target='blank' className="hover:underline">Terms &amp; Conditions</NavLink>
                       </li>
                   </ul>
               </div>
