@@ -313,7 +313,7 @@ function Collection(props) {
           <p className="text-neutral-400 text-xl mt-10">{collection.description}</p>
           <div className="my-6 flex flex-col clear-both">
           {user && user.login == collection.user &&
-            <button className='bg-blue-600 w-48 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={showAdd}>Add a book</button>
+            <button className='bg-blue-600 w-fit text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={showAdd}><i className="fa fa-plus mr-1"></i>Add a book</button>
           }
           <div className="flex gap-3 flex-wrap mt-5">
           <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
@@ -347,7 +347,7 @@ function Collection(props) {
           {filtered.slice(0, bookCount).map((el,i) => {
             return (
               <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
-                <img src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
+                <img src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"} className="h-64 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep">{el.tytul}
                   {user && user.login == collection.user &&
@@ -407,7 +407,7 @@ function Collection(props) {
                       props.setToast({type:"error", text: "This book is already on the list!"})
                     }
                     document.querySelector(".add_search").value = ""
-                  }} className="cursor-pointer block add_suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1"></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span>
+                  }} className="cursor-pointer block add_suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"} className="h-10 float-left mr-2 mt-1"></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span>
                 )
               })}
             </div>

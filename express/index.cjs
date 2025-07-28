@@ -152,7 +152,6 @@ app.get('/new_books', (req,res) => {
   })
 })
 
-
 app.get('/collection/:id', (req,res) => {
   connection.query(`SELECT collections.*, COUNT(likes.id) AS likes FROM collections LEFT JOIN likes ON collections.id = likes.collection WHERE collections.id = ? GROUP BY collections.id`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
