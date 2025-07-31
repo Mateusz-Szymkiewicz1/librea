@@ -28,6 +28,7 @@ function Settings(props) {
           }
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
+            console.log(res2[0])
             setUser(res2[0])
             setLoading(false)
           }
@@ -129,19 +130,60 @@ function Settings(props) {
         }).then(() => window.location.href = '/login')
       })
   }
+  let deleteAccount = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/delete_account", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          }
+      }).then(() => window.location.href = '/')
+  }
+  let change_visibility = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    user.private = !user.private
+    setUser({...user, private: user.private})
+    fetch("http://localhost:3000/change_visibility", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            change_to: user.private ? "private" : "public"
+          }),
+      })
+  }
   return (
     <div className="ml-5 mt-10">
       {user &&
         <>
           <h1 className="text-3xl"><i className="fa fa-cogs mr-3 text-blue-500"></i>Settings</h1>
           <p className="text-xl text-slate-200 mt-16">Account</p>
-          <div className="bg-neutral-900 p-5 w-fit mt-5">
+          <div className="bg-neutral-900 p-5 w-fit min-w-72 mt-5">
           <div className="flex flex-col flex-wrap">
           <span className="ml-1 text-xl"><i className="fa fa-user mr-2"></i>Username</span>
           <input type="text" maxLength="50" onChange={(e) => setEditLogin(e.target.value)} className="mt-4 p-2 w-56 bg-neutral-600 rounded-md focus:outline-none mr-2" placeholder={user.login}></input>
           <button onClick={changeLogin} className="bg-blue-500 w-fit p-2 mt-4 px-4 hover:bg-blue-600"><i className="fa fa-rotate mr-1"></i>Change username</button>
           </div>
-          <div className="flex flex-col mt-5">
+          <div className="flex flex-col mt-7">
           <span className="ml-1 text-xl"><i className="fa fa-key mr-2"></i>Password</span>
           <div className="relative w-fit mr-2">
             <input placeholder="********" id="password" type="password" onChange={(e) => setEditPass(e.target.value)} maxLength="100" className="mt-3 p-2 pr-10 w-50 bg-neutral-600 rounded-md focus:outline-none"></input>
@@ -179,6 +221,11 @@ function Settings(props) {
         </div>
         <button className="bg-blue-500 w-fit h-10 px-4 hover:bg-blue-600 mt-3" onClick={changePass}><i className="fa fa-rotate mr-1"></i>Change password</button>
         </div>
+        <span className="ml-1 text-xl block mt-7"><i className="fa fa-eye mr-2"></i>Visiblity</span>
+        <span className="mt-2 block">Your account is currently <span className="text-blue-500 italic">{user.private ? "Private" : "Public"}</span></span>
+        <button className="bg-blue-500 w-fit h-10 px-4 hover:bg-blue-600 mt-3" onClick={change_visibility}><i className="fa fa-rotate mr-1"></i>Switch to a {user.private ? "Public" : "Private"} account</button>
+        <span className="ml-1 text-xl block mt-7 text-red-500"><i className="fa fa-skull mr-2"></i>Danger zone</span>
+        <button className="bg-red-500 w-fit h-10 px-4 hover:bg-red-600 mt-3" onClick={deleteAccount}><i className="fa fa-trash mr-1"></i>Delete the account</button>
         </div>
         </>
       }

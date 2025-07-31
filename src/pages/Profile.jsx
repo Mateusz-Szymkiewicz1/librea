@@ -288,7 +288,12 @@ function Profile(props) {
                         }
                         <p onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
                       </div>
-                      }
+            }
+            {profile.private == 1 && (!user || user.login != profile.login) &&
+              <p className='text-neutral-400 text-xl ml-5 mt-5'>This profile is private.</p>
+            }
+            {(profile.private == 0 || (user && user.login == profile.login)) &&
+            <>
             {profile.collections.length == 0 &&
             <>
               <p className='text-slate-200 text-2xl ml-5 mt-5'>Collections</p>
@@ -373,7 +378,7 @@ function Profile(props) {
                 })}
               </div>
             </>
-          }
+          }</>}
             </div>
             <div className="changeProfInput z-50 fixed hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
               <div className="bg-neutral-700 p-5 pb-8 text-white">

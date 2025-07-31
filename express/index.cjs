@@ -169,14 +169,18 @@ app.get('/tags', (req,res) => {
 })
 
 app.post('/user/:login', (req,res) => {
-  connection.query(`SELECT login, prof, admin FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
+  let query = ""
+  if(req.session.user != req.params.login){
+    query = "AND collections.private = 0"
+  }
+  connection.query(`SELECT login, prof, admin, private FROM users WHERE users.login = ?`,[req.params.login], (err, rows, fields) => {
     if(rows && rows.length > 0){
       connection.query(`SELECT book, rating FROM ratings WHERE ratings.user = ?`,[req.params.login], (err2, rows2, fields2) => {
         if(rows2){
           rows[0].ratings = rows2
         }
       })
-      connection.query(`SELECT * FROM collections WHERE collections.user = ?`,[req.params.login], (err4, rows4, fields4) => {
+      connection.query(`SELECT * FROM collections WHERE collections.user = ? ${query}`,[req.params.login], (err4, rows4, fields4) => {
         if(rows4){
           rows[0].collections = rows4
         }
@@ -374,6 +378,14 @@ app.post('/edit_review', (req,res) => {
   })
 })
 
+app.post('/change_visibility', (req,res) => {
+  if(!req.session.user) return
+  let status = req.body.change_to == "private" ? 1 : 0
+  connection.query(`UPDATE users SET private = ? WHERE login = ?`,[status,req.session.user], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/edit_quote', (req,res) => {
   if(!req.session.user) return
   let quote = req.body.text
@@ -395,6 +407,14 @@ app.post('/delete_review', (req,res) => {
   })
 })
 
+app.post('/delete_account', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM users WHERE login = ?`,[req.session.user], (err, rows, fields) => {
+    req.session.destroy()
+    res.json("done")
+  })
+})
+
 app.post('/delete_quote', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM quotes WHERE id = ?`,[req.body.id], (err, rows, fields) => {
@@ -404,7 +424,7 @@ app.post('/delete_quote', (req,res) => {
 
 app.post('/new_collection', (req,res) => {
   if(!req.session.user) return
-  connection.query(`INSERT INTO collections (user,name,books,description) VALUES ('${req.session.user}',?,?,?);`,[req.body.name,req.body.books, req.body.desc], (err, rows, fields) => {
+  connection.query(`INSERT INTO collections (user,name,books,description,private) VALUES ('${req.session.user}',?,?,?,?);`,[req.body.name,req.body.books, req.body.desc,req.body.private], (err, rows, fields) => {
     res.json("done")
   })
 })
@@ -488,7 +508,7 @@ app.post('/collection_add_book', (req,res) => {
 
 app.post('/collection_edit_info', (req,res) => {
   if(!req.session.user) return
-  connection.query(`UPDATE collections SET name = ?, description = ? WHERE id = ?;`,[req.body.name,req.body.desc,req.body.collection], (err, rows, fields) => {
+  connection.query(`UPDATE collections SET name = ?, description = ?, private = ? WHERE id = ?;`,[req.body.name,req.body.desc,req.body.private,req.body.collection], (err, rows, fields) => {
     res.json("done")
   })
 })

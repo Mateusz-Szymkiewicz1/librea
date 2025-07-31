@@ -483,7 +483,14 @@ function Admin(props) {
                   <p className="text-neutral-200 mt-2">Written by <NavLink target="_blank" to={"/profile/"+el.quote.user} className="italic text-blue-400">{el.quote.user}</NavLink> on <NavLink target="_blank" to={"/book/"+el.quote.book.id} className="italic text-blue-400">{el.quote.book.tytul}</NavLink> by {el.quote.book.autor}</p>
                   </>
                 }
-                <p className="text-neutral-200 mt-5">Submitted: {el.date.split('T')[0]} by <NavLink target="_blank" to={"/profile/"+el.user_reporting} className="italic text-blue-400">{el.user_reporting}</NavLink></p>
+                <p className="text-neutral-200 mt-5">Submitted: {el.date.split('T')[0]} by 
+                  {el.user_reporting &&
+                    <NavLink target="_blank" to={"/profile/"+el.user_reporting} className="italic ml-1 text-blue-400">{el.user_reporting}</NavLink>
+                  }
+                  {!el.user_reporting &&
+                    <span className="italic text-gray-400 ml-1">User Deleted</span>
+                  }
+                </p>
               </div>
                 )
               })}

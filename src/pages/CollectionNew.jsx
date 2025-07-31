@@ -7,6 +7,7 @@ function CollectionNew(props) {
   const [autofill, setAutofill] = useState([])
   const [name, setName] = useState("")
   const [desc, setDesc] = useState("")
+  const [isPrivate, setIsPrivate] = useState(false)
   const [books, setBooks] = useState([])
   const [loading, setLoading] = useState(true)
   useEffect(() => {
@@ -69,7 +70,8 @@ function CollectionNew(props) {
       body: JSON.stringify({
         name: name,
         books: JSON.stringify(tab),
-        desc: desc
+        desc: desc,
+        private: isPrivate ? "1" : "0"
       }),
     }).then(() => {
       props.setToast({type: "msg", text: "Added a new collection!", stay: true})
@@ -86,6 +88,10 @@ function CollectionNew(props) {
           <h1 className="text-white text-3xl">New collection</h1>
           <input type="text" onChange={(e) => setName(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Name" maxLength={200}/>
           <input type="text" onChange={(e) => setDesc(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Description" maxLength={1000}/> 
+           <div checked={isPrivate} onChange={() => setIsPrivate(prev => !prev)} className="flex items-center my-4">
+            <input id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm dark:bg-gray-700 dark:border-gray-600"></input>
+            <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Private collection</label>
+        </div>
           <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700' onClick={showAdd}><i className="fa fa-plus mr-2"></i>Add a book</button>
           {books.length == 0 &&
             <p className="text-neutral-300 text-lg">There's currently no books in this collection.</p>
