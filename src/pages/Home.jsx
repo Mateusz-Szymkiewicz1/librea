@@ -142,6 +142,7 @@ function Home() {
           {user.collections.length > 0 &&
             <>
             <p className='text-slate-200 text-2xl ml-5 mt-16'>Your collections</p>
+            <p className='text-slate-300 text-lg ml-5 mt-2'>Maybe try "to-read", "wishlist" or "books i absolutely loved"?</p>
             <NavLink to="/collection/new"><button className='bg-blue-600 text-white text-lg p-3 ml-5 mt-3 hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Create a collection</button></NavLink>
             <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
             {user.collections.map(el =>
@@ -153,6 +154,7 @@ function Home() {
           {user.ratings.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recently rated</p>
+              <p className='text-slate-300 text-lg mt-2 ml-5'>Changed your mind?</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentlyrated.map((el,i) => 
                   <BookCard book={el} key={el.id}></BookCard>
@@ -163,6 +165,7 @@ function Home() {
           {user.reviews.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl ml-5 mt-16'>Recent reviews</p>
+              <p className='text-slate-300 text-lg mt-2 ml-5'>Maybe re-read it one more time? Are you sure?</p>
               <div className='flex flex-wrap gap-5 ml-5 my-3 mb-20'>
                 {recentreviews.map((el,i) => 
                   <BookCard book={el} key={el.id}></BookCard>
@@ -178,6 +181,7 @@ function Home() {
         {popular.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Popular</p>
+              <p className='text-slate-300 text-lg mt-2'>These ones have been popping off 🔥🔥🔥</p>
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {popular.map((el,i) => 
                   <BookCard book={el} key={el.id}></BookCard>
@@ -190,6 +194,7 @@ function Home() {
         {newlyAdded.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Newly added</p>
+              <p className='text-slate-300 text-lg mt-2'>Might want to give these ones a chance</p>
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {newlyAdded.map((el,i) => 
                 <BookCard book={el} key={el.id}></BookCard>

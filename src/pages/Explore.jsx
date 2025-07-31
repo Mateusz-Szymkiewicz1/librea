@@ -47,6 +47,7 @@ function Explore() {
           {popular.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Popular recently</p>
+              <p className='text-slate-300 text-lg mt-2'>These ones have been popping off 🔥🔥🔥</p>
               <div className='flex flex-wrap gap-5 my-3 mb-20'>
                 {popular.map((el,i) => 
                   <BookCard book={el} key={el.id}></BookCard>
@@ -57,7 +58,8 @@ function Explore() {
           <div>
                   {newlyAdded.length > 0 &&
                       <>
-                        <p className='text-slate-200 font-semibold text-2xl mt-16'>Newly added</p>
+                        <p className='text-slate-200 fontg-semibold text-2xl mt-16'>Newly added</p>
+                        <p className='text-slate-300 text-lg mt-2'>Might want to give these ones a chance</p>
                         <div className='flex flex-wrap gap-5 my-3 mb-20'>
                           {newlyAdded.map((el,i) => 
                             <BookCard book={el} key={el.id}></BookCard>
