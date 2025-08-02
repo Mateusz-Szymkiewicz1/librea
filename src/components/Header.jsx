@@ -186,6 +186,9 @@ function Header() {
                   <NavLink to="/book/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-file-circle-plus mr-2"></i>Add a book</p></NavLink>
                   <NavLink to="/author/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-feather-pointed mr-2"></i>Add an author</p></NavLink>
                   {user.admin == 1 &&
+                    <NavLink to="/post/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-newspaper mr-2"></i>New Blog Post</p></NavLink>
+                  }
+                  {user.admin == 1 &&
                     <NavLink to="/admin" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-user-tie mr-2"></i>Admin Panel</p></NavLink>
                   }
                   <NavLink to={"/settings"} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-cogs mr-2"></i>Settings</p></NavLink>

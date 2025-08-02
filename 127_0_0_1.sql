@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Lip 31, 2025 at 09:54 PM
+-- Generation Time: Aug 02, 2025 at 10:46 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -253,6 +253,28 @@ CREATE TABLE `notifications` (
 -- --------------------------------------------------------
 
 --
+-- Struktura tabeli dla tabeli `posts`
+--
+
+CREATE TABLE `posts` (
+  `id` int(11) NOT NULL,
+  `title` text NOT NULL,
+  `text` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `thumbnail` text NOT NULL,
+  `user` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `posts`
+--
+
+INSERT INTO `posts` (`id`, `title`, `text`, `date`, `thumbnail`, `user`) VALUES
+(2, 'asd', '<p>asd</p><p><img src=\"../../public/uploads/blog/postimg_1754167195532_0.jpg\"></p>', '2025-08-02 20:39:55', '', 'asdfghjkl');
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabeli dla tabeli `quotes`
 --
 
@@ -384,7 +406,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('IKLO7NdQia2XbyMuG_NFP4OeTdnyFetq', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-02T17:54:08.273Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754157248);
+('C854lcEgscVY10kRORz0IECDJfj0bJgE', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-04T12:19:19.216Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754309959);
 
 -- --------------------------------------------------------
 
@@ -505,6 +527,13 @@ ALTER TABLE `notifications`
   ADD KEY `like_from` (`like_from`);
 
 --
+-- Indeksy dla tabeli `posts`
+--
+ALTER TABLE `posts`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`user`);
+
+--
 -- Indeksy dla tabeli `quotes`
 --
 ALTER TABLE `quotes`
@@ -615,6 +644,12 @@ ALTER TABLE `notifications`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
+-- AUTO_INCREMENT for table `posts`
+--
+ALTER TABLE `posts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
 -- AUTO_INCREMENT for table `quotes`
 --
 ALTER TABLE `quotes`
@@ -684,6 +719,12 @@ ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
   ADD CONSTRAINT `notifications_ibfk_4` FOREIGN KEY (`like_from`) REFERENCES `users` (`login`) ON DELETE CASCADE,
   ADD CONSTRAINT `notifications_ibfk_5` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `posts`
+--
+ALTER TABLE `posts`
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `quotes`

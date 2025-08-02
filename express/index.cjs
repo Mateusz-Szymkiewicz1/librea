@@ -57,11 +57,22 @@ const authors_storage = multer.diskStorage({
     });
   }
 });
+const blog_storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, '../public/uploads/blog')
+  },
+  filename: function (req, file, cb) {
+    crypto.pseudoRandomBytes(16, function (err, raw) {
+      cb(null, raw.toString('hex') + Date.now() + path.extname(file.originalname));
+    });
+  }
+});
 const profs_upload = multer({ storage: profs_storage, limits: {fieldSize: 50*1024*1024} });
 const covers_upload = multer({ storage: covers_storage, limits: {fieldSize: 50*1024*1024} });
 const books_upload = multer({ storage: books_storage, limits: {fieldSize: 50*1024*1024} });
 const waiting_authors_upload = multer({ storage: waiting_authors_storage, limits: {fieldSize: 50*1024*1024} });
 const authors_upload = multer({ storage: authors_storage, limits: {fieldSize: 50*1024*1024} });
+const blog_upload = multer({ storage: blog_storage, limits: {fieldSize: 50*1024*1024} });
 MySQLStore = require('connect-mysql')(session)
 const app = express().use(express.json())
 
@@ -154,6 +165,16 @@ app.get('/new_books', (req,res) => {
 
 app.get('/collection/:id', (req,res) => {
   connection.query(`SELECT collections.*, COUNT(likes.id) AS likes FROM collections LEFT JOIN likes ON collections.id = likes.collection WHERE collections.id = ? GROUP BY collections.id`,[req.params.id], (err, rows, fields) => {
+    if(rows && rows.length == 1){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
+app.post('/post/:id', (req,res) => {
+  connection.query(`SELECT posts.* FROM posts WHERE posts.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
       res.send(rows)
     }else{
@@ -582,6 +603,42 @@ function add_book(req, res){
     res.json("done")
   })
 };
+
+const saveBase64Images = (html) => {
+  const imgRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"[^>]*>/g;
+  let match;
+  let imgIndex = 0;
+  let newHtml = html;
+
+  while ((match = imgRegex.exec(html)) !== null) {
+    const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    const filename = `postimg_${Date.now()}_${imgIndex}.${ext}`;
+    const filepath = path.join(__dirname, '../public/uploads/blog', filename);
+
+    fs.writeFileSync(filepath, buffer);
+
+    // Replace base64 src with file path
+    newHtml = newHtml.replace(match[0], match[0].replace(match[0].match(/src="[^"]+"/)[0], `src="../../public/uploads/blog/${filename}"`));
+    imgIndex++;
+  }
+  return newHtml;
+};
+
+app.post("/submit_blog_post", blog_upload.single("img"), submit_blog_post);
+
+function submit_blog_post(req, res) {
+  if(!req.session.user) return
+  let filename = ""
+  req.body.text = saveBase64Images(req.body.text);
+  if(req.file){
+    filename = req.file.filename
+  }
+  connection.query(`INSERT INTO posts(title, text, thumbnail, user) VALUES (?,?,?,?);`,[req.body.title,req.body.text,filename,req.session.user], (err, rows, fields) => {
+    res.json("done")
+  })
+}
 
 app.post("/add_author", waiting_authors_upload.single("img"), add_author);
 
