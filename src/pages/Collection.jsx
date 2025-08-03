@@ -345,7 +345,7 @@ function Collection(props) {
             </div>
           {filtered.slice(0, bookCount).map((el,i) => {
             return (
-              <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+              <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600 shadow-lg">
                 <img src={"/uploads/"+el.okladka} onError={(e) => e.target.src = "../../public/default.jpg"} className="h-64 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep">{el.tytul}
@@ -385,13 +385,13 @@ function Collection(props) {
             <input checked={editPrivate} onChange={() => setEditPrivate(prev => !prev)} id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm dark:bg-gray-700 dark:border-gray-600"></input>
             <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Private collection</label>
         </div> 
-        <button className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={editInfo}>Edit</button>
+        <button className='bg-blue-600 text-white px-8 text-lg p-3 mt-5 block hover:bg-blue-700' onClick={editInfo}><i className="fa fa-pencil mr-2"></i>Edit</button>
         </div>
       </div>
       <div className="add z-50 fixed hidden top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
         <div className="bg-neutral-700 p-5 pb-8 text-white">
           <div className="flex justify-between">
-            <h1 className="text-xl font-semibold">Add a book</h1>
+            <h1 className="shadow text-xl font-semibold">Add a book</h1>
             <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeAdd}></i>
           </div>
           <div className="h-11 w-72 relative">

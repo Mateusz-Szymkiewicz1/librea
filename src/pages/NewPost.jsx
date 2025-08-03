@@ -171,23 +171,23 @@ function NewPost(props) {
           <h1 className="text-center font-semibold mb-10 text-4xl mt-16 text-slate-200">
             {edit_id == "new" ? "New Blog Post" : "Edit Blog Post"}
           </h1>
-          <input value={title} onChange={() => setTitle(event.target.value)} type='text' maxLength="200" placeholder='Title...' className="w-full outline-none rounded-md py-3 px-4 bg-neutral-700 text-sm text-slate-200 mb-5" />
+          <input value={title} onChange={() => setTitle(event.target.value)} type='text' maxLength="200" placeholder='Title...' className="shadow w-full outline-none rounded-md py-3 px-4 bg-neutral-700 text-sm text-slate-200 mb-5" />
           {oldImg && !deleted &&
             <div className="flex flex-wrap">
             <img className="mb-4 max-w-96 mr-4" src={'../../public/uploads/blog/'+oldImg} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
-            <div onClick={deleteThumbnail} className="rounded-md mb-4 px-5 h-fit cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-trash mr-3"></i>Delete thumbnail</div>
+            <div onClick={deleteThumbnail} className="shadow rounded-md mb-4 px-5 h-fit cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-trash mr-3"></i>Delete thumbnail</div>
             </div>
           }
-          <FileUpload ref={fileUploadRef} name="thumbnail[]" invalidfiletypemessage="Wrong file format!" chooseLabel="Add a thumbnail" accept="image/*" showuploadbutton="false" filelimit="1" emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}>
+          <FileUpload ref={fileUploadRef} name="thumbnail[]" invalidfiletypemessage="Wrong file format!" chooseLabel="Add a thumbnail" accept="image/*" showuploadbutton="false" filelimit="1" emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>} className="shadow-xl">
           </FileUpload>
-          <Editor value={text} onTextChange={(e) => setText(e.htmlValue)} className="mt-5" style={{ height: '320px' }} />
+          <Editor value={text} onTextChange={(e) => setText(e.htmlValue)} className="mt-5 shadow-xl" style={{ height: '320px' }} />
           <div>
             <div onClick={toggle_preview} className="rounded-md my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-search mr-3"></i>Preview</div>
             {edit_id == "new" &&
-              <div onClick={submit} className="rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-circle-plus mr-3"></i>Submit</div>
+              <div onClick={submit} className="shadow rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-circle-plus mr-3"></i>Submit</div>
             }
             {edit_id != "new" &&
-              <div onClick={submit_edit} className="rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-pencil mr-3"></i>Edit</div>
+              <div onClick={submit_edit} className="shadow rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-pencil mr-3"></i>Edit</div>
             }
           </div>
         </div>

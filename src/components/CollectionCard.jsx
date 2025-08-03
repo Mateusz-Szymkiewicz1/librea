@@ -6,7 +6,7 @@ function CollectionCard(props) {
   light ? bg = "bg-neutral-600 hover:bg-neutral-500" : bg = "bg-neutral-700 hover:bg-neutral-600"
   return (
     <>
-      <NavLink to={"/collection/"+collection.id} key={collection.id}><div className={bg+' p-5'}>
+      <NavLink to={"/collection/"+collection.id} key={collection.id}><div className={bg+' p-5 shadow-lg'}>
                   <div className='grid grid-cols-2'>
                   <img className="h-20 w-20 object-cover border border-neutral-500" src={"/uploads/"+collection.books[0].okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
                   {collection.books.length > 1 &&

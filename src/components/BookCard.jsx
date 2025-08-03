@@ -7,7 +7,7 @@ function BookCard(props) {
   book.ilosc_ocen == 0 ? rating = "None" : rating = (book.suma_ocen/book.ilosc_ocen).toFixed(1)
   return (
     <>
-      <NavLink to={"/book/"+book.id}><div className={bg+" p-5"}>
+      <NavLink to={"/book/"+book.id}><div className={bg+" p-5 shadow-lg"}>
         <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+book.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
         <p className="text-white mt-3 text-xl">{book.tytul}</p>
         <p className="text-slate-200 mt-1 text-lg">{book.autor}</p>

@@ -111,7 +111,7 @@ function EditAuthor(props) {
       {!loading &&
       <>
         <div className="w-full lg:w-1/2 float-left p-2 sm:p-5 mb-28">
-        <div className="bg-neutral-700  h-full w-full p-5">
+        <div className="bg-neutral-700 shadow-lg h-full w-full p-5">
           <h1 className="text-white text-3xl">Edit author page</h1>
           {names.map((el, i) => {
             return(
@@ -128,19 +128,19 @@ function EditAuthor(props) {
               </div>
             )
           })}
-          <button onClick={(e) => setNames(names.concat([""]))} className='bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>
+          <button onClick={(e) => setNames(names.concat([""]))} className='shadow bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>
           <input value={birth} onChange={(e) => setBirth(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Year of birth"/> 
           <input value={death} onChange={(e) => setDeath(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Year of death"/> 
           <textarea value={desc} onChange={(e) => setDesc(e.target.value)} className="bg-neutral-600 mt-5 border border-neutral-500 rounded w-full h-32 outline-none p-2" placeholder="Description"></textarea>
           {photoName.length > 0 && !deletedPhoto &&
             <>
               <p className="mt-2 text-xl">Current photo:</p>
-              <button onClick={deletePhoto} className='bg-blue-600 text-white px-5 p-3 my-1 block hover:bg-blue-700'><i className="fa fa-trash mr-2"></i>Delete</button>
+              <button onClick={deletePhoto} className='shadow bg-blue-600 text-white px-5 p-3 my-1 block hover:bg-blue-700'><i className="fa fa-trash mr-2"></i>Delete</button>
               <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/authors/"+photoName} className="h-24 mr-3 mb-5 mt-2"></img>
             </>
           }
           <FileUpload className="mt-5" ref={fileUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload a photo.</p>} onSelect={(e) => setPhoto(e.files)} onClear={() => setPhoto([])} onRemove={() => setPhoto([])}></FileUpload>
-          <button onClick={submit} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Edit author info</button>
+          <button onClick={submit} className='shadow bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Edit author info</button>
         </div>
       </div>
       <div className="px-10 mt-5 w-1/2 float-left flex justify-center hidden lg:block">

@@ -56,25 +56,18 @@ function Search() {
           {user &&
             <>
             <p className="text-lg text-neutral-200 mt-5">No book you're looking for? Add a new one to our database!</p>
-            <NavLink to="/book/new"><button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700'><i className="fa-solid fa-file-circle-plus mr-3"></i>Add a book</button></NavLink>
+            <NavLink to="/book/new"><button className='shadow float-left bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700'><i className="fa-solid fa-file-circle-plus mr-3"></i>Add a book</button></NavLink>
             </>
           }
           </>
         }
-        <div className="my-6 flex flex-col">
+        <div className="my-6 flex flex-col clear-both">
           <div className="flex gap-3 flex-wrap">
           <select className="border text-sm rounded-lg outline-none block w-48 p-2.5 bg-neutral-600 border-gray-600 placeholder-gray-400 text-white" onChange={(e) => setSort(e.target.value)}>
             <option defaultValue="id">Sort by: Default</option>
             <option value="title">Sort by: Title</option>
             <option value="author">Sort by: Author</option>
             <option value="rating">Sort by: Rating</option>
-            <style>
-              {`
-              .optionListContainer{
-                background: #525252 !important;
-              }
-              `}
-            </style>
             </select>     
               <Multiselect
                 isObject={false}
@@ -100,7 +93,7 @@ function Search() {
             </div>
           {wyniki.map(el => {
             return (
-              <NavLink to={"/book/"+el.id} key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+              <NavLink to={"/book/"+el.id} key={el.id} className="shadow-lg bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+el.okladka} className="h-64 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep">{el.tytul}</h2>

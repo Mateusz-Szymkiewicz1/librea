@@ -257,7 +257,7 @@ function Profile(props) {
       <div className="px-5 mt-5">
         {profile &&
           <div className="px-5 mt-10 flex flex-col gap-5 sm:flex-row justify-center">
-            <div className="flex flex-col bg-neutral-700 h-fit w-fit p-5 text-slate-200">
+            <div className="flex flex-col bg-neutral-700 h-fit w-fit p-5 text-slate-200 shadow-lg">
                 <div className="relative" onMouseEnter={toggleAddProf} onMouseLeave={toggleAddProf}>
                   {profile.prof &&
                     <img className="block h-52 w-52 cover-fit float-left" src={"/public/user_uploads/profs/"+profile.prof}onError={(e) => {
@@ -275,7 +275,7 @@ function Profile(props) {
                 </div>
                 <h1 className="text-4xl mt-3">{profile.login}</h1>
             </div>
-            <div className="w-full sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200 relative">
+            <div className="w-full shadow-lg sm:w-3/4 bg-neutral-700 mb-10 p-3 text-slate-200 relative">
             <span className="absolute top-3 right-5">
                           {user && user.login != profile.login &&
                             <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>

@@ -119,8 +119,8 @@ function Author(props) {
               <div className='mx-3 sm:mx-5'>
                 {user && user.admin == 1 &&
                   <div>
-                    <NavLink to={"/author/edit/"+author.id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3  hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit author info</button></NavLink>
-                    <button onClick={deleteAuthor} className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete author</button>
+                    <NavLink to={"/author/edit/"+author.id}><button className='shadow bg-red-600 text-white px-10 text-lg p-3 mb-3  hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit author info</button></NavLink>
+                    <button onClick={deleteAuthor} className='shadow bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete author</button>
                   </div>
                 }
                 {author.books.length > 0 &&

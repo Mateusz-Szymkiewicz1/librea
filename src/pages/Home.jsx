@@ -120,7 +120,7 @@ function Home() {
           </div>
         </section>
 
-        <div className='flex flex-wrap justify-evenly text-slate-200 w-full bg-blue-700 my-12'>
+        <div className='flex shadow-lg flex-wrap justify-evenly text-slate-200 w-full bg-blue-700 my-12'>
           <div className='text-center h-48 flex justify-center items-center flex-col hover:bg-blue-600 w-48'>
             <i className="fa fa-search text-3xl mb-3"></i>
             <p className='text-2xl'>Organised</p>
@@ -194,25 +194,6 @@ function Home() {
       }
       {!loading &&
         <>
-        <div className='bg-neutral-700 p-5'>
-          <p className='text-slate-200 font-semibold text-2xl'>New blog posts</p>
-          <p className='text-slate-300 text-lg mt-2'>Check what's been happening lately!</p>
-          <div ref={sliderRef} className="keen-slider my-3">
-                {posts.map((el, i) => (
-                  <NavLink to={"/post/"+el.id} className="keen-slider__slide bg-neutral-600 p-3 hover:bg-neutral-500" key={el.id}>
-                    <span className='text-lg text-slate-200'>{el.date.slice(0,10)}</span>
-                    <p className='text-xl mb-2'>{el.title}</p>
-                    {!el.thumbnail &&
-                      <img src="../../public/post_default.jpg"></img>
-                    }
-                    {el.thumbnail &&
-                      <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
-                    }
-                  </NavLink>
-                ))}
-              </div>
-            <NavLink to="/posts" className='text-blue-500 text-lg mt-2'>See more posts</NavLink>
-            </div>
         <div className='mx-3 sm:mx-5'>
             <style>
             {`
@@ -237,6 +218,25 @@ function Home() {
             </>
           }
         </div>
+        <div className='bg-neutral-700 p-5 shadow-lg'>
+          <p className='text-slate-200 font-semibold text-2xl'>New blog posts</p>
+          <p className='text-slate-300 text-lg mt-2'>Check what's been happening lately!</p>
+          <div ref={sliderRef} className="keen-slider my-3">
+                {posts.map((el, i) => (
+                  <NavLink to={"/post/"+el.id} className="shadow keen-slider__slide bg-neutral-600 p-3 hover:bg-neutral-500" key={el.id}>
+                    <span className='text-lg text-slate-200'>{el.date.slice(0,10)}</span>
+                    <p className='text-xl mb-2'>{el.title}</p>
+                    {!el.thumbnail &&
+                      <img src="../../public/post_default.jpg"></img>
+                    }
+                    {el.thumbnail &&
+                      <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
+                    }
+                  </NavLink>
+                ))}
+              </div>
+            <NavLink to="/posts" className='text-blue-500 text-lg mt-2'>See more posts</NavLink>
+            </div>
         <div className='mx-3 sm:mx-5'>
         {newlyAdded.length > 0 &&
             <>

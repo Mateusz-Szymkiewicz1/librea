@@ -105,10 +105,10 @@ function Notifications() {
     <>
       {!loading && owner &&
         <>
-        <div className="bg-neutral-600 m-5 p-5">
+        <div className="bg-neutral-700 shadow-lg m-5 p-5">
           <h1 className="text-2xl text-center"><i className="fa fa-bell mr-2"></i>Notifications</h1>
         </div>
-        <div className="bg-neutral-600 min-h-80 m-5 p-5 flex flex-col">
+        <div className="bg-neutral-700 shadow-lg min-h-80 m-5 p-5 flex flex-col">
           {notifications.length < 1 &&
             <h1 className="text-xl text-center mt-20">No notifications...</h1>
           }
@@ -138,7 +138,7 @@ function Notifications() {
                       id = el.review.id
                     }
                     return(
-                      <NavLink data-href={link} onClick={mark_as_seen} data-notif={el.id} data-id={id} data-type={type} key={el.id} to={link}><div className={el.seen == 1 ? "bg-neutral-500 hover:bg-neutral-400 m-1 p-2" : "bg-blue-700 hover:bg-blue-600 m-1 p-2"}>{new_text}
+                      <NavLink data-href={link} onClick={mark_as_seen} data-notif={el.id} data-id={id} data-type={type} key={el.id} to={link}><div className={el.seen == 1 ? "shadow bg-neutral-500 hover:bg-neutral-400 m-1 p-2" : "bg-blue-700 hover:bg-blue-600 m-1 p-2 shadow"}>{new_text}
                       {el.quote &&
                         <> on <span className={el.seen == 1 ? "text-blue-200 italic" : "text-blue-100 italic"}>{el.quote.book.tytul}</span></>
                       }

@@ -84,7 +84,7 @@ function CollectionNew(props) {
   return (
     <>
       <div className="lg:mt-10 w-full lg:w-1/2 float-left p-2 sm:p-5">
-        <div className="bg-neutral-700  h-full w-full p-5">
+        <div className="bg-neutral-700 shadow-lg h-full w-full p-5">
           <h1 className="text-white text-3xl">New collection</h1>
           <input type="text" onChange={(e) => setName(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Name" maxLength={200}/>
           <input type="text" onChange={(e) => setDesc(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Description" maxLength={1000}/> 
@@ -92,7 +92,7 @@ function CollectionNew(props) {
             <input id="default-checkbox" type="checkbox" value="" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm dark:bg-gray-700 dark:border-gray-600"></input>
             <label className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Private collection</label>
         </div>
-          <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700' onClick={showAdd}><i className="fa fa-plus mr-2"></i>Add a book</button>
+          <button className='shadow bg-blue-600 text-white px-10 text-lg p-3 mb-4 mt-4 block hover:bg-blue-700' onClick={showAdd}><i className="fa fa-plus mr-2"></i>Add a book</button>
           {books.length == 0 &&
             <p className="text-neutral-300 text-lg">There's currently no books in this collection.</p>
           }
@@ -104,7 +104,7 @@ function CollectionNew(props) {
               </span>
             )
           })}
-          <button className='bg-blue-600 text-white px-10 text-lg p-3 mt-16 block hover:bg-blue-700' onClick={createCollection}>Create collection</button>
+          <button className='shadow bg-blue-600 text-white px-10 text-lg p-3 mt-16 block hover:bg-blue-700' onClick={createCollection}>Create collection</button>
         </div>
       </div>
       <div className="px-10 mt-10 w-1/2 float-left flex justify-center hidden lg:block">

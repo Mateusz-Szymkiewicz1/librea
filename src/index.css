@@ -62,3 +62,6 @@ font-weight: 600;
 .p-badge-warning{
   display: none;
 }
+.optionListContainer{
+                background: #525252 !important;
+              }

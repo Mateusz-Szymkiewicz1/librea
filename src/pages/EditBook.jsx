@@ -125,7 +125,7 @@ function EditBook(props) {
       {!loading && admin &&
       <>
           <div className="w-full lg:w-1/2 float-left p-2 sm:p-5 mb-28">
-        <div className="bg-neutral-700  h-full w-full p-5">
+        <div className="bg-neutral-700 shadow-lg h-full w-full p-5">
           <h1 className="text-white text-3xl">Edit book</h1>
           <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" className="mt-5 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Title"/>
           <input value={author} onChange={(e) => setAuthor(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-blue-500 placeholder-gray-400 text-white" placeholder="Author"/> 
@@ -157,12 +157,12 @@ function EditBook(props) {
           {coverName.length > 0 && !deletedCover &&
             <>
               <p className="mt-2 text-xl">Current cover:</p>
-              <button onClick={deleteCover} className='bg-blue-600 text-white px-5 p-3 my-1 block hover:bg-blue-700'><i className="fa fa-trash mr-2"></i>Delete</button>
+              <button onClick={deleteCover} className='shadow bg-blue-600 text-white px-5 p-3 my-1 block hover:bg-blue-700'><i className="fa fa-trash mr-2"></i>Delete</button>
               <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/uploads/"+coverName} className="h-24 mr-3 mb-5 mt-2"></img>
             </>
           }
           <FileUpload className="mt-5" ref={fileUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload a new cover.</p>} onSelect={(e) => setCover(e.files)} onClear={() => setCover([])} onRemove={() => setCover([])}></FileUpload>
-          <button onClick={submit} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Submit new info</button>
+          <button onClick={submit} className='shadow bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Submit new info</button>
         </div>
       </div>
       <div className="px-10 mt-5 w-1/2 float-left flex justify-center hidden lg:block">

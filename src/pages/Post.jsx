@@ -84,8 +84,8 @@ function Post() {
           }
           {user && user.admin == 1 &&
             <div className='mt-5'>
-              <NavLink to={"/post/edit/"+post_id}><button className='bg-orange-500 text-white px-10 text-lg p-3 mb-3  hover:bg-orange-600'><i className="fa fa-pencil mr-3"></i>Edit post</button></NavLink>
-              <button onClick={deletePost} className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete post</button>
+              <NavLink to={"/post/edit/"+post_id}><button className='shadow bg-orange-500 text-white px-10 text-lg p-3 mb-3  hover:bg-orange-600'><i className="fa fa-pencil mr-3"></i>Edit post</button></NavLink>
+              <button onClick={deletePost} className='shadow bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete post</button>
             </div>
           }
           <p className="text-lg dark:text-slate-400 py-8" dangerouslySetInnerHTML={{__html: post.text}}></p>

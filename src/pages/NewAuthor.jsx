@@ -223,13 +223,13 @@ function NewAuthor(props) {
       <>
         {waiting.length > 0 &&
           <>
-          <div className="mx-2 sm:mx-5 bg-neutral-700 h-16 !mt-10 flex justify-between items-center sm:p-5 p-3 text-lg sm:text-xl">
+          <div className="mx-2 sm:mx-5 shadow-lg bg-neutral-700 h-16 !mt-10 flex justify-between items-center sm:p-5 p-3 text-lg sm:text-xl">
             <span>Waiting submissions ({waiting.length})</span>
             <i className="fa fa-angle-down cursor-pointer" onClick={toggleWaiting}></i>
           </div>
           {showWaiting && waiting.map(el => {
             return(
-              <div key={el.id} className="flex bg-neutral-600 text-white p-3 hover:bg-neutral-500 mx-2 sm:mx-5 mb-1 mt-1">
+              <div key={el.id} className="flex shadow-lg bg-neutral-600 text-white p-3 hover:bg-neutral-500 mx-2 sm:mx-5 mb-1 mt-1">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/authors/"+el.photo} className="h-20 mr-3"></img>
                 <div className="w-full">
                 <h2 className="text-2xl break-keep flex justify-between">{el.names}<span><i data-id={el.id} onClick={showEdit} className="fa fa-pencil text-amber-500 mr-3 cursor-pointer"></i><i onClick={deleteSubmission} data-id={el.id} className="fa fa-trash text-red-500 cursor-pointer"></i></span></h2>
@@ -242,7 +242,7 @@ function NewAuthor(props) {
           </>
         } 
           <div className="w-full lg:w-1/2 float-left p-2 sm:p-5 mb-28">
-        <div className="bg-neutral-700  h-full w-full p-5">
+        <div className="bg-neutral-700 shadow-lg h-full w-full p-5">
           <h1 className="text-white text-3xl">Add a new author</h1>
           {names.map((el, i) => {
             return(
@@ -259,12 +259,12 @@ function NewAuthor(props) {
               </div>
             )
           })}
-          <button onClick={(e) => setNames(names.concat([""]))} className='bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>
+          <button onClick={(e) => setNames(names.concat([""]))} className='shadow bg-blue-600 text-white px-5 p-2 mt-4 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add another name/alias</button>
           <input value={birth} onChange={(e) => setBirth(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Year of birth"/> 
           <input value={death} onChange={(e) => setDeath(e.target.value)} type="text" className="mt-4 outline-none text-lg border text-sm rounded-lg block w-full p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Year of death"/> 
           <textarea value={desc} onChange={(e) => setDesc(e.target.value)} className="bg-neutral-600 mt-5 border border-neutral-500 rounded w-full h-32 outline-none p-2" placeholder="Description"></textarea>
           <FileUpload className="mt-5" ref={fileUploadRef} showuploadbutton="false" customUpload={true} accept="image/*" maxFileSize={5000000} emptyTemplate={<p className="m-0">Upload a photo.</p>} onSelect={(e) => setPhoto(e.files)} onClear={() => setPhoto([])} onRemove={() => setPhoto([])}></FileUpload>
-          <button onClick={submit} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Submit a new author</button>
+          <button onClick={submit} className='shadow bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Submit a new author</button>
         </div>
       </div>
       <div className="px-10 mt-5 w-1/2 float-left flex justify-center hidden lg:block">

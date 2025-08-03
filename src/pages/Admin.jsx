@@ -367,7 +367,7 @@ function Admin(props) {
               <div className="flex flex-col">
               {submissions.map(el => {
                 return(
-                  <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+                  <div key={el.id} className="shadow-lg bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/covers/"+el.okladka} className="h-48 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep flex sm:justify-between">
@@ -398,10 +398,10 @@ function Admin(props) {
                 )
               })}
               {numOfSubmissions > offset+5 &&
-                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700 shadow"><i className="fa fa-caret-down mr-3"></i>Show more</button>
               }
               {numOfSubmissions <= offset+5 && offset > 0 &&
-                <button onClick={hideSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+                <button onClick={hideSuggestions} className="shadow bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
             </>
@@ -412,7 +412,7 @@ function Admin(props) {
               <div className="flex flex-col">
               {authorSubmissions.map(el => {
                 return(
-                  <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+                  <div key={el.id} className="shadow-lg bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <img onError={(e) => e.target.src = "../../public/default.jpg"} src={"/user_uploads/authors/"+el.photo} className="h-48 sm:float-left mr-3 mb-2"></img>
                 <div>
                 <h2 className="text-2xl break-keep flex sm:justify-between">
@@ -438,10 +438,10 @@ function Admin(props) {
                 )
               })}
               {numOfAuthorSubmissions > authorOffset+5 &&
-                <button onClick={() => setAuthorOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+                <button onClick={() => setAuthorOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700 shadow"><i className="fa fa-caret-down mr-3"></i>Show more</button>
               }
               {numOfAuthorSubmissions <= authorOffset+5 && authorOffset > 0 &&
-                <button onClick={hideAuthorSuggestions} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+                <button onClick={hideAuthorSuggestions} className="shadow bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
             </>
@@ -452,7 +452,7 @@ function Admin(props) {
               <div className="flex flex-col">
               {reports.map(el => {
                 return(
-                  <div key={el.id} className="bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
+                  <div key={el.id} className="shadow-lg bg-neutral-700 text-white p-3 mt-4 hover:bg-neutral-600">
                 <div>
                 <h2 className="text-2xl break-keep flex sm:justify-between">
                   {el.quote && <p>Type: Quote</p>}
@@ -495,10 +495,10 @@ function Admin(props) {
                 )
               })}
               {numOfReports > reportOffset+5 &&
-                <button onClick={() => setReportOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+                <button onClick={() => setReportOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700 shadow"><i className="fa fa-caret-down mr-3"></i>Show more</button>
               }
               {numOfReports <= reportOffset+5 && reportOffset > 0 &&
-                <button onClick={hideReports} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+                <button onClick={hideReports} className="shadow bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
               </div>
               </>

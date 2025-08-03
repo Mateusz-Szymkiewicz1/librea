@@ -144,14 +144,14 @@ function Header() {
   }
   return (
     <>
-      <div className="text-white w-100 bg-neutral-600 shadow flex flex-row sm:justify-between px-2 items-center p-2 sm:p-0 sticky top-0 z-50">
+      <div className="text-white w-100 bg-neutral-600 shadow-lg flex flex-row sm:justify-between px-2 items-center p-2 sm:p-0 sticky top-0 z-50">
           <NavLink to="/"><img src="/icon.png" className="h-16 sm:block hidden"></img></NavLink>   
           <div className="z-40 flex h-11 sm:w-96 w-50 gap-1 relative mr-2">
-            <input onKeyUp={handleSearch} type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full outline-none h-11 bg-neutral-700 text-slate-200 text-sm px-3" />
-            <NavLink className="h-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4" to={user ? "/explore" : "/login"}>
+            <input onKeyUp={handleSearch} type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="shadow w-full outline-none h-11 bg-neutral-700 text-slate-200 text-sm px-3" />
+            <NavLink className="shadow h-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4" to={user ? "/explore" : "/login"}>
               <i className="fa fa-binoculars"></i>
             </NavLink>
-            <div className="absolute top-12 right-0 left-0 flex flex-col">
+            <div className="absolute shadow-xl top-12 right-0 left-0 flex flex-col">
               {autofill.map(el => {
                 return (
                   <NavLink to={"/book/"+el.id} key={el.id}><span className="block suggestion bg-neutral-700 p-3 border-b border-neutral-500 hover:bg-neutral-600" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1" onError={(e) => e.target.src = "../../public/default.jpg"}></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span></NavLink>
@@ -163,25 +163,25 @@ function Header() {
             {user &&
               <>
               <div className="relative flex">
-                <span onClick={toggleDropdown} className={path != "notifications" ? "block cursor-pointer" : "block cursor-pointer pr-5"}>
+                <span onClick={toggleDropdown} className={path != "notifications" ? "block cursor-pointer shadow" : "block cursor-pointer pr-5 shadow"}>
                   {user.prof &&
-                    <img className="block h-10 w-10 cover-fit float-left profMenu" src={"/public/user_uploads/profs/"+user.prof} onError={(e) => {
-                    e.target.parentElement.innerHTML = `<span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">${user.login.slice(0,1).toUpperCase()}</span>`
+                    <img className="shadow block h-10 w-10 cover-fit float-left profMenu" src={"/public/user_uploads/profs/"+user.prof} onError={(e) => {
+                    e.target.parentElement.innerHTML = `<span className="shadow bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">${user.login.slice(0,1).toUpperCase()}</span>`
                     }}></img>
                   }
                   {!user.prof &&
-                    <span className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">{user.login.slice(0,1).toUpperCase()}</span>
+                    <span className="shadow bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 profMenu">{user.login.slice(0,1).toUpperCase()}</span>
                   }
                 </span>
                 {path != "notifications" &&
-                <span onClick={toggleNotifications} className="pr-5 block relative cursor-pointer notifMenu">
+                <span onClick={toggleNotifications} className="shadow pr-5 block relative cursor-pointer notifMenu">
                   <i className="bg-blue-500 block font-bold hover:bg-blue-600 h-full flex justify-center items-center p-3 text-md ml-2 fa fa-bell notifMenu"></i>
                   {notificationsNotSeen > 0 &&
                   <span className="absolute top-0 left-0 inline-flex items-center py-0.5 px-1.5 rounded-full text-xs font-medium transform translate-x-1/2 bg-red-500 text-white">{notificationsNotSeen}</span>
                   }
                 </span>
                 }
-                <div className={path != "notifications" ? "bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-16 p-2 w-52 hidden dropdown_user" : "bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-5 p-2 w-52 hidden dropdown_user"}>
+                <div className={path != "notifications" ? "shadow-lg bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-16 p-2 w-52 hidden dropdown_user" : "shadow-lg bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-5 p-2 w-52 hidden dropdown_user"}>
                   <NavLink to={"profile/"+user.login} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-user mr-2"></i>Profile</p></NavLink>
                   <NavLink to="/book/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-file-circle-plus mr-2"></i>Add a book</p></NavLink>
                   <NavLink to="/author/new" onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-feather-pointed mr-2"></i>Add an author</p></NavLink>
@@ -194,7 +194,7 @@ function Header() {
                   <NavLink to={"/settings"} onClick={toggleDropdown}><p className="p-3 hover:bg-neutral-600 mb-2"><i className="fa fa-cogs mr-2"></i>Settings</p></NavLink>
                   <p onClick={wyloguj} className="p-3 cursor-pointer bg-red-500 hover:bg-red-600"><i className="fa fa-sign-out mr-2"></i>Sign out</p>
                 </div>
-                <div className="bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-5 p-2 w-80 hidden dropdown_notifications" onClick={(e) => e.stopPropagation()}>
+                <div className="shadow-lg bg-neutral-700 z-40 border border-neutral-500 absolute top-16 right-5 p-2 w-80 hidden dropdown_notifications" onClick={(e) => e.stopPropagation()}>
                   {notifications.length == 0 && 
                     <div className="bg-neutral-600 hover:bg-neutral-500 m-1 p-2">No notifications...</div>
                   }

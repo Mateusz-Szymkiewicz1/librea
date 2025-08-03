@@ -521,18 +521,18 @@ function Book(props) {
                       }
                      })}</p>
                   {user.collections.find(x => !x.books.includes(":"+book_id+"}")) &&
-                  <button onClick={showAddToCollection} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add to a collection</button>
+                  <button onClick={showAddToCollection} className='shadow bg-blue-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add to a collection</button>
                   }
                 </>
               }
               {user && user.admin == 1 &&
                 <div>
-                  <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3  hover:bg-red-700'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
-                  <button className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700' onClick={deleteBook}><i className="fa fa-trash mr-3"></i>Delete book</button>
+                  <NavLink to={"/book/edit/"+book_id}><button className='bg-red-600 text-white px-10 text-lg p-3 mb-3  hover:bg-red-700 shadow'><i className="fa fa-pencil mr-3"></i>Edit book info</button></NavLink>
+                  <button className='shadow bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700' onClick={deleteBook}><i className="fa fa-trash mr-3"></i>Delete book</button>
                 </div>
               }
               </div>
-              <div className="bg-neutral-600 sm:ml-5 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
+              <div className="bg-neutral-600 shadow-lg sm:ml-5 w-full sm:w-auto text-center sm:text-left p-5 float-left mr-16">
                 <h3 className="text-white text-xl font-semibold mb-2">What's <span className="font-bold">your</span> rating?</h3>
                 {!user &&
                   <p className="text-slate-200 pb-3">You need to be logged in to vote.</p>
@@ -550,7 +550,7 @@ function Book(props) {
               </div>
               <div className="sm:pl-5 pl-3 sm:pr-16 pr-3">
               <h2 id="reviews" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
-              <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
+              <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="shadow bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
               <div className="inline-flex items-center">
               <label className="flex items-center cursor-pointer relative mt-2">
                 <input disabled={user ? false : true} onChange={(e) => setSpoiler(e.target.checked)} type="checkbox" className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-200 checked:bg-blue-500 checked:border-slate-800" id="check" />
@@ -565,10 +565,10 @@ function Book(props) {
             {!user && 
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a review.</p>
             }
-            <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700'><i className="fa fa-send mr-2"></i>Send</button>
+            <button onClick={handleReview} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700 shadow'><i className="fa fa-send mr-2"></i>Send</button>
               {currentPage == 1 && review.map((el, i) => {
                 return (
-                  <div className="bg-blue-950 p-5 text-white my-5" key={i}>
+                  <div className="bg-blue-950 p-5 text-white my-5 shadow-lg" key={i}>
                     <div className="flex justify-between">
                     <NavLink to={"/profile/"+el.user} className="float-left">
                     <h3 className="text-xl w-fit">
@@ -611,7 +611,7 @@ function Book(props) {
               {book.reviews.map((el, i) => {
                   if(user && el.user == user.login) return
                   return (
-                    <div className="bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
+                    <div className="shadow-lg bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
                       <div className="flex justify-between">
                       <NavLink to={"/profile/"+el.user}>
                       <h3 className="text-xl">
@@ -691,10 +691,10 @@ function Book(props) {
               {book.ilosc_cytatow == 0 &&
                 <p className="text-xl dark:text-gray-300 mt-3">No quotes yet!</p>
               }
-              <button onClick={showNewQuote} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-4 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add a quote</button>
+              <button onClick={showNewQuote} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-4 block hover:bg-blue-700 shadow'><i className="fa fa-add mr-2"></i>Add a quote</button>
               {user && user.quotes && currentQuotePage == 1 && user.quotes.map((el, i) => {
                   return (
-                    <div className="bg-blue-950 p-5 text-white my-5 relative" key={el.id}>
+                    <div className="shadow-lg bg-blue-950 p-5 text-white my-5 relative" key={el.id}>
                       <p className="clear-both break-words text-xl pt-3">"{el.text}"</p>
                         <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
                         <span className="absolute top-3 right-5"><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEditQuote} data-text={el.text} data-quote={el.id}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteQuote} data-quote={el.id}></i></span>
@@ -716,7 +716,7 @@ function Book(props) {
               {book.quotes && book.quotes.map((el, i) => {
                   if(user && el.user == user.login) return
                   return (
-                    <div className="bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
+                    <div className="shadow-lg bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
                       <p className="clear-both break-words  text-xl pt-3">"{el.text}"</p>
                         <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
                         <span className="absolute top-3 right-5">

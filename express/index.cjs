@@ -991,6 +991,14 @@ app.post('/new_books', (req,res) => {
   })
 })
 
+app.post('/posts', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT * FROM posts ORDER BY date ASC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
+
 app.post('/new_authors', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT * FROM new_authors ORDER BY submit_date ASC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
