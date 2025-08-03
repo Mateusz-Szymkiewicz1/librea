@@ -22,6 +22,11 @@ function NewPost(props) {
   setDate(`${yyyy}-${mm}-${dd}`);
 }, []);
 
+  let edit_id = window.location.href.split('/').at(-1)
+  let [oldImg, setOldImg] = useState("")
+  let [oldText, setOldText] = useState("")
+  let [deleted, setDeleted] = useState(false)
+
   useEffect(() => {
       fetch("http://localhost:3000/login", {
         credentials: 'include',
@@ -49,6 +54,21 @@ function NewPost(props) {
           })      
         }
       })
+      if(edit_id !== "new"){
+        fetch("http://localhost:3000/post/"+edit_id, {
+            credentials: 'include',
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }).then(res => res.json()).then(res => {
+            console.log(res[0].text)
+            setTitle(res[0].title)
+            setText(res[0].text)
+            setOldImg(res[0].thumbnail)
+            setOldText(res[0].text)
+          })
+      }
     }, [])
     const toggle_preview = () => {
     document.querySelector('.preview img').src = ""
@@ -97,8 +117,51 @@ function NewPost(props) {
       body: formData
     }).then(() => {
       props.setToast({type:"msg", text: "Post added!", stay: true})
-      navigator("/")
+      navigator("/posts")
     })
+  }
+   const submit_edit = async () => {
+    if(!text || !title){
+      props.setToast({type:"error", text: "Empty title/content!"})
+      return
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+    const response = await useDecision().then(function () {
+        document.querySelector(".decision").remove()
+        return
+    }, function () {
+        document.querySelector(".decision").remove()
+        return "stop"
+    });
+    if(response) return
+    const formData  = new FormData();
+    formData.append('id', edit_id);
+    formData.append('title', title);
+    formData.append('text', text);
+    formData.append('oldtext', oldText);
+    formData.append('deleted', deleted);
+    formData.append('oldimg', oldImg);
+    formData.append('img', fileUploadRef.current.getFiles()[0]);
+    fetch("http://localhost:3000/edit_blog_post", {
+      credentials: 'include',
+      method: "POST",
+      body: formData
+    }).then(() => {
+      props.setToast({type:"msg", text: "Edited a post!", stay: true})
+      navigator("/post/"+edit_id)
+    })
+  }
+  const deleteThumbnail = async () => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+    const response = await useDecision().then(function () {
+        document.querySelector(".decision").remove()
+        return
+    }, function () {
+        document.querySelector(".decision").remove()
+        return "stop"
+    });
+    if(response) return
+      setDeleted(true)
   }
   return (
     <>
@@ -106,15 +169,26 @@ function NewPost(props) {
         <>
         <div className="flex flex-col px-12 lg:px-32">
           <h1 className="text-center font-semibold mb-10 text-4xl mt-16 text-slate-200">
-            New Blog Post
+            {edit_id == "new" ? "New Blog Post" : "Edit Blog Post"}
           </h1>
-          <input onChange={() => setTitle(event.target.value)} type='text' maxLength="200" placeholder='Title...' className="w-full outline-none rounded-md py-3 px-4 bg-neutral-700 text-sm text-slate-200 mb-5" />
+          <input value={title} onChange={() => setTitle(event.target.value)} type='text' maxLength="200" placeholder='Title...' className="w-full outline-none rounded-md py-3 px-4 bg-neutral-700 text-sm text-slate-200 mb-5" />
+          {oldImg && !deleted &&
+            <div className="flex flex-wrap">
+            <img className="mb-4 max-w-96 mr-4" src={'../../public/uploads/blog/'+oldImg} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
+            <div onClick={deleteThumbnail} className="rounded-md mb-4 px-5 h-fit cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-trash mr-3"></i>Delete thumbnail</div>
+            </div>
+          }
           <FileUpload ref={fileUploadRef} name="thumbnail[]" invalidfiletypemessage="Wrong file format!" chooseLabel="Add a thumbnail" accept="image/*" showuploadbutton="false" filelimit="1" emptyTemplate={<p className="m-0">Drag and drop files to here to upload.</p>}>
           </FileUpload>
-          <Editor value={text} onTextChange={(e) => setText(e.htmlValue)} className="mt-5 bg-neutral-700" style={{ height: '320px' }} />
+          <Editor value={text} onTextChange={(e) => setText(e.htmlValue)} className="mt-5" style={{ height: '320px' }} />
           <div>
             <div onClick={toggle_preview} className="rounded-md my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-search mr-3"></i>Preview</div>
-            <div onClick={submit} className="rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-circle-plus mr-3"></i>Submit</div>
+            {edit_id == "new" &&
+              <div onClick={submit} className="rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-circle-plus mr-3"></i>Submit</div>
+            }
+            {edit_id != "new" &&
+              <div onClick={submit_edit} className="rounded-md ml-2 my-5 px-5 cursor-pointer text-white bg-blue-600 float-left p-3"><i className="fa fa-pencil mr-3"></i>Edit</div>
+            }
           </div>
         </div>
         <div className={preview ? "block preview z-50 max-h-full overflow-y-scroll px-6 lg:px-8 fixed top-0 left-0 right-0 min-h-full bg-neutral-800" : "hidden preview z-50 max-h-full overflow-y-scroll px-6 lg:px-8 fixed top-0 left-0 right-0 min-h-full bg-neutral-800"}>

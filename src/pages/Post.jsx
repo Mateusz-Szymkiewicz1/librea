@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import NoMatch from './NoMatch';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useDecision } from '../components/useDecision';
 
 function Post() {
+  const navigator = useNavigate()
   let post_id = window.location.href.split('/').at(-1)
   const [post, setPost] = useState()
   const [user, setUser] = useState()
@@ -44,18 +47,48 @@ function Post() {
         }
       })
     }, [])
+    const deletePost = async () => {
+        if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+          const response = await useDecision().then(function () {
+              document.querySelector(".decision").remove()
+              return
+          }, function () {
+              document.querySelector(".decision").remove()
+              return "stop"
+          });
+          if(response) return
+          fetch("http://localhost:3000/delete_post", {
+            credentials: 'include',
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: post_id
+            })
+          }).then(res => res.json()).then(res => {
+            navigator("/posts")
+            props.setToast({type:"msg", text:"Deleted a post!", stay: true})
+          })
+      }
   return (
     <>
       {post && post.id && !loading &&
         <div className="post px-5">
-          <h1 className="font-semibold dark:text-slate-200 my-10 text-4xl">
+          <h1 className="font-semibold dark:text-slate-200 mt-10 mb-5 text-4xl">
             { post.title }
             <span className="text-lg dark:text-slate-400 font-normal text-slate-600 ml-1">{ post.date }</span>
           </h1>
-          {post.thumnail &&
-            <img src={post.thumbnail} onError={(e) => e.target.src = "../../public/default.jpg"}></img>
+          {post.thumbnail &&
+            <img className='max-w-full' src={"../../public/uploads/blog/"+post.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
           }
-          <p className="text-lg dark:text-slate-400 py-10" dangerouslySetInnerHTML={{__html: post.text}}></p>
+          {user && user.admin == 1 &&
+            <div className='mt-5'>
+              <NavLink to={"/post/edit/"+post_id}><button className='bg-orange-500 text-white px-10 text-lg p-3 mb-3  hover:bg-orange-600'><i className="fa fa-pencil mr-3"></i>Edit post</button></NavLink>
+              <button onClick={deletePost} className='bg-red-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-red-700'><i className="fa fa-trash mr-3"></i>Delete post</button>
+            </div>
+          }
+          <p className="text-lg dark:text-slate-400 py-8" dangerouslySetInnerHTML={{__html: post.text}}></p>
         </div>
       }
       {loading &&

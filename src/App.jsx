@@ -27,6 +27,7 @@ import Author from './pages/Author.jsx';
 import EditAuthor from './pages/EditAuthor.jsx';
 import NewPost from './pages/NewPost.jsx';
 import Post from './pages/Post.jsx';
+import Posts from './pages/Posts.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -66,7 +67,9 @@ function App() {
             <Route path="/author/edit/:id" element={<EditAuthor key={location.pathname} setToast={setToast} />} />
             <Route path="/admin" element={<Admin setToast={setToast} />} />
             <Route path="/post/new" element={<NewPost setToast={setToast} closeToast={closeToast} />} />
+            <Route path="/post/edit/:id" element={<NewPost setToast={setToast} closeToast={closeToast} />} />
             <Route path="/post/:id" element={<Post setToast={setToast} />} />
+            <Route path="/posts" element={<Posts/>} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
           {msg &&

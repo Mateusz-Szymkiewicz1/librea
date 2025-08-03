@@ -183,6 +183,16 @@ app.post('/post/:id', (req,res) => {
   })
 })
 
+app.get('/recent_posts', (req,res) => {
+  connection.query(`SELECT posts.* FROM posts ORDER BY date DESC LIMIT 10`,[req.params.id], (err, rows, fields) => {
+    if(rows){
+      res.send(rows)
+    }else{
+      res.send({ status: 0, text: "No matches found..."})
+    }
+  })
+})
+
 app.get('/tags', (req,res) => {
   connection.query(`SELECT * FROM tags`,[req.params.id], (err, rows, fields) => {
       res.send(rows[0])
@@ -428,6 +438,30 @@ app.post('/delete_review', (req,res) => {
   })
 })
 
+app.post('/delete_post', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`SELECT thumbnail,text FROM posts WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    if(rows[0]){
+      if(rows[0].thumbnail){
+        fs.unlink('../public/uploads/blog/'+rows[0].thumbnail, (err) => {
+          if (err) console.log("Was unable to delete the file")
+        })
+      }
+      const imgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+      let match;
+      while ((match = imgRegex.exec(rows[0].text)) !== null) {
+        const fileName = path.basename(match[1]); // extract just the file name
+        fs.unlink(`../public/uploads/blog/${fileName}`, (err) => {
+          if (err) console.log(`Unable to delete image: ${fileName}`);
+        });
+      }
+    }
+  })
+  connection.query(`DELETE FROM posts WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/delete_account', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM users WHERE login = ?`,[req.session.user], (err, rows, fields) => {
@@ -636,6 +670,42 @@ function submit_blog_post(req, res) {
     filename = req.file.filename
   }
   connection.query(`INSERT INTO posts(title, text, thumbnail, user) VALUES (?,?,?,?);`,[req.body.title,req.body.text,filename,req.session.user], (err, rows, fields) => {
+    res.json("done")
+  })
+}
+
+app.post("/edit_blog_post", blog_upload.single("img"), edit_blog_post);
+
+function edit_blog_post(req, res) {
+  if(!req.session.user) return
+    const imgRegex = /<img[^>]+src=["']([^"']+)["']/g;
+      let match;
+      while ((match = imgRegex.exec(req.body.oldtext)) !== null) {
+        const fileName = path.basename(match[1]); // extract just the file name
+        if(req.body.text.includes(fileName)) continue; // if the image is still in the text, skip deletion
+        fs.unlink(`../public/uploads/blog/${fileName}`, (err) => {
+          if (err) console.log(`Unable to delete image: ${fileName}`);
+        });
+  }
+  req.body.text = saveBase64Images(req.body.text);
+  let filename = ""
+  if(req.file){
+    filename = req.file.filename
+    if(req.body.oldimg){
+      fs.unlink('../public/uploads/blog/'+req.body.oldimg, (err) => {
+        if (err) console.log("Was unable to delete the file")
+      })
+    }
+  }
+  if(!req.file && req.body.deleted == "false"){
+    filename = req.body.oldimg
+  }
+  if(req.body.deleted == "true"){
+    fs.unlink('../public/uploads/blog/'+req.body.oldimg, (err) => {
+      if (err) console.log("Was unable to delete the file")
+    })
+  }
+  connection.query(`UPDATE posts SET title = ?, text = ?, thumbnail = ?, user = ? WHERE id = ?`,[req.body.title,req.body.text,filename,req.session.user,req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 }

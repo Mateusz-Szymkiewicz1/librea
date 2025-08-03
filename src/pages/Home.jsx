@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { NavLink } from 'react-router-dom';
 import BookCard from '../components/BookCard.jsx';
 import CollectionCard from '../components/CollectionCard.jsx';
+import "keen-slider/keen-slider.min.css";
+import { useKeenSlider } from "keen-slider/react"
 
 function Home() {
   const navigate = useNavigate();
@@ -11,11 +13,26 @@ function Home() {
   const [recentreviews, setRecentreviews] = useState([])
   const [loading, setLoading] = useState(true)
   const [popular, setPopular] = useState([])
+  const [posts, setPosts] = useState([])
   const [newlyAdded, setNewlyAdded] = useState([])
+
+   const [sliderRef, slider] = useKeenSlider({
+    slides: { perView: 1, spacing: 20 },
+    breakpoints: {
+      "(min-width: 640px)": { slides: { perView: 2, spacing: 20 } },
+      "(min-width: 1024px)": { slides: { perView: 3, spacing: 20 } },
+      "(min-width: 1280px)": { slides: { perView: 4, spacing: 20 } },
+    },
+    loop: false,
+  })
 
   useEffect(() => {
     fetch("http://localhost:3000/popular_books").then(res => res.json()).then(res => {
       setPopular([...res])
+    })
+    fetch("http://localhost:3000/recent_posts").then(res => res.json()).then(res => {
+      console.log(res)
+      setPosts([...res])
     })
     fetch("http://localhost:3000/new_books").then(res => res.json()).then(res => {
       setNewlyAdded([...res])
@@ -177,7 +194,37 @@ function Home() {
       }
       {!loading &&
         <>
+        <div className='bg-neutral-700 p-5'>
+          <p className='text-slate-200 font-semibold text-2xl'>New blog posts</p>
+          <p className='text-slate-300 text-lg mt-2'>Check what's been happening lately!</p>
+          <div ref={sliderRef} className="keen-slider my-3">
+                {posts.map((el, i) => (
+                  <NavLink to={"/post/"+el.id} className="keen-slider__slide bg-neutral-600 p-3 hover:bg-neutral-500" key={el.id}>
+                    <span className='text-lg text-slate-200'>{el.date.slice(0,10)}</span>
+                    <p className='text-xl mb-2'>{el.title}</p>
+                    {!el.thumbnail &&
+                      <img src="../../public/post_default.jpg"></img>
+                    }
+                    {el.thumbnail &&
+                      <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"}></img>
+                    }
+                  </NavLink>
+                ))}
+              </div>
+            <NavLink to="/posts" className='text-blue-500 text-lg mt-2'>See more posts</NavLink>
+            </div>
         <div className='mx-3 sm:mx-5'>
+            <style>
+            {`
+              .keen-slider img {
+                height: 180px !important; /* Match your placeholder height */
+                object-fit: cover;
+                width: 100%;
+                background: #23272a;
+                display: block;
+              }
+            `}
+          </style>
         {popular.length > 0 &&
             <>
               <p className='text-slate-200 font-semibold text-2xl mt-16'>Popular</p>

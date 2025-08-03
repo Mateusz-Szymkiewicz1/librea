@@ -144,17 +144,17 @@ function Header() {
   }
   return (
     <>
-      <div className="text-white w-100 bg-neutral-700 shadow flex flex-row sm:justify-between px-2 items-center p-2 sm:p-0">
+      <div className="text-white w-100 bg-neutral-600 shadow flex flex-row sm:justify-between px-2 items-center p-2 sm:p-0 sticky top-0 z-50">
           <NavLink to="/"><img src="/icon.png" className="h-16 sm:block hidden"></img></NavLink>   
           <div className="z-40 flex h-11 sm:w-96 w-50 gap-1 relative mr-2">
-            <input onKeyUp={handleSearch} type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full outline-none h-11 bg-neutral-800 text-slate-200 text-sm px-3" />
+            <input onKeyUp={handleSearch} type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search..." className="w-full outline-none h-11 bg-neutral-700 text-slate-200 text-sm px-3" />
             <NavLink className="h-full flex items-center justify-center bg-blue-500 hover:bg-blue-600 px-4" to={user ? "/explore" : "/login"}>
               <i className="fa fa-binoculars"></i>
             </NavLink>
             <div className="absolute top-12 right-0 left-0 flex flex-col">
               {autofill.map(el => {
                 return (
-                  <NavLink to={"/book/"+el.id} key={el.id}><span className="block suggestion bg-neutral-600 p-3 border-b border-neutral-800 hover:bg-neutral-700" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1" onError={(e) => e.target.src = "../../public/default.jpg"}></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span></NavLink>
+                  <NavLink to={"/book/"+el.id} key={el.id}><span className="block suggestion bg-neutral-700 p-3 border-b border-neutral-500 hover:bg-neutral-600" data-book={el.id}><img src={"/uploads/"+el.okladka} className="h-10 float-left mr-2 mt-1" onError={(e) => e.target.src = "../../public/default.jpg"}></img><span>{el.tytul}</span><br/><span className="text-neutral-300">{el.autor} - {el.rok}</span></span></NavLink>
                 )
               })}
             </div>

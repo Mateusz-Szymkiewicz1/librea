@@ -68,6 +68,13 @@ function Search() {
             <option value="title">Sort by: Title</option>
             <option value="author">Sort by: Author</option>
             <option value="rating">Sort by: Rating</option>
+            <style>
+              {`
+              .optionListContainer{
+                background: #525252 !important;
+              }
+              `}
+            </style>
             </select>     
               <Multiselect
                 isObject={false}
