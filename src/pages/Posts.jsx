@@ -8,6 +8,8 @@ function Posts() {
   const [offset, setOffset] = useState(0)
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(false)
+  const [numOfPosts, setNumOfPosts] = useState(0)
+  const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -49,9 +51,28 @@ function Posts() {
         setPosts([])
         return;
       }
-      setPosts([...res])
+      setPosts([])
+      setNumOfPosts(res[0].posts)
+      setPosts([...res.slice(1, res.length)])
+    })
+  }, [refresh])
+
+useEffect(() => {
+    if(offset == 0) return
+    fetch("http://localhost:3000/posts", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        offset: offset
+      })
+    }).then(res => res.json()).then(res => {
+      setPosts(prev => prev.concat([...res.slice(1, res.length)]))
     })
   }, [offset])
+
 const getPlainText = (html) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
@@ -98,6 +119,11 @@ const toggleDropdown = async (e) => {
                 props.setToast({type:"msg", text:"Deleted a post!", stay: true})
               })
   }
+  const hidePosts = () => {
+    setOffset(0)
+    setRefresh(prev => !prev)
+    window.scrollTo(0,0)
+  }
   return (
     <>
       {!loading &&
@@ -129,6 +155,12 @@ const toggleDropdown = async (e) => {
             </NavLink>
           )
         })}
+        {numOfPosts > offset+5 &&
+                <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700 shadow ml-5"><i className="fa fa-caret-down mr-3"></i>Show more</button>
+              }
+              {numOfPosts <= offset+5 && offset > 0 &&
+                <button onClick={hidePosts} className="ml-5 shadow bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
+              }
         </>
       }
       {loading &&

@@ -993,8 +993,11 @@ app.post('/new_books', (req,res) => {
 
 app.post('/posts', (req,res) => {
   if(!req.session.user) return
-  connection.query(`SELECT * FROM posts ORDER BY date DESC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
-    res.send(rows)
+  connection.query(`SELECT * FROM posts ORDER BY date DESC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+    connection.query(`SELECT COUNT(*) AS posts FROM posts`, (err2, rows2, fields2) => {
+      rows.unshift({posts: rows2[0].posts})
+      res.send(rows)
+    })
   })
 })
 
