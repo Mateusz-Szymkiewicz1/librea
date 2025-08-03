@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
+import { useDecision } from "../components/useDecision"
 
 function Posts() {
+  const navigator = useNavigate()
   const [posts, setPosts] = useState([])
   const [offset, setOffset] = useState(0)
   const [user, setUser] = useState()
@@ -9,16 +11,26 @@ function Posts() {
 
   useEffect(() => {
     fetch("http://localhost:3000/login", {
-      credentials: 'include',
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      }
-    }).then(res => res.json()).then(res => {
-      if(!res.text){
-        setUser(res[0])
-      }
-    })
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }).then(res => res.json()).then(res => {
+        if(!res.text){
+          fetch("http://localhost:3000/user/"+res, {
+            credentials: 'include',
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            }
+          }).then(res2 => res2.json()).then(async res2 => {
+            if(!res2.text){
+              setUser(res2[0])
+            }
+          })
+        }
+      })
   }, [])
 
   useEffect(() => {
@@ -40,23 +52,84 @@ function Posts() {
       setPosts([...res])
     })
   }, [offset])
-
+const getPlainText = (html) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  return doc.body.textContent || "";
+};
+const toggleDropdown = async (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+    const menu = e.target.parentElement.parentElement.querySelector('.post_dropdown')
+    document.querySelectorAll('.post_dropdown').forEach(el => {
+      if(!el.classList.contains("hidden") && el != menu){
+      el.classList.add("hidden")
+    }
+    })
+    if(menu.classList.contains("hidden")){
+      menu.classList.remove("hidden")
+    }else{
+      menu.classList.add("hidden")
+    }
+  }
+  const deletePost = async (e, post_id) => {
+    e.stopPropagation()
+    e.preventDefault()
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+              const response = await useDecision().then(function () {
+                  document.querySelector(".decision").remove()
+                  return
+              }, function () {
+                  document.querySelector(".decision").remove()
+                  return "stop"
+              });
+              if(response) return
+              fetch("http://localhost:3000/delete_post", {
+                credentials: 'include',
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  id: post_id
+                })
+              }).then(res => res.json()).then(res => {
+                navigator("/posts")
+                props.setToast({type:"msg", text:"Deleted a post!", stay: true})
+              })
+  }
   return (
     <>
       {!loading &&
-        posts.map(el => {
+        <>
+        <h1 className="text-center text-3xl my-12 font-semibold">Blog posts</h1>
+        {posts.map(el => {
+          const plainText = getPlainText(el.text);
           return (
-            <NavLink to={"/post/"+el.id} key={el.id} className="bg-neutral-700 p-4 m-5 flex justify-between hover:bg-neutral-600 shadow">
-              <div>
-                <h1 className="text-2xl text-slate-200">{el.title}</h1>
+            <NavLink to={"/post/"+el.id} key={el.id} className="bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
+              <div className="mr-12 lg:mr-20">
+                <h2 className="text-2xl text-slate-200">{el.title}</h2>
                 <span className="text-lg text-slate-300">{el.date.slice(0,10)}</span>
+                <p className="text-lg text-slate-300 mt-3">{plainText.slice(0,250)+"..."}</p>
               </div>
               {el.thumbnail &&
-                <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"} className="max-w-96 shadow"></img>
+                <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"} className="max-w-96 max-h-96 shadow order-1 md:order-2 mt-4 md:mt-0"></img>
+              }
+              {user && user.admin == 1 &&
+                <div>
+                <div onClick={toggleDropdown} className="bg-blue-500 p-3 h-fit w-fit absolute top-3 right-3 shadow-lg">
+                  <i className="fa fa-ellipsis-vertical"></i>
+                </div>
+                <div className="z-50 post_dropdown absolute right-3 top-16 bg-neutral-800 p-3 hidden">
+                  <NavLink to={"/post/edit/"+el.id} className="block p-2 bg-orange-500 hover:bg-orange-600"><i className="fa fa-pencil mr-1"></i>Edit</NavLink>
+                  <p onClick={(e) => deletePost(e, el.id)} className="p-2 bg-red-500 mt-2 hover:bg-red-600"><i className="fa fa-trash mr-1"></i>Delete</p>
+                </div>
+                </div>
               }
             </NavLink>
           )
-        })
+        })}
+        </>
       }
       {loading &&
         <div role="status" className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-neutral-800 z-50">

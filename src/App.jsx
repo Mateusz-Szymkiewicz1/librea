@@ -66,8 +66,8 @@ function App() {
             <Route path="/book/edit/:id" element={<EditBook key={location.pathname} setToast={setToast} />} />
             <Route path="/author/edit/:id" element={<EditAuthor key={location.pathname} setToast={setToast} />} />
             <Route path="/admin" element={<Admin setToast={setToast} />} />
-            <Route path="/post/new" element={<NewPost setToast={setToast} closeToast={closeToast} />} />
-            <Route path="/post/edit/:id" element={<NewPost setToast={setToast} closeToast={closeToast} />} />
+            <Route path="/post/new" element={<NewPost key={location.pathname} setToast={setToast} closeToast={closeToast} />} />
+            <Route path="/post/edit/:id" element={<NewPost key={location.pathname} setToast={setToast} closeToast={closeToast} />} />
             <Route path="/post/:id" element={<Post setToast={setToast} />} />
             <Route path="/posts" element={<Posts/>} />
             <Route path="*" element={<NoMatch />} />

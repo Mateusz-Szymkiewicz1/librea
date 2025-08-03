@@ -993,7 +993,7 @@ app.post('/new_books', (req,res) => {
 
 app.post('/posts', (req,res) => {
   if(!req.session.user) return
-  connection.query(`SELECT * FROM posts ORDER BY date ASC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+  connection.query(`SELECT * FROM posts ORDER BY date DESC LIMIT 10 OFFSET ${req.body.offset}`, (err, rows, fields) => {
     res.send(rows)
   })
 })
