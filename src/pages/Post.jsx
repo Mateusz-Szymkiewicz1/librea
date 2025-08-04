@@ -125,21 +125,29 @@ function Post(props) {
         <div className='flex gap-5 text-2xl mx-5 items-center'>
           <span>
           {user && user.likes.find(x => x.post == post_id) &&
-            <i onClick={like} className="fa-solid fa-heart cursor-pointer mr-1"></i>
+            <i onClick={like} className="fa-solid fa-heart cursor-pointer mr-2"></i>
           }
           {user && !user.likes.find(x => x.post == post_id) &&
-            <i onClick={like} className="fa-regular fa-heart cursor-pointer mr-1"></i>
+            <i onClick={like} className="fa-regular fa-heart cursor-pointer mr-2"></i>
           }
           {!user &&
-            <NavLink to="/login"><i className="fa-regular fa-heart mr-1"></i></NavLink>
+            <NavLink to="/login"><i className="fa-regular fa-heart mr-2"></i></NavLink>
           }
           Like ({post.likes})</span>
           {!user &&
-            <NavLink to="/login"><button className="bg-blue-500 hover:bg-blue-600 p-1 px-3"><i className="fa fa-link"></i>Share</button></NavLink>
+            <NavLink to="/login"><button className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link mr-1"></i>Share</button></NavLink>
           }
           {user &&
-            <button onClick={share} className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link"></i>Share</button>
+            <button onClick={share} className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link mr-1"></i>Share</button>
           }
+        </div>
+        <div className='mx-5 mt-16 md:mr-16 mr-10'>
+          <h2 className='text-3xl'>Comments ({post.numOfComments})</h2>
+          <textarea disabled={user ? false : true} className="shadow bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3 max-w-96" placeholder="What are your thoughts?"></textarea>
+            {!user && 
+              <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a comment.</p>
+            }
+            <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700 shadow'><i className="fa fa-send mr-2"></i>Send</button>
         </div>
         </>
       }

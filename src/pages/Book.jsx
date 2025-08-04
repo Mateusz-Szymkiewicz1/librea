@@ -596,12 +596,13 @@ function Book(props) {
                         setReview([...review])
                       }}>Reveal</span></p>
                     }
+                    <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                     <div>
                       {user && user.likes.find(x => x.review == el.id) &&
-                        <i onClick={like} className="fa-solid fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                        <i onClick={like} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-review={el.id}></i>
                       }
                       {user && !user.likes.find(x => x.review == el.id) &&
-                        <i onClick={like} className="fa-regular fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                        <i onClick={like} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-review={el.id}></i>
                       }
                       <span className="pl-2 text-xl">{el.likes}</span>
                     </div>
@@ -649,15 +650,16 @@ function Book(props) {
                           setBook(structuredClone(book))
                         }}>Reveal</span></p>
                       }
+                      <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                       <div>
                         {user && user.likes.find(x => x.review == el.id) &&
-                          <i onClick={like} className="fa-solid fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                          <i onClick={like} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-review={el.id}></i>
                         }
                         {user && !user.likes.find(x => x.review == el.id) &&
-                          <i onClick={like} className="fa-regular fa-heart text-2xl mt-5 cursor-pointer" data-review={el.id}></i>
+                          <i onClick={like} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-review={el.id}></i>
                         }
                         {!user &&
-                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-5 cursor-pointer"></i></NavLink>
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer"></i></NavLink>
                         }
                         <span className="pl-2 text-xl">{el.likes}</span>
                       </div>
@@ -698,15 +700,16 @@ function Book(props) {
                       <p className="clear-both break-words text-xl pt-3">"{el.text}"</p>
                         <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
                         <span className="absolute top-3 right-5"><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl" onClick={showEditQuote} data-text={el.text} data-quote={el.id}></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteQuote} data-quote={el.id}></i></span>
+                      <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                       <div>
                         {user && user.likes.find(x => x.quote == el.id) &&
-                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-quote={el.id}></i>
                         }
                         {user && !user.likes.find(x => x.quote == el.id) &&
-                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-quote={el.id}></i>
                         }
                         {!user &&
-                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-3 cursor-pointer"></i></NavLink>
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer"></i></NavLink>
                         }
                         <span className="pl-2 text-xl">{el.likes}</span>
                       </div>
@@ -718,7 +721,7 @@ function Book(props) {
                   return (
                     <div className="shadow-lg bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
                       <p className="clear-both break-words  text-xl pt-3">"{el.text}"</p>
-                        <span className="block mt-5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
+                        <span className="block mt-f5">Submitted by: <NavLink className="text-blue-400 hover:underline" to={"/profile/"+el.user}>{el.user}</NavLink></span>
                         <span className="absolute top-3 right-5">
                           {user &&
                             <span onClick={toggleDropdown}><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
@@ -732,15 +735,16 @@ function Book(props) {
                         <p data-id={el.id} data-type={"quote"} onClick={report} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
                       </div>
                       }
+                      <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                       <div>
                         {user && user.likes.find(x => x.quote == el.id) &&
-                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                          <i onClick={likeQuote} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-quote={el.id}></i>
                         }
                         {user && !user.likes.find(x => x.quote == el.id) &&
-                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-3 cursor-pointer" data-quote={el.id}></i>
+                          <i onClick={likeQuote} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-quote={el.id}></i>
                         }
                         {!user &&
-                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-3 cursor-pointer"></i></NavLink>
+                          <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer"></i></NavLink>
                         }
                         <span className="pl-2 text-xl">{el.likes}</span>
                       </div>

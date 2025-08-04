@@ -174,9 +174,12 @@ app.get('/collection/:id', (req,res) => {
 })
 
 app.post('/post/:id', (req,res) => {
-  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id WHERE posts.id = ? GROUP BY posts.id`,[req.params.id], (err, rows, fields) => {
+  connection.query(`SELECT posts.*, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) AS likes, (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS numOfComments FROM posts WHERE posts.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      res.send(rows)
+      connection.query(`SELECT * FROM comments WHERE post = ? ORDER BY date DESC`, [req.params.id], (err, commentRows) => {
+        rows[0].comments = commentRows;
+        res.send(rows)
+      })
     }else{
       res.send({ status: 0, text: "No matches found..."})
     }

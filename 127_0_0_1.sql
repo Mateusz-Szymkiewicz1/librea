@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 02, 2025 at 10:46 PM
+-- Generation Time: Aug 04, 2025 at 09:41 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -147,6 +147,27 @@ INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`, `privat
 -- --------------------------------------------------------
 
 --
+-- Struktura tabeli dla tabeli `comments`
+--
+
+CREATE TABLE `comments` (
+  `id` int(11) NOT NULL,
+  `post` int(11) NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `text` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `comments`
+--
+
+INSERT INTO `comments` (`id`, `post`, `user`, `text`, `date`) VALUES
+(1, 11, 'asd', 'qewwqe', '2025-08-04 19:28:32');
+
+-- --------------------------------------------------------
+
+--
 -- Struktura tabeli dla tabeli `likes`
 --
 
@@ -155,21 +176,26 @@ CREATE TABLE `likes` (
   `user` varchar(50) NOT NULL,
   `review` int(11) DEFAULT NULL,
   `collection` int(11) DEFAULT NULL,
-  `quote` int(11) DEFAULT NULL
+  `quote` int(11) DEFAULT NULL,
+  `post` int(11) DEFAULT NULL,
+  `comment` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `likes`
 --
 
-INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`) VALUES
-(50, 'asd', NULL, 6, NULL),
-(67, 'asdfghjkl', NULL, NULL, 19),
-(84, 'qwertyuiop', 37, NULL, NULL),
-(85, 'qwertyuiop', NULL, 16, NULL),
-(111, 'asdfghjkl', NULL, NULL, 18),
-(112, 'asdfghjkl', NULL, 16, NULL),
-(124, 'asdfghjkl', 37, NULL, NULL);
+INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`, `post`, `comment`) VALUES
+(50, 'asd', NULL, 6, NULL, NULL, NULL),
+(67, 'asdfghjkl', NULL, NULL, 19, NULL, NULL),
+(84, 'qwertyuiop', 37, NULL, NULL, NULL, NULL),
+(85, 'qwertyuiop', NULL, 16, NULL, NULL, NULL),
+(111, 'asdfghjkl', NULL, NULL, 18, NULL, NULL),
+(112, 'asdfghjkl', NULL, 16, NULL, NULL, NULL),
+(127, 'qweasd', 37, NULL, NULL, NULL, NULL),
+(128, 'asdfghjkl', 37, NULL, NULL, NULL, NULL),
+(129, 'asdasd12e', NULL, NULL, NULL, 16, NULL),
+(135, 'asdfghjkl', NULL, NULL, NULL, 11, NULL);
 
 -- --------------------------------------------------------
 
@@ -250,6 +276,13 @@ CREATE TABLE `notifications` (
   `seen` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `type`, `text`, `user`, `quote`, `review`, `collection`, `like_from`, `date`, `seen`) VALUES
+(52, 'like', 'qweasd has liked your review.', 'asdfghjkl', NULL, 37, NULL, 'qweasd', '2025-08-03 17:18:48', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -270,7 +303,12 @@ CREATE TABLE `posts` (
 --
 
 INSERT INTO `posts` (`id`, `title`, `text`, `date`, `thumbnail`, `user`) VALUES
-(2, 'asd', '<p>asd</p><p><img src=\"../../public/uploads/blog/postimg_1754167195532_0.jpg\"></p>', '2025-08-02 20:39:55', '', 'asdfghjkl');
+(11, 'asdasdsad', '<p><span style=\"color: rgb(212, 212, 212);\">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eligendi, adipisci consequatur totam numquam eaque minima provident vel nemo impedit illo officiis ratione doloribus rerum dignissimos ipsa? Culpa perferendis temporibus delectus, expedita nulla sit quae quo? Minus laborum, quidem ab dolores voluptatibus quaerat architecto adipisci facilis sint explicabo rerum, cum voluptates? Sunt adipisci doloremque delectus ex consequuntur explicabo officiis nobis voluptatum ipsum, corrupti soluta modi pariatur iure? Tenetur numquam temporibus pariatur! Ducimus adipisci placeat officiis voluptate! Nesciunt ducimus sit nostrum. Sapiente magni alias odit, quis ullam fugiat debitis facere omnis, aliquid tempora exercitationem veritatis veniam ipsam, rem ipsa est velit expedita.</span></p><p><br></p><p><img src=\"../../public/uploads/blog/postimg_1754235729181_0.jpg\"></p><p><br></p><p><br></p><p>Minus laborum, quidem ab dolores voluptatibus quaerat architecto adipisci facilis sint explicabo rerum, cum voluptates? Sunt adipisci doloremque delectus ex consequuntur explicabo officiis nobis voluptatum ipsum, corrupti soluta modi pariatur iure? Tenetur numquam temporibus pariatur! Ducimus adipisci placeat officiis voluptate! Nesciunt ducimus sit nostrum. Sapiente magni alias odit, quis ullam fugiat debitis facere omnis, aliquid tempora exercitationem veritatis veniam ipsam, rem ipsa est velit expedita.</p>', '2025-08-03 15:41:35', '220a17e14b1bd536c50368363c45bfd91754243175782.jpg', 'asdfghjkl'),
+(13, 'asdasd', '<p>asdasdsad</p>', '2025-08-03 20:54:01', '', 'asdfghjkl'),
+(14, 'qweqwewqe', '<p>qweqwe</p>', '2025-08-03 20:59:36', '', 'asdfghjkl'),
+(15, 'cxvxcv', '<p>xcvcxvcxv</p>', '2025-08-03 20:59:40', '', 'asdfghjkl'),
+(16, 'bnb', '<p>bnbnnm</p>', '2025-08-03 20:59:45', '', 'asdfghjkl'),
+(17, 'o', '<p>o</p>', '2025-08-03 20:59:50', '', 'asdfghjkl');
 
 -- --------------------------------------------------------
 
@@ -282,30 +320,31 @@ CREATE TABLE `quotes` (
   `id` int(11) NOT NULL,
   `user` varchar(50) NOT NULL,
   `book` int(11) NOT NULL,
-  `text` text NOT NULL
+  `text` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `quotes`
 --
 
-INSERT INTO `quotes` (`id`, `user`, `book`, `text`) VALUES
-(2, 'qweqwe', 1, 'asdasd'),
-(5, 'qweqwe', 1, 'asdasd'),
-(6, 'qweqwe', 1, 'asdasd'),
-(7, 'qweqwe', 1, 'mnmnmn'),
-(8, 'qweqwe', 1, 'asdasd'),
-(9, 'qweqwe', 1, 'ghghghgh'),
-(10, 'qweqwe', 1, 'asdasd'),
-(11, 'qweqwe', 1, 'ererererer'),
-(12, 'qweqwe', 1, 'asdasd'),
-(13, 'qweqwe', 1, 'gfhdufa'),
-(14, 'qweqwe', 1, 'asdasd'),
-(15, 'qweqwe', 1, 'xcxcxcxc'),
-(16, 'qweqwe', 1, 'asdasd'),
-(17, 'qweqwe', 1, 'vbbvvb'),
-(18, 'asdfghjkl', 1, 'popopopo'),
-(19, 'asdfghjkl', 5, 'qweqweqweqwe');
+INSERT INTO `quotes` (`id`, `user`, `book`, `text`, `date`) VALUES
+(2, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(5, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(6, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(7, 'qweqwe', 1, 'mnmnmn', '2025-08-04 19:33:41'),
+(8, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(9, 'qweqwe', 1, 'ghghghgh', '2025-08-04 19:33:41'),
+(10, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(11, 'qweqwe', 1, 'ererererer', '2025-08-04 19:33:41'),
+(12, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(13, 'qweqwe', 1, 'gfhdufa', '2025-08-04 19:33:41'),
+(14, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(15, 'qweqwe', 1, 'xcxcxcxc', '2025-08-04 19:33:41'),
+(16, 'qweqwe', 1, 'asdasd', '2025-08-04 19:33:41'),
+(17, 'qweqwe', 1, 'vbbvvb', '2025-08-04 19:33:41'),
+(18, 'asdfghjkl', 1, 'popopopo', '2025-08-04 19:33:41'),
+(19, 'asdfghjkl', 5, 'qweqweqweqwe', '2025-08-04 19:33:41');
 
 -- --------------------------------------------------------
 
@@ -370,24 +409,25 @@ CREATE TABLE `reviews` (
   `user` varchar(50) NOT NULL,
   `book` int(11) NOT NULL,
   `text` text NOT NULL,
-  `spoiler` tinyint(1) NOT NULL
+  `spoiler` tinyint(1) NOT NULL,
+  `date` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `reviews`
 --
 
-INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`) VALUES
-(18, 'asd', 1, 'asdasdasdas', 0),
-(22, 'qwerty', 1, 'asdasd', 0),
-(23, 'qweqwe', 1, 'asdasdads', 0),
-(24, 'asdqweqwe', 1, 'asdasdasdasd', 0),
-(25, 'asdqweqwe', 1, 'asdasdasd', 0),
-(26, 'asdqweqwe', 1, 'asdasdsad', 0),
-(27, 'qweqwe', 1, 'asdasdsadasd', 0),
-(28, 'qwerty', 1, 'asdasdasdasd', 0),
-(29, 'qwerty', 1, 'asdasdasd', 0),
-(37, 'asdfghjkl', 1, 'asdasdasdsad', 0);
+INSERT INTO `reviews` (`id`, `user`, `book`, `text`, `spoiler`, `date`) VALUES
+(18, 'asd', 1, 'asdasdasdas', 0, '2025-08-04 19:29:50'),
+(22, 'qwerty', 1, 'asdasd', 0, '2025-08-04 19:29:50'),
+(23, 'qweqwe', 1, 'asdasdads', 0, '2025-08-04 19:29:50'),
+(24, 'asdqweqwe', 1, 'asdasdasdasd', 0, '2025-08-04 19:29:50'),
+(25, 'asdqweqwe', 1, 'asdasdasd', 0, '2025-08-04 19:29:50'),
+(26, 'asdqweqwe', 1, 'asdasdsad', 0, '2025-08-04 19:29:50'),
+(27, 'qweqwe', 1, 'asdasdsadasd', 0, '2025-08-04 19:29:50'),
+(28, 'qwerty', 1, 'asdasdasdasd', 0, '2025-08-04 19:29:50'),
+(29, 'qwerty', 1, 'asdasdasd', 0, '2025-08-04 19:29:50'),
+(37, 'asdfghjkl', 1, 'asdasdasdsad', 0, '2025-08-04 19:29:50');
 
 -- --------------------------------------------------------
 
@@ -406,7 +446,8 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('C854lcEgscVY10kRORz0IECDJfj0bJgE', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-04T12:19:19.216Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754309959);
+('JWaTv8-Djac79qhWsLO5btVyDddotTHj', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-05T17:13:41.371Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754414021),
+('zEEt73y8XTq9vvXAY7NXAHvbIWq_0-1f', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-05T17:18:43.896Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"qweasd\"}', 1754414324);
 
 -- --------------------------------------------------------
 
@@ -452,6 +493,7 @@ INSERT INTO `users` (`login`, `haslo`, `email`, `prof`, `admin`, `private`) VALU
 ('asde', '$2a$10$m/utAoIDf7knKdE9TJoNPu/n3MSg2fOkcSgN4Xdd2MPCatXE2tSH6', 'sadasdasd@asd.pl', '', 0, 0),
 ('asdfghjkl', '$2a$10$6hwqsEpZK9dA3IGY55.o0OrARw8K9B9xKqZ4pJ7bpoWG5mRdsvzDG', 'asdsad@asdsad.pl', '', 1, 0),
 ('asdqweqwe', '$2a$10$7LBAKgpq.pI73Ij6zqRCfOA49lALT8RpsayEQw0/6atacWY.Pi4Ny', 'asdasd@W.asdpl', '', 0, 0),
+('qweasd', '$2a$10$kdlRh19Y4gniuEa5DR0jB.jfp/KZKcxDShcW/tfIBVT6ttqfsPZSC', 'dsdf@ads.pl', '', 0, 0),
 ('qweqwe', '$2a$10$PYeYpkTfP9CGPIW47IF/.OxYlDUW0UQ/V4GhpSDjFetkqcQfW2vtO', 'asdasd@sddsf.pl', '', 0, 0),
 ('qwerty', '$2a$10$JJX554Kbq5KenfL9sZoRwO9pf3egIxPQbS/rwX1.TWRSwQJ0irEJu', 'adasd@assdas.pl', '', 0, 0),
 ('qwertyuiop', '$2a$10$Gz3EIkl1L0uUjBMcFCyD9e/JusVN4RAykjh74f35OGzsOGMhHBl96', 'qwertyuiop@sd.pl', '', 0, 0);
@@ -493,6 +535,14 @@ ALTER TABLE `collections`
   ADD KEY `user` (`user`);
 
 --
+-- Indeksy dla tabeli `comments`
+--
+ALTER TABLE `comments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `post` (`post`),
+  ADD KEY `user` (`user`);
+
+--
 -- Indeksy dla tabeli `likes`
 --
 ALTER TABLE `likes`
@@ -500,7 +550,9 @@ ALTER TABLE `likes`
   ADD KEY `collection` (`collection`),
   ADD KEY `review` (`review`),
   ADD KEY `user` (`user`) USING BTREE,
-  ADD KEY `quote` (`quote`);
+  ADD KEY `quote` (`quote`),
+  ADD KEY `post` (`post`),
+  ADD KEY `comment` (`comment`);
 
 --
 -- Indeksy dla tabeli `new_authors`
@@ -620,10 +672,16 @@ ALTER TABLE `collections`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
+-- AUTO_INCREMENT for table `comments`
+--
+ALTER TABLE `comments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
 
 --
 -- AUTO_INCREMENT for table `new_authors`
@@ -641,13 +699,13 @@ ALTER TABLE `new_books`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `posts`
 --
 ALTER TABLE `posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `quotes`
@@ -696,13 +754,22 @@ ALTER TABLE `collections`
   ADD CONSTRAINT `collections_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `comments`
+--
+ALTER TABLE `comments`
+  ADD CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
+  ADD CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`post`) REFERENCES `posts` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `likes`
 --
 ALTER TABLE `likes`
   ADD CONSTRAINT `likes_ibfk_1` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `likes_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   ADD CONSTRAINT `likes_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `likes_ibfk_4` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `likes_ibfk_4` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `likes_ibfk_5` FOREIGN KEY (`post`) REFERENCES `posts` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `likes_ibfk_6` FOREIGN KEY (`comment`) REFERENCES `comments` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `new_books`
