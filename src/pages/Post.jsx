@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import NoMatch from './NoMatch';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDecision } from '../components/useDecision';
+import ReactPaginate from 'react-paginate';
 
 function Post(props) {
   const navigator2 = useNavigate()
@@ -9,9 +10,13 @@ function Post(props) {
   const [post, setPost] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
+  const [textarea, setTextarea] = useState("")
+  const [pages, setPages] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [comment, setComment] = useState([])
   
   useEffect(() => {
-      fetch("http://localhost:3000/post/"+post_id, {
+      fetch("http://localhost:3000/post/"+post_id+"?offset="+((currentPage-1)*2), {
         credentials: 'include',
         method: "POST",
         headers: {
@@ -21,6 +26,7 @@ function Post(props) {
         console.log(res[0])
         if(!res.text){
           res[0].date = res[0].date.slice(0, 10)
+          setPages(Math.ceil((res[0].numOfComments)/2))
           setPost(res[0])
         }
         setLoading(false)
@@ -38,16 +44,37 @@ function Post(props) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-            }
+            },
+            body: JSON.stringify({
+              post: post_id
+            }),
           }).then(res2 => res2.json()).then(async res2 => {
             if(!res2.text){
               console.log(res2[0])
               setUser(res2[0])
+              setComment(res2[0].comments.filter(x => x.post == post_id))
             }
           })
         }
       })
     }, [])
+    const pageChange = (e) => {
+    let offset = (e.selected)*2
+    setCurrentPage(e.selected+1)
+    fetch('http://localhost:3000/post/'+post_id+"?offset="+offset, {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      }).then(res => res.json()).then(res => {
+      if(res.status != 0){
+        res[0].date = res[0].date.slice(0, 10)
+        setPost(res[0])
+        document.querySelector("#comments").scrollIntoView()
+      }
+    })
+  }
     const deletePost = async () => {
         if (document.querySelector(".decision")) document.querySelector('.decision').remove()
           const response = await useDecision().then(function () {
@@ -142,13 +169,109 @@ function Post(props) {
           }
         </div>
         <div className='mx-5 mt-16 md:mr-16 mr-10'>
-          <h2 className='text-3xl'>Comments ({post.numOfComments})</h2>
-          <textarea disabled={user ? false : true} className="shadow bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3 max-w-96" placeholder="What are your thoughts?"></textarea>
+          <h2 className='text-3xl' id="comments">Comments ({post.numOfComments})</h2>
+          <textarea onChange={(e) => setTextarea(e.target.value)} disabled={user ? false : true} className="shadow bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3 max-w-96" placeholder="What are your thoughts?"></textarea>
             {!user && 
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a comment.</p>
             }
             <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700 shadow'><i className="fa fa-send mr-2"></i>Send</button>
-        </div>
+        {currentPage == 1 && comment.map((el, i) => {
+                        return (
+                          <div className="bg-blue-950 p-5 text-white my-5 shadow-lg" key={i}>
+                            <div className="flex justify-between">
+                            <NavLink to={"/profile/"+el.user} className="float-left">
+                            <h3 className="text-xl w-fit">
+                              {el.prof &&
+                                <img className="block h-10 w-10 cover-fit w-fit float-left" src={"/public/user_uploads/profs/"+el.prof} onError={(e) => {
+                                e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
+                                }}></img>
+                              }
+                              {!el.prof &&
+                                <span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> 
+                              }
+                              <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
+                            </h3></NavLink>
+                              <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" data-comment={el.id}></i></span>
+                            </div>
+                            <p className="clear-both break-words text-xl pt-3">{el.text}</p>
+                            <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
+                            <div>
+                              {user && user.likes.find(x => x.comment == el.id) &&
+                                <i className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                              }
+                              {user && !user.likes.find(x => x.comment == el.id) &&
+                                <i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                              }
+                              <span className="pl-2 text-xl">{el.likes}</span>
+                            </div>
+                        </div>
+                        )
+                      })}
+        {post.comments.map((el, i) => {
+                          if(user && el.user == user.login) return
+                          return (
+                            <div className="shadow-lg bg-neutral-700 p-5 text-white my-5 relative" key={el.id}>
+                              <div className="flex justify-between">
+                              <NavLink to={"/profile/"+el.user}>
+                              <h3 className="text-xl">
+                                {el.prof && 
+                                  <img className="block h-10 w-10 cover-fit w-fit float-left" src={"user_uploads/profs/"+el.prof} onError={(e) => {
+                                    e.target.parentElement.innerHTML = `<span class="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">${el.user.slice(0,1).toUpperCase()}</span><span class="text-3xl ml-3 mt-1 block float-left">${el.user}</span>`
+                                    }}></img>
+                                }
+                                {!el.prof &&
+                                  <span className="bg-blue-500 block font-bold h-full flex justify-center items-center p-3 text-md w-fit float-left">{el.user.slice(0,1).toUpperCase()}</span> 
+                                }
+                                <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
+                              </h3></NavLink>
+                              {user &&
+                                <span><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                              }
+                              </div>
+                              {user &&
+                              <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
+                                {user.admin != 0 &&
+                                  <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" data-comment={el.id}><i className="fa fa-trash mr-2"></i>Delete</p>
+                                }
+                                <p data-id={el.id} data-type={"comment"} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
+                              </div>
+                              }
+                              <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
+                              <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
+                              <div>
+                                {user && user.likes.find(x => x.review == el.id) &&
+                                  <i className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                }
+                                {user && !user.likes.find(x => x.review == el.id) &&
+                                  <i  className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                }
+                                {!user &&
+                                  <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer"></i></NavLink>
+                                }
+                                <span className="pl-2 text-xl">{el.likes}</span>
+                              </div>
+                            </div>
+                          )
+                      })}
+        {pages > 1 &&
+            <>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="Next"
+                pageRangeDisplayed={5}
+                pageCount={pages}
+                previousLabel="Previous"
+                renderOnZeroPageCount={null}
+                onPageChange={pageChange}
+                className="flex gap-3 sm:mr-16 mr-3 mb-10"
+                nextLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-10 hover:bg-blue-600"
+                previousLinkClassName="cursor-pointer bg-blue-500 w-8 text-slate-200 h-8 text-lg flex justify-center items-center p-5 px-12 hover:bg-blue-600"
+                pageLinkClassName="cursor-pointer bg-blue-500 block p-5 flex justify-center items-center w-8 text-slate-200 h-8 text-xl hover:bg-blue-600"
+                activeClassName="brightness-125"
+              />
+            </>
+          }
+                  </div>
         </>
       }
       {loading &&

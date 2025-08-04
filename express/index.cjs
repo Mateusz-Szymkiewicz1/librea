@@ -174,9 +174,14 @@ app.get('/collection/:id', (req,res) => {
 })
 
 app.post('/post/:id', (req,res) => {
+  try{
+    parseInt(req.query.offset)
+  }catch(e){
+    res.send({ status: 0, text: "No matches found..."})
+  }
   connection.query(`SELECT posts.*, (SELECT COUNT(*) FROM likes WHERE likes.post = posts.id) AS likes, (SELECT COUNT(*) FROM comments WHERE comments.post = posts.id) AS numOfComments FROM posts WHERE posts.id = ?`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
-      connection.query(`SELECT * FROM comments WHERE post = ? ORDER BY date DESC`, [req.params.id], (err, commentRows) => {
+      connection.query(`SELECT * FROM comments WHERE post = ? ORDER BY date DESC LIMIT 2 OFFSET ${req.query.offset}`, [req.params.id], (err, commentRows) => {
         rows[0].comments = commentRows;
         res.send(rows)
       })
@@ -232,6 +237,11 @@ app.post('/user/:login', (req,res) => {
       connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.user = ? AND quotes.book = ? GROUP BY quotes.id ORDER BY quotes.id DESC`,[req.params.login,req.body.book], (err7, rows7, fields7) => {
         if(rows7){
           rows[0].quotes = rows7
+        }
+      })
+      connection.query(`SELECT comments.*, COUNT(likes.id) AS likes FROM comments LEFT JOIN likes ON comments.id = likes.comment WHERE comments.user = ? AND comments.post = ? GROUP BY comments.id ORDER BY comments.id DESC`,[req.params.login,req.body.post], (err8, rows8, fields8) => {
+        if(rows8){
+          rows[0].comments = rows8
         }
       })
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) WHERE reviews.user = ? GROUP BY reviews.id ORDER BY reviews.id DESC`,[req.params.login], (err3, rows3, fields3) => {
