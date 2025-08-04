@@ -174,7 +174,7 @@ app.get('/collection/:id', (req,res) => {
 })
 
 app.post('/post/:id', (req,res) => {
-  connection.query(`SELECT posts.* FROM posts WHERE posts.id = ?`,[req.params.id], (err, rows, fields) => {
+  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id WHERE posts.id = ? GROUP BY posts.id`,[req.params.id], (err, rows, fields) => {
     if(rows && rows.length == 1){
       res.send(rows)
     }else{
@@ -512,6 +512,20 @@ app.post('/review_unlike', (req,res) => {
       unlike_notification(req.session.user,"review",rows2[0].user,req.body.review)
       res.json("done")
     })
+  })
+})
+
+app.post('/post_like', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO likes (user,post) VALUES ('${req.session.user}',?);`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/post_unlike', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM likes WHERE user = '${req.session.user}' AND post = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
   })
 })
 
@@ -992,8 +1006,7 @@ app.post('/new_books', (req,res) => {
 })
 
 app.post('/posts', (req,res) => {
-  if(!req.session.user) return
-  connection.query(`SELECT * FROM posts ORDER BY date DESC LIMIT 5 OFFSET ${req.body.offset}`, (err, rows, fields) => {
+  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id GROUP BY posts.id ORDER BY posts.date DESC LIMIT 5 OFFSET ${req.body.offset};`, (err, rows, fields) => {
     connection.query(`SELECT COUNT(*) AS posts FROM posts`, (err2, rows2, fields2) => {
       rows.unshift({posts: rows2[0].posts})
       res.send(rows)

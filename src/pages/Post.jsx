@@ -3,8 +3,8 @@ import NoMatch from './NoMatch';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDecision } from '../components/useDecision';
 
-function Post() {
-  const navigator = useNavigate()
+function Post(props) {
+  const navigator2 = useNavigate()
   let post_id = window.location.href.split('/').at(-1)
   const [post, setPost] = useState()
   const [user, setUser] = useState()
@@ -41,6 +41,7 @@ function Post() {
             }
           }).then(res2 => res2.json()).then(async res2 => {
             if(!res2.text){
+              console.log(res2[0])
               setUser(res2[0])
             }
           })
@@ -67,13 +68,44 @@ function Post() {
               id: post_id
             })
           }).then(res => res.json()).then(res => {
-            navigator("/posts")
+            navigator2("/posts")
             props.setToast({type:"msg", text:"Deleted a post!", stay: true})
           })
+      }
+      const like = (e) => {
+        let link = ""
+        if(e.target.classList.contains("fa-regular")){
+          e.target.classList.remove("fa-regular")
+          e.target.classList.add("fa-solid")
+          link = "post_like"
+          post.likes = parseInt(post.likes) + 1
+          setPost({...post, likes: post.likes})
+        }else{
+          e.target.classList.remove("fa-solid")
+          e.target.classList.add("fa-regular")
+          link = "post_unlike"
+          post.likes = parseInt(post.likes) - 1
+          setPost({...post, likes: post.likes})
+        }
+        fetch("http://localhost:3000/"+link, {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: post_id
+          }),
+        })
+      }
+      const share = () => {
+        navigator.clipboard.writeText("http://localhost:5173/post/"+post_id)
+        props.setToast({type: "msg", text: "Copied the link!"})
       }
   return (
     <>
       {post && post.id && !loading &&
+        <>
         <div className="post px-5">
           <h1 className="font-semibold dark:text-slate-200 mt-10 mb-5 text-4xl">
             { post.title }
@@ -90,6 +122,26 @@ function Post() {
           }
           <p className="text-lg dark:text-slate-400 py-8" dangerouslySetInnerHTML={{__html: post.text}}></p>
         </div>
+        <div className='flex gap-5 text-2xl mx-5 items-center'>
+          <span>
+          {user && user.likes.find(x => x.post == post_id) &&
+            <i onClick={like} className="fa-solid fa-heart cursor-pointer mr-1"></i>
+          }
+          {user && !user.likes.find(x => x.post == post_id) &&
+            <i onClick={like} className="fa-regular fa-heart cursor-pointer mr-1"></i>
+          }
+          {!user &&
+            <NavLink to="/login"><i className="fa-regular fa-heart mr-1"></i></NavLink>
+          }
+          Like ({post.likes})</span>
+          {!user &&
+            <NavLink to="/login"><button className="bg-blue-500 hover:bg-blue-600 p-1 px-3"><i className="fa fa-link"></i>Share</button></NavLink>
+          }
+          {user &&
+            <button onClick={share} className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link"></i>Share</button>
+          }
+        </div>
+        </>
       }
       {loading &&
         <div role="status" className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-neutral-800 z-50">
