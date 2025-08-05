@@ -6,7 +6,7 @@ import ReactPaginate from 'react-paginate';
 
 function Post(props) {
   const navigator2 = useNavigate()
-  let post_id = window.location.href.split('/').at(-1)
+  let post_id = window.location.href.split('/').at(-1).split("#")[0]
   const [post, setPost] = useState()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
@@ -14,6 +14,8 @@ function Post(props) {
   const [pages, setPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [comment, setComment] = useState([])
+  const [refresh, setRefresh] = useState(false)
+  const [editComment, setEditComment] = useState("")
   
   useEffect(() => {
       fetch("http://localhost:3000/post/"+post_id+"?offset="+((currentPage-1)*2), {
@@ -57,7 +59,7 @@ function Post(props) {
           })
         }
       })
-    }, [])
+    }, [refresh])
     const pageChange = (e) => {
     let offset = (e.selected)*2
     setCurrentPage(e.selected+1)
@@ -129,6 +131,166 @@ function Post(props) {
         navigator.clipboard.writeText("http://localhost:5173/post/"+post_id)
         props.setToast({type: "msg", text: "Copied the link!"})
       }
+    const submitComment = () => {
+      if(!user) return
+    if(comment.length > 0){
+      props.setToast({type:"error", text: "You have written a comment already. You can edit it!"})
+      return
+    }
+    if(textarea.length < 1){
+      props.setToast({type:"error",text: "Don't send an empty comment!"})
+      return
+    }else{
+      fetch("http://localhost:3000/comment", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          post: post_id,
+          text: textarea
+        }),
+      }).then(res => res.json()).then(res => {
+          setTextarea("")
+          document.querySelector("textarea").value = ""
+          setRefresh(!refresh)
+          props.setToast({type:"msg",text:"Comment published!"})
+      })
+    }
+    }
+    const deleteComment = async (e) => {
+        if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+          const response = await useDecision().then(function () {
+              document.querySelector(".decision").remove()
+              return
+          }, function () {
+              document.querySelector(".decision").remove()
+              return "stop"
+          });
+          if(response) return
+        fetch("http://localhost:3000/delete_comment", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: e.target.dataset.comment
+          })
+        }).then(() => {
+          setRefresh(!refresh)
+          props.setToast({type:"msg",text:"Comment deleted!"})
+        })
+      }
+      const toggleDropdown = async (e) => {
+    e.stopPropagation()
+    const menu = e.target.parentElement.parentElement.parentElement.querySelector('.drop_menu')
+    document.querySelectorAll('.drop_menu').forEach(el => {
+      if(!el.classList.contains("hidden") && el != menu){
+      el.classList.add("hidden")
+    }
+    })
+    if(menu.classList.contains("hidden")){
+      menu.classList.remove("hidden")
+    }else{
+      menu.classList.add("hidden")
+    }
+  }
+   const report = async (e) => {
+      if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+        const response = await useDecision().then(function () {
+            document.querySelector(".decision").remove()
+            return
+        }, function () {
+            document.querySelector(".decision").remove()
+            return "stop"
+        });
+        if(response) return
+        fetch("http://localhost:3000/report", {
+          credentials: 'include',
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: e.target.dataset.id,
+            type: e.target.dataset.type
+          })
+        }).then(res => res.json()).then(res => {
+            if(res == "already reported"){
+              props.setToast({type:"error", text:"Already reported!"})
+            }else{
+              props.setToast({type:"msg", text:"Sent a report!"})
+            }
+        })
+    }
+    useEffect(() => {
+        if(comment.length < 1) return
+        setEditComment(comment[0].text)
+      }, [comment])
+     const closeEditComment = () => {
+    document.querySelector('.editComment').classList.add("hidden")
+  }
+  const showEditComment = () => {
+    document.querySelector('.editComment').classList.remove("hidden")
+  }
+  const editCommentFun = async () => {
+    if(editComment.length < 1){
+      props.setToast({type:"error", text: "Write something!"})
+      return;
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/edit_comment", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: comment[0].id,
+          text: editComment
+        })
+      }).then(() => {
+        closeEditComment()
+        setRefresh(!refresh)
+        props.setToast({type:"msg",text:"Comment changed!"})
+      })
+  }
+  const like_comment = (e) => {
+    let link = ""
+    if(e.target.classList.contains("fa-regular")){
+      e.target.classList.remove("fa-regular")
+      e.target.classList.add("fa-solid")
+      link = "comment_like"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes+1
+    }else{
+      e.target.classList.remove("fa-solid")
+      e.target.classList.add("fa-regular")
+      link = "comment_unlike"
+      let likes = parseInt(e.target.parentElement.querySelector("span").innerHTML)
+      e.target.parentElement.querySelector("span").innerHTML = likes-1
+    }
+    fetch("http://localhost:3000/"+link, {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        comment: e.target.dataset.comment
+      }),
+    })
+  }
   return (
     <>
       {post && post.id && !loading &&
@@ -174,7 +336,7 @@ function Post(props) {
             {!user && 
               <p className="text-slate-200 pb-3 text-lg pt-3">You need to be logged in to write a comment.</p>
             }
-            <button className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700 shadow'><i className="fa fa-send mr-2"></i>Send</button>
+            <button onClick={submitComment} className='bg-blue-600 text-white px-10 text-lg p-3 mb-10 mt-3 block hover:bg-blue-700 shadow'><i className="fa fa-send mr-2"></i>Send</button>
         {currentPage == 1 && comment.map((el, i) => {
                         return (
                           <div className="bg-blue-950 p-5 text-white my-5 shadow-lg" key={i}>
@@ -191,16 +353,16 @@ function Post(props) {
                               }
                               <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                             </h3></NavLink>
-                              <span><i className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" data-comment={el.id}></i></span>
+                              <span><i onClick={showEditComment} className="fa fa-pencil text-amber-500 cursor-pointer text-2xl"></i><i className="fa fa-trash ml-5 text-red-600 cursor-pointer text-2xl" onClick={deleteComment} data-comment={el.id}></i></span>
                             </div>
                             <p className="clear-both break-words text-xl pt-3">{el.text}</p>
                             <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                             <div>
                               {user && user.likes.find(x => x.comment == el.id) &&
-                                <i className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                <i onClick={like_comment} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
                               }
                               {user && !user.likes.find(x => x.comment == el.id) &&
-                                <i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                <i onClick={like_comment} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
                               }
                               <span className="pl-2 text-xl">{el.likes}</span>
                             </div>
@@ -225,25 +387,25 @@ function Post(props) {
                                 <span className="text-3xl ml-3 mt-1 block float-left">{el.user}</span>
                               </h3></NavLink>
                               {user &&
-                                <span><i className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
+                                <span><i onClick={toggleDropdown} className="fa fa-ellipsis-vertical cursor-pointer text-2xl p-2"></i></span>
                               }
                               </div>
                               {user &&
                               <div onClick={(e) => e.stopPropagation()} className="drop_menu bg-neutral-600 w-fit p-2 gap-1 flex flex-col absolute right-5 hidden">
                                 {user.admin != 0 &&
-                                  <p className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" data-comment={el.id}><i className="fa fa-trash mr-2"></i>Delete</p>
+                                  <p onClick={deleteComment} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer" data-comment={el.id}><i className="fa fa-trash mr-2"></i>Delete</p>
                                 }
-                                <p data-id={el.id} data-type={"comment"} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
+                                <p onClick={report} data-id={el.id} data-type={"comment"} className="text-red-400 hover:bg-neutral-700 p-2 px-3 cursor-pointer"><i className="fa fa-triangle-exclamation mr-2"></i>Report</p>
                               </div>
                               }
                               <p className="clear-both break-words  text-xl pt-3">{el.text}</p>
                               <span className="text-slate-200 mt-2 block">{el.date.slice(0,10)}</span>
                               <div>
                                 {user && user.likes.find(x => x.review == el.id) &&
-                                  <i className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                  <i onClick={like_comment} className="fa-solid fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
                                 }
                                 {user && !user.likes.find(x => x.review == el.id) &&
-                                  <i  className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
+                                  <i onClick={like_comment} className="fa-regular fa-heart text-2xl mt-2 cursor-pointer" data-comment={el.id}></i>
                                 }
                                 {!user &&
                                   <NavLink to="/login"><i className="fa-regular fa-heart text-2xl mt-2 cursor-pointer"></i></NavLink>
@@ -274,6 +436,16 @@ function Post(props) {
                   </div>
         </>
       }
+      <div className="editComment z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Edit comment</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEditComment}></i>
+          </div>
+          <textarea value={editComment} onChange={(e) => setEditComment(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="What do you think?"/>
+        <button onClick={editCommentFun} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-pencil mr-2"></i>Edit</button>
+        </div>
+      </div>
       {loading &&
         <div role="status" className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-neutral-800 z-50">
         <svg aria-hidden="true" className="inline w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

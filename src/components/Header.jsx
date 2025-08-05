@@ -223,6 +223,11 @@ function Header() {
                       type = "review"
                       id = el.review.id
                     }
+                    if(el.comment){
+                      link = "/post/"+el.comment.post.id
+                      type = "comment"
+                      id = el.comment.id
+                    }
                     return(
                       <NavLink data-href={link} onClick={mark_as_seen} data-notif={el.id} data-id={id} data-type={type} key={el.id} to={link}><div className={el.seen == 1 ? "bg-neutral-600 hover:bg-neutral-500 m-1 p-2" : "bg-blue-600 hover:bg-blue-500 m-1 p-2"}>{new_text}
                       {el.quote &&

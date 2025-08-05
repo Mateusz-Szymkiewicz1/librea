@@ -347,8 +347,16 @@ function Admin(props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: report.quote ? report.quote.id : report.review.id,
-          type: report.quote ? "quote" : "review"
+          id: report.quote
+            ? report.quote.id
+            : report.comment
+            ? report.comment.id
+            : report.review.id,
+          type: report.quote
+            ? "quote"
+            : report.comment
+            ? "comment"
+            : "review"
         })
       }).then(res => res.json()).then(res => {
         props.setToast({type:"msg", text:"Content deleted!"})
@@ -457,6 +465,7 @@ function Admin(props) {
                 <h2 className="text-2xl break-keep flex sm:justify-between">
                   {el.quote && <p>Type: Quote</p>}
                   {el.review && <p>Type: Review</p>}
+                  {el.comment && <p>Type: Comment</p>}
                   {el.user && <p>Type: User - <NavLink className="italic text-blue-400" target="_blank" to={"/profile/"+el.user}>{el.user}</NavLink></p>}
                   <span>
                     <i onClick={ban} data-id={el.id} className="fa fa-xmark mx-2 sm:mx-4 text-red-500 cursor-pointer">
@@ -481,6 +490,12 @@ function Admin(props) {
                   <>
                   <p className="text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.quote.text}</p>
                   <p className="text-neutral-200 mt-2">Written by <NavLink target="_blank" to={"/profile/"+el.quote.user} className="italic text-blue-400">{el.quote.user}</NavLink> on <NavLink target="_blank" to={"/book/"+el.quote.book.id} className="italic text-blue-400">{el.quote.book.tytul}</NavLink> by {el.quote.book.autor}</p>
+                  </>
+                }
+                {el.comment &&
+                  <>
+                  <p className="text-neutral-200 text-lg mt-3 pr-5 clear-both">{el.comment.text}</p>
+                  <p className="text-neutral-200 mt-2">Written by <NavLink target="_blank" to={"/profile/"+el.comment.user} className="italic text-blue-400">{el.comment.user}</NavLink> on <NavLink target="_blank" to={"/post/"+el.comment.post.id} className="italic text-blue-400">{el.comment.post.title}</NavLink></p>
                   </>
                 }
                 <p className="text-neutral-200 mt-5">Submitted: {el.date.split('T')[0]} by 

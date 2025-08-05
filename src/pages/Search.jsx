@@ -8,7 +8,7 @@ function Search() {
   const [tags, setTags] = useState([])
   const [selectedTags, setSelectedTags] = useState([])
   const [user,setUser] = useState()
-  let search = window.location.href.split('/').at(-1)
+  let search = window.location.href.split('/').at(-1).split("#")[0]
   useEffect(() => {
     fetch("http://localhost:3000/login", {
       credentials: 'include',

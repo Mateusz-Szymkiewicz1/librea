@@ -827,7 +827,7 @@ function Book(props) {
               </label>
               <span className="text-white pl-2 pt-2">Mark as a spoiler</span>
             </div> 
-        <button onClick={editReviewFun} className='bg-blue-600 text-white px-10 text-lg p-3 mt-5 block hover:bg-blue-700'>Edit</button>
+        <button onClick={editReviewFun} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-pencil mr-2"></i>Edit</button>
         </div>
       </div>
       <div className="add_to_collection z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
