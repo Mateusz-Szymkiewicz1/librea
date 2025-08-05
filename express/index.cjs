@@ -1075,6 +1075,12 @@ app.post('/posts', (req,res) => {
   })
 })
 
+app.post('/posts_search', (req,res) => {
+  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id WHERE (posts.title LIKE CONCAT('%', ? ,'%') OR posts.text LIKE CONCAT('%', ? ,'%')) GROUP BY posts.id ORDER BY posts.date`,[req.body.search,req.body.search], (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
 
 app.post('/new_authors', (req,res) => {
   if(!req.session.user) return

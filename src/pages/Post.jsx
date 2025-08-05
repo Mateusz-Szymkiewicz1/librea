@@ -323,12 +323,7 @@ function Post(props) {
             <NavLink to="/login"><i className="fa-regular fa-heart mr-2"></i></NavLink>
           }
           Like ({post.likes})</span>
-          {!user &&
-            <NavLink to="/login"><button className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link mr-1"></i>Share</button></NavLink>
-          }
-          {user &&
-            <button onClick={share} className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link mr-1"></i>Share</button>
-          }
+          <button onClick={share} className="bg-blue-500 hover:bg-blue-600 p-1 px-3 text-lg"><i className="fa fa-link mr-1"></i>Share</button>
         </div>
         <div className='mx-5 mt-16 md:mr-16 mr-10'>
           <h2 className='text-3xl' id="comments">Comments ({post.numOfComments})</h2>

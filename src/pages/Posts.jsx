@@ -10,6 +10,8 @@ function Posts() {
   const [loading, setLoading] = useState(false)
   const [numOfPosts, setNumOfPosts] = useState(0)
   const [refresh, setRefresh] = useState(false)
+  const [search, setSearch] = useState("")
+  const [searchResults, setSearchResults] = useState([])
 
   useEffect(() => {
     fetch("http://localhost:3000/login", {
@@ -124,15 +126,37 @@ const toggleDropdown = async (e) => {
     setRefresh(prev => !prev)
     window.scrollTo(0,0)
   }
+  useEffect(() => {
+    if(search.length < 3){
+      setSearchResults([])
+    }else{
+      fetch("http://localhost:3000/posts_search", {
+                credentials: 'include',
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  search: search
+                })
+              }).then(res => res.json()).then(res => {
+                console.log(res)
+                setSearchResults(res)
+              })
+    }
+  }, [search])
   return (
     <>
       {!loading &&
         <>
         <h1 className="text-center text-3xl my-12 font-semibold">Blog posts</h1>
-        {posts.map(el => {
+        <div className="flex items-center">
+          <i className="fa fa-search ml-5 text-sm p-3 bg-blue-500"></i><input type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search in posts..." className="shadow w-64 sm:w-96 outline-none h-11 bg-neutral-700 text-slate-200 text-sm px-3" />
+        </div>
+        {searchResults.length < 1 && posts.map(el => {
           const plainText = getPlainText(el.text);
           return (
-            <NavLink to={"/post/"+el.id} key={el.id} className="bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
+            <NavLink to={"/post/"+el.id} key={el.id} className="shadpow-lg bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
               <div className="mr-12 lg:mr-20">
                 <h2 className="text-2xl text-slate-200">{el.title}</h2>
                 <span className="text-lg text-slate-300">{el.date.slice(0,10)}</span>
@@ -155,14 +179,40 @@ const toggleDropdown = async (e) => {
             </NavLink>
           )
         })}
-        {numOfPosts > offset+5 &&
+        {searchResults.length < 1 && numOfPosts > offset+5 &&
                 <button onClick={() => setOffset(prev => prev+5)} className="bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700 shadow ml-5"><i className="fa fa-caret-down mr-3"></i>Show more</button>
               }
-              {numOfPosts <= offset+5 && offset > 0 &&
+              {searchResults.length < 1 && numOfPosts <= offset+5 && offset > 0 &&
                 <button onClick={hidePosts} className="ml-5 shadow bg-blue-600 p-3 text-lg mt-3 hover:bg-blue-700"><i className="fa fa-caret-up mr-3"></i>Hide</button>
               }
         </>
       }
+      {searchResults.length > 0 && searchResults.map(el => {
+          const plainText = getPlainText(el.text);
+          return (
+            <NavLink to={"/post/"+el.id} key={el.id} className="shadpow-lg bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
+              <div className="mr-12 lg:mr-20">
+                <h2 className="text-2xl text-slate-200">{el.title}</h2>
+                <span className="text-lg text-slate-300">{el.date.slice(0,10)}</span>
+                <p className="text-lg text-slate-300 mt-3">{plainText.slice(0,250)+"..."}</p>
+              </div>
+              {el.thumbnail &&
+                <img src={"../../public/uploads/blog/"+el.thumbnail} onError={(e) => e.target.src = "../../public/post_default.jpg"} className="max-w-96 max-h-96 shadow order-1 md:order-2 mt-4 md:mt-0"></img>
+              }
+              {user && user.admin == 1 &&
+                <div>
+                <div onClick={toggleDropdown} className="bg-blue-500 p-3 h-fit w-fit absolute top-3 right-3 shadow-lg">
+                  <i className="fa fa-ellipsis-vertical"></i>
+                </div>
+                <div className="z-50 post_dropdown absolute right-3 top-16 bg-neutral-800 p-3 hidden">
+                  <NavLink to={"/post/edit/"+el.id} className="block p-2 bg-orange-500 hover:bg-orange-600"><i className="fa fa-pencil mr-1"></i>Edit</NavLink>
+                  <p onClick={(e) => deletePost(e, el.id)} className="p-2 bg-red-500 mt-2 hover:bg-red-600"><i className="fa fa-trash mr-1"></i>Delete</p>
+                </div>
+                </div>
+              }
+            </NavLink>
+          )
+        })}
       {loading &&
         <div role="status" className="fixed top-0 left-0 right-0 bottom-0 flex justify-center items-center bg-neutral-800 z-50">
         <svg aria-hidden="true" className="inline w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

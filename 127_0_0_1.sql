@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 04, 2025 at 09:41 PM
+-- Generation Time: Aug 05, 2025 at 03:54 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -163,7 +163,8 @@ CREATE TABLE `comments` (
 --
 
 INSERT INTO `comments` (`id`, `post`, `user`, `text`, `date`) VALUES
-(1, 11, 'asd', 'qewwqe', '2025-08-04 19:28:32');
+(3, 11, 'asd', 'qewwqe', '2025-08-04 19:28:32'),
+(7, 11, 'asdfghjkl', 'comment2', '2025-08-05 09:06:39');
 
 -- --------------------------------------------------------
 
@@ -195,7 +196,8 @@ INSERT INTO `likes` (`id`, `user`, `review`, `collection`, `quote`, `post`, `com
 (127, 'qweasd', 37, NULL, NULL, NULL, NULL),
 (128, 'asdfghjkl', 37, NULL, NULL, NULL, NULL),
 (129, 'asdasd12e', NULL, NULL, NULL, 16, NULL),
-(135, 'asdfghjkl', NULL, NULL, NULL, 11, NULL);
+(135, 'asdfghjkl', NULL, NULL, NULL, 11, NULL),
+(139, 'asdfghjkl', NULL, NULL, NULL, NULL, 7);
 
 -- --------------------------------------------------------
 
@@ -271,6 +273,7 @@ CREATE TABLE `notifications` (
   `quote` int(11) DEFAULT NULL,
   `review` int(11) DEFAULT NULL,
   `collection` int(11) DEFAULT NULL,
+  `comment` int(11) DEFAULT NULL,
   `like_from` varchar(50) DEFAULT NULL,
   `date` timestamp NOT NULL DEFAULT current_timestamp(),
   `seen` tinyint(1) NOT NULL
@@ -280,8 +283,8 @@ CREATE TABLE `notifications` (
 -- Dumping data for table `notifications`
 --
 
-INSERT INTO `notifications` (`id`, `type`, `text`, `user`, `quote`, `review`, `collection`, `like_from`, `date`, `seen`) VALUES
-(52, 'like', 'qweasd has liked your review.', 'asdfghjkl', NULL, 37, NULL, 'qweasd', '2025-08-03 17:18:48', 0);
+INSERT INTO `notifications` (`id`, `type`, `text`, `user`, `quote`, `review`, `collection`, `comment`, `like_from`, `date`, `seen`) VALUES
+(52, 'like', 'qweasd has liked your review.', 'asdfghjkl', NULL, 37, NULL, NULL, 'qweasd', '2025-08-03 17:18:48', 0);
 
 -- --------------------------------------------------------
 
@@ -386,17 +389,18 @@ CREATE TABLE `reports` (
   `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `review` int(11) DEFAULT NULL,
   `quote` int(11) DEFAULT NULL,
-  `user` varchar(50) DEFAULT NULL
+  `user` varchar(50) DEFAULT NULL,
+  `comment` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `reports`
 --
 
-INSERT INTO `reports` (`id`, `user_reporting`, `date`, `review`, `quote`, `user`) VALUES
-(12, 'asdfghjkl', '2025-06-07 11:36:57', NULL, 2, NULL),
-(13, 'asdfghjkl', '2025-06-07 14:31:10', NULL, NULL, 'asdfghjkl'),
-(14, NULL, '2025-07-31 17:48:43', 37, NULL, NULL);
+INSERT INTO `reports` (`id`, `user_reporting`, `date`, `review`, `quote`, `user`, `comment`) VALUES
+(12, 'asdfghjkl', '2025-06-07 11:36:57', NULL, 2, NULL, NULL),
+(13, 'asdfghjkl', '2025-06-07 14:31:10', NULL, NULL, 'asdfghjkl', NULL),
+(14, NULL, '2025-07-31 17:48:43', 37, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -576,7 +580,8 @@ ALTER TABLE `notifications`
   ADD KEY `quote` (`quote`),
   ADD KEY `review` (`review`),
   ADD KEY `collection` (`collection`),
-  ADD KEY `like_from` (`like_from`);
+  ADD KEY `like_from` (`like_from`),
+  ADD KEY `comment` (`comment`);
 
 --
 -- Indeksy dla tabeli `posts`
@@ -609,7 +614,8 @@ ALTER TABLE `reports`
   ADD KEY `user_reporting` (`user_reporting`),
   ADD KEY `user` (`user`),
   ADD KEY `quote` (`quote`),
-  ADD KEY `review` (`review`);
+  ADD KEY `review` (`review`),
+  ADD KEY `comment` (`comment`);
 
 --
 -- Indeksy dla tabeli `reviews`
@@ -675,13 +681,13 @@ ALTER TABLE `collections`
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `likes`
 --
 ALTER TABLE `likes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
 
 --
 -- AUTO_INCREMENT for table `new_authors`
@@ -699,7 +705,7 @@ ALTER TABLE `new_books`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `posts`
@@ -723,7 +729,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `reports`
 --
 ALTER TABLE `reports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `reviews`
@@ -785,7 +791,8 @@ ALTER TABLE `notifications`
   ADD CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`collection`) REFERENCES `collections` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `notifications_ibfk_3` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
   ADD CONSTRAINT `notifications_ibfk_4` FOREIGN KEY (`like_from`) REFERENCES `users` (`login`) ON DELETE CASCADE,
-  ADD CONSTRAINT `notifications_ibfk_5` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `notifications_ibfk_5` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_6` FOREIGN KEY (`comment`) REFERENCES `comments` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `posts`
@@ -814,7 +821,8 @@ ALTER TABLE `reports`
   ADD CONSTRAINT `reports_ibfk_1` FOREIGN KEY (`quote`) REFERENCES `quotes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reports_ibfk_2` FOREIGN KEY (`review`) REFERENCES `reviews` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `reports_ibfk_4` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
-  ADD CONSTRAINT `reports_ibfk_5` FOREIGN KEY (`user_reporting`) REFERENCES `users` (`login`) ON DELETE SET NULL;
+  ADD CONSTRAINT `reports_ibfk_5` FOREIGN KEY (`user_reporting`) REFERENCES `users` (`login`) ON DELETE SET NULL,
+  ADD CONSTRAINT `reports_ibfk_6` FOREIGN KEY (`comment`) REFERENCES `comments` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `reviews`
