@@ -244,6 +244,11 @@ app.post('/user/:login', (req,res) => {
           rows[0].comments = rows8
         }
       })
+      connection.query(`SELECT * FROM notes WHERE user = ? AND book = ?`,[req.params.login,req.body.book], (err9, rows9, fields9) => {
+        if(rows9){
+          rows[0].notes = rows9
+        }
+      })
       connection.query(`SELECT reviews.*, COUNT(likes.id) AS likes, ratings.rating FROM reviews LEFT JOIN likes ON reviews.id = likes.review LEFT JOIN ratings ON (ratings.book = reviews.book AND ratings.user = reviews.user) WHERE reviews.user = ? GROUP BY reviews.id ORDER BY reviews.id DESC`,[req.params.login], (err3, rows3, fields3) => {
         if(rows3){
           rows[0].reviews = rows3
@@ -383,6 +388,13 @@ app.post('/rate', (req,res) => {
 app.post('/review', (req,res) => {
   if(!req.session.user) return
   connection.query(`INSERT INTO reviews (user,book,text,spoiler) VALUES ('${req.session.user}',?,?,?);`,[req.body.book,req.body.text, req.body.spoiler], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/add_note', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`INSERT INTO notes (user,book,text,page) VALUES ('${req.session.user}',?,?,?);`,[req.body.book,req.body.text, req.body.page], (err, rows, fields) => {
     res.json("done")
   })
 })
@@ -1080,7 +1092,6 @@ app.post('/posts_search', (req,res) => {
     res.send(rows)
   })
 })
-
 
 app.post('/new_authors', (req,res) => {
   if(!req.session.user) return

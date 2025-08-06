@@ -28,6 +28,9 @@ function Book(props) {
   const [newQuote, setNewQuote] = useState("")
   const [editQuote, setEditQuote] = useState("")
   const [editedQuote, setEditedQuote] = useState()
+  const [noteText, setNoteText] = useState("")
+  const [notePage, setNotePage] = useState("")
+
   const handleRating = (rate) => {
     setRating(rate)
     if(rate == 0) return
@@ -148,6 +151,7 @@ function Book(props) {
           }),
         }).then(res2 => res2.json()).then(async res2 => {
           if(!res2.text){
+            console.log(res2[0])
             setUser(res2[0])
             if(res2[0].ratings.find(x => x.book == book_id)){
               setRating(res2[0].ratings.find(x => x.book == book_id).rating)
@@ -254,6 +258,12 @@ function Book(props) {
   }
   const closeEdit = () => {
     document.querySelector('.edit').classList.add("hidden")
+  }
+  const showNotes = () => {
+    document.querySelector('.notes').classList.remove("hidden")
+  }
+  const closeNotes = () => {
+    document.querySelector('.notes').classList.add("hidden")
   }
   const showEdit = () => {
     document.querySelector('.edit').classList.remove("hidden")
@@ -469,6 +479,30 @@ function Book(props) {
       })
     })
   }, [])
+  const addNote = () => {
+    if(noteText.length < 1 || notePage.length < 1){
+      props.setToast({type:"error", text: "Fill the inputs!"})
+      return;
+    }
+    fetch("http://localhost:3000/add_note", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          book: book.id,
+          text: noteText,
+          page: notePage
+        }),
+      }).then(res => res.json()).then(res => {
+          setNoteText("")
+          setNotePage("")
+          closeNotes()
+          setRefresh(!refresh)
+          props.setToast({type:"msg",text:"Note added!"})
+      })
+  }
   return (
     <>
       <div>
@@ -510,16 +544,14 @@ function Book(props) {
                     {user.collections.find(x => x.books.includes(":"+book_id+"}")) &&
                       <span className="mr-2">In your collections:</span>
                     }    
-                    {user.collections.map((el,i) => {
-                      if(el.books.includes(":"+book_id+"}")){
-                        return(
-                          <span key={i}>
-                          <NavLink className="text-blue-500 underline" to={"/collection/"+el.id}><span>{el.name}</span></NavLink>
-                          <span>, </span>
-                          </span>
-                        )
-                      }
-                     })}</p>
+                    {user.collections
+                    .filter(el => el.books.includes(":" + book_id + "}"))
+                    .map((el, i, arr) => (
+                      <NavLink key={i} className="text-blue-500 underline" to={`/collection/${el.id}`}>
+                        {el.name}
+                      </NavLink>
+                    ))
+                    .reduce((prev, curr) => [prev, ', ', curr])}</p>
                   {user.collections.find(x => !x.books.includes(":"+book_id+"}")) &&
                   <button onClick={showAddToCollection} className='shadow bg-blue-600 text-white px-10 text-lg p-3 mb-10 block hover:bg-blue-700'><i className="fa fa-add mr-2"></i>Add to a collection</button>
                   }
@@ -549,6 +581,31 @@ function Book(props) {
                 />
               </div>
               <div className="sm:pl-5 pl-3 sm:pr-16 pr-3">
+              {user &&
+                <h2 className="text-3xl font-semibold clear-both text-slate-200 pt-20">Your notes ({user.notes.length})</h2>
+              }
+              {user && user.notes.length == 0 &&
+                <p className="text-slate-200 mt-5">You have no notes yet. <span className="text-blue-500 underline cursor-pointer" onClick={showNotes}>Add one!</span></p>
+              }
+              {user && user.notes.length > 0 &&
+                <>
+                <button className='shadow bg-blue-600 text-white px-10 text-lg p-3 my-5 block hover:bg-blue-700' onClick={showNotes}><i className="fa fa-plus mr-3"></i>Add</button>
+                <div className='flex flex-wrap gap-5 my-3 mb-20'>
+                  {user.notes.map((el, i) => {
+                    return(
+                      <div key={i} className="bg-blue-950 w-96 text-lg p-5 shadow-lg relative">
+                        <span className="text-slate-200">Page {el.page}</span>
+                        <p className="mt-1">{el.text}</p>
+                        <div className="absolute top-4 right-4 flex gap-3">
+                          <i className="fa fa-pencil text-yellow-500 cursor-pointer"></i>
+                          <i className="fa fa-trash text-red-500 cursor-pointer"></i>
+                        </div>
+                      </div>
+                    )
+                  })}                  
+                </div>
+                </>
+              }
               <h2 id="reviews" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Reviews ({book.ilosc_recenzji})</h2>
               <textarea disabled={user ? false : true} onChange={(e) => setTextarea(e.target.value)} className="shadow bg-neutral-600 mt-10 w-full h-48 outline-none text-white text-lg p-3" placeholder="What are your thoughts?"></textarea>
               <div className="inline-flex items-center">
@@ -828,6 +885,17 @@ function Book(props) {
               <span className="text-white pl-2 pt-2">Mark as a spoiler</span>
             </div> 
         <button onClick={editReviewFun} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-pencil mr-2"></i>Edit</button>
+        </div>
+      </div>
+      <div className="notes z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white min-w-96">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Add a note</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeNotes}></i>
+            </div>
+            <textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Note..."/>
+            <input value={notePage} type="text" onChange={(e) => setNotePage(e.target.value)} placeholder="Page..." className="shadow w-full outline-none border rounded-lg h-11 bg-neutral-600 my-2 border-neutral-500 placeholder-gray-400 text-white text-sm px-3" />
+            <button onClick={addNote} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add</button>
         </div>
       </div>
       <div className="add_to_collection z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 05, 2025 at 03:54 PM
+-- Generation Time: Aug 06, 2025 at 11:09 PM
 -- Wersja serwera: 10.4.32-MariaDB
 -- Wersja PHP: 8.2.12
 
@@ -140,7 +140,7 @@ INSERT INTO `collections` (`id`, `user`, `name`, `books`, `description`, `privat
 (10, 'asd', 'erree', '[{\"id\":6},{\"id\":2},{\"id\":1},{\"id\":5}]', 'asdasdasdasd', 0),
 (14, 'asde', 'Orwell', '[{\"id\":6},{\"id\":5}]', 'ksiązki orwella. duh', 0),
 (15, 'asde', 'asdasd', '[{\"id\":1},{\"id\":4},{\"id\":3},{\"id\":5},{\"id\":2}]', '', 0),
-(16, 'asdfghjkl', 'asdasd', '[{\"id\":5}]', 'adsdas', 0),
+(16, 'asdfghjkl', 'asdasd', '[{\"id\":5},{\"id\":6}]', 'adsdas', 0),
 (17, 'asdfghjkl', 'Balzac', '[{\"id\":1}]', '', 0),
 (20, 'asdfghjkl', 'private', '[{\"id\":6}]', '', 1);
 
@@ -258,6 +258,30 @@ INSERT INTO `new_books` (`id`, `tytul`, `autor`, `rok`, `strony`, `opis`, `tagi`
 (36, 'asdasd', 'asdasd', 'asd', 12, '', '[]', '9d7b6d5a4b5fecf7e0d94028e79988041730668287010.webp', 'asd', '2024-11-03 21:11:27'),
 (37, 'asdasd', 'asd', '123123', 123, 'sadad', '[\"classics\"]', '', 'asdfghjkl', '2025-06-05 10:57:28'),
 (38, 'asd', 'asd', 'asd', 12323, '', '[]', '0ffd533dd127c9876d39a3ce9c108e661750357031653.png', 'asdfghjkl', '2025-06-19 18:17:11');
+
+-- --------------------------------------------------------
+
+--
+-- Struktura tabeli dla tabeli `notes`
+--
+
+CREATE TABLE `notes` (
+  `id` int(11) NOT NULL,
+  `user` varchar(50) NOT NULL,
+  `book` int(11) NOT NULL,
+  `text` text NOT NULL,
+  `page` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `notes`
+--
+
+INSERT INTO `notes` (`id`, `user`, `book`, `text`, `page`) VALUES
+(1, 'asdfghjkl', 6, 'asdasdasd', 120),
+(2, 'asdfghjkl', 6, 'qweqwe', 12),
+(3, 'asdfghjkl', 6, 'asdasdasd', 14),
+(4, 'asdfghjkl', 6, '6uyuyuyu', 33);
 
 -- --------------------------------------------------------
 
@@ -450,8 +474,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`sid`, `session`, `expires`) VALUES
-('JWaTv8-Djac79qhWsLO5btVyDddotTHj', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-05T17:13:41.371Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754414021),
-('zEEt73y8XTq9vvXAY7NXAHvbIWq_0-1f', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-05T17:18:43.896Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"qweasd\"}', 1754414324);
+('2IGdbAu8LIfE0LL1Hg0N0F4SjbMmkMsM', '{\"cookie\":{\"originalMaxAge\":172800000,\"expires\":\"2025-08-07T18:05:12.872Z\",\"httpOnly\":true,\"path\":\"/\"},\"user\":\"asdfghjkl\"}', 1754589913);
 
 -- --------------------------------------------------------
 
@@ -569,6 +592,14 @@ ALTER TABLE `new_authors`
 --
 ALTER TABLE `new_books`
   ADD PRIMARY KEY (`id`),
+  ADD KEY `user` (`user`);
+
+--
+-- Indeksy dla tabeli `notes`
+--
+ALTER TABLE `notes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `book` (`book`),
   ADD KEY `user` (`user`);
 
 --
@@ -702,6 +733,12 @@ ALTER TABLE `new_books`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
+-- AUTO_INCREMENT for table `notes`
+--
+ALTER TABLE `notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
@@ -782,6 +819,13 @@ ALTER TABLE `likes`
 --
 ALTER TABLE `new_books`
   ADD CONSTRAINT `new_books_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `notes`
+--
+ALTER TABLE `notes`
+  ADD CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`user`) REFERENCES `users` (`login`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notes_ibfk_2` FOREIGN KEY (`book`) REFERENCES `books` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `notifications`
