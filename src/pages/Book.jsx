@@ -30,6 +30,9 @@ function Book(props) {
   const [editedQuote, setEditedQuote] = useState()
   const [noteText, setNoteText] = useState("")
   const [notePage, setNotePage] = useState("")
+  const [editNoteText, setEditNoteText] = useState("")
+  const [editNotePage, setEditNotePage] = useState("")
+  const [editNoteId, setEditNoteId] = useState("")
 
   const handleRating = (rate) => {
     setRating(rate)
@@ -232,6 +235,30 @@ function Book(props) {
       props.setToast({type:"msg",text:"Review deleted!"})
     })
   }
+  const deleteNote = async (e) => {
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+    fetch("http://localhost:3000/delete_note", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: e.target.dataset.id
+      })
+    }).then(() => {
+      setRefresh(!refresh)
+      props.setToast({type:"msg",text:"Note deleted!"})
+    })
+  }
   const deleteQuote = async (e) => {
     if (document.querySelector(".decision")) document.querySelector('.decision').remove()
       const response = await useDecision().then(function () {
@@ -265,6 +292,16 @@ function Book(props) {
   const closeNotes = () => {
     document.querySelector('.notes').classList.add("hidden")
   }
+  const showEditNote = () => {
+    const note = user.notes.find(el => el.id == event.target.dataset.id)
+    setEditNoteText(note.text)
+    setEditNotePage(note.page)
+    setEditNoteId(note.id)
+    document.querySelector('.editNote').classList.remove("hidden")
+  }
+  const closeEditNote = () => {
+    document.querySelector('.editNote').classList.add("hidden")
+  }
   const showEdit = () => {
     document.querySelector('.edit').classList.remove("hidden")
   }
@@ -292,6 +329,40 @@ function Book(props) {
     if(review.length < 1) return
     setEditReview(review[0].text)
   }, [review])
+  const editNote = async () => {
+    if(editNoteText.length < 1 || editNotePage.length < 1){
+      props.setToast({type:"error", text: "Fill the inputs!"})
+      return
+    }
+    if (document.querySelector(".decision")) document.querySelector('.decision').remove()
+      const response = await useDecision().then(function () {
+          document.querySelector(".decision").remove()
+          return
+      }, function () {
+          document.querySelector(".decision").remove()
+          return "stop"
+      });
+      if(response) return
+      fetch("http://localhost:3000/edit_note", {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editNoteId,
+          text: editNoteText,
+          page: editNotePage
+        })
+      }).then(() => {
+        closeEditNote()
+        setRefresh(!refresh)
+        setEditNoteId("")
+        setEditNotePage("")
+        setEditNoteText("")
+        props.setToast({type:"msg",text:"Note changed!"})
+      })
+  }
   const editQuoteFun = async () => {
     if(editQuote.length < 1){
       props.setToast({type:"error", text: "Write something!"})
@@ -597,8 +668,8 @@ function Book(props) {
                         <span className="text-slate-200">Page {el.page}</span>
                         <p className="mt-1">{el.text}</p>
                         <div className="absolute top-4 right-4 flex gap-3">
-                          <i className="fa fa-pencil text-yellow-500 cursor-pointer"></i>
-                          <i className="fa fa-trash text-red-500 cursor-pointer"></i>
+                          <i onClick={showEditNote} data-id={el.id} className="fa fa-pencil text-yellow-500 cursor-pointer"></i>
+                          <i data-id={el.id} onClick={deleteNote} className="fa fa-trash text-red-500 cursor-pointer"></i>
                         </div>
                       </div>
                     )
@@ -896,6 +967,17 @@ function Book(props) {
             <textarea value={noteText} onChange={(e) => setNoteText(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Note..."/>
             <input value={notePage} type="text" onChange={(e) => setNotePage(e.target.value)} placeholder="Page..." className="shadow w-full outline-none border rounded-lg h-11 bg-neutral-600 my-2 border-neutral-500 placeholder-gray-400 text-white text-sm px-3" />
             <button onClick={addNote} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-plus mr-2"></i>Add</button>
+        </div>
+      </div>
+      <div className="editNote z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>
+        <div className="bg-neutral-700 p-5 pb-8 text-white min-w-96">
+          <div className="flex justify-between">
+            <h1 className="text-xl font-semibold">Edit note</h1>
+            <i className="fa fa-close mr-1 text-xl cursor-pointer" onClick={closeEditNote}></i>
+            </div>
+            <textarea value={editNoteText} onChange={(e) => setEditNoteText(e.target.value)} className="mt-4 outline-none text-lg border text-sm rounded-lg block sm:w-96 w-64 p-2.5 bg-neutral-600 border-neutral-500 placeholder-gray-400 text-white" placeholder="Note..."/>
+            <input value={editNotePage} type="text" onChange={(e) => setEditNotePage(e.target.value)} placeholder="Page..." className="shadow w-full outline-none border rounded-lg h-11 bg-neutral-600 my-2 border-neutral-500 placeholder-gray-400 text-white text-sm px-3" />
+            <button onClick={editNote} className='bg-blue-600 text-white px-10 text-lg p-2 mt-5 block hover:bg-blue-700'><i className="fa fa-pencil mr-2"></i>Edit</button>
         </div>
       </div>
       <div className="add_to_collection z-40 hidden fixed top-0 bottom-0 right-0 left-0 bg-neutral-800 flex justify-center items-center" style={{background: "rgba(50,50,50,0.9)"}}>

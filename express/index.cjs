@@ -440,6 +440,13 @@ app.post('/edit_review', (req,res) => {
   })
 })
 
+app.post('/edit_note', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`UPDATE notes SET text = ?, page = ? WHERE id = ?`,[req.body.text,req.body.page,req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
 app.post('/edit_comment', (req,res) => {
   if(!req.session.user) return
   connection.query(`UPDATE comments SET text = ? WHERE id = ?`,[req.body.text,req.body.id], (err, rows, fields) => {
@@ -472,6 +479,13 @@ app.post('/edit_quote', (req,res) => {
 app.post('/delete_review', (req,res) => {
   if(!req.session.user) return
   connection.query(`DELETE FROM reviews WHERE id = ?`,[req.body.id], (err, rows, fields) => {
+    res.json("done")
+  })
+})
+
+app.post('/delete_note', (req,res) => {
+  if(!req.session.user) return
+  connection.query(`DELETE FROM notes WHERE id = ?`,[req.body.id], (err, rows, fields) => {
     res.json("done")
   })
 })

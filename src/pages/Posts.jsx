@@ -156,7 +156,7 @@ const toggleDropdown = async (e) => {
         {searchResults.length < 1 && posts.map(el => {
           const plainText = getPlainText(el.text);
           return (
-            <NavLink to={"/post/"+el.id} key={el.id} className="shadpow-lg bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
+            <NavLink to={"/post/"+el.id} key={el.id} className="shadow-lg bg-neutral-700 p-4 m-5 flex flex-col md:flex-row justify-between hover:bg-neutral-600 shadow relative">
               <div className="mr-12 lg:mr-20">
                 <h2 className="text-2xl text-slate-200">{el.title}</h2>
                 <span className="text-lg text-slate-300">{el.date.slice(0,10)}</span>
