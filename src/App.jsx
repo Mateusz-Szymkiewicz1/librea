@@ -1,6 +1,6 @@
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import Book from './pages/Book.jsx';
 import Login from './pages/Login.jsx';
@@ -28,10 +28,13 @@ import EditAuthor from './pages/EditAuthor.jsx';
 import NewPost from './pages/NewPost.jsx';
 import Post from './pages/Post.jsx';
 import Posts from './pages/Posts.jsx';
+import Pomodoro from './pages/Pomodoro.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
   const location = useLocation();
+  const [logged, setLogged] = useState(false);
+
   const closeToast = () => {
     setMsg()
   }
@@ -42,6 +45,19 @@ function App() {
     if(msg && !msg.stay){
       setMsg()
     }
+     fetch("http://localhost:3000/login", {
+      credentials: 'include',
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    }).then(res => res.json()).then(res => {
+      if(!res.text && !location.pathname.includes("pomodoro")){
+        setLogged(true);
+      }else{
+        setLogged(false);
+      }
+    })
   }, [location])
   return (
     <>
@@ -70,10 +86,14 @@ function App() {
             <Route path="/post/edit/:id" element={<NewPost key={location.pathname} setToast={setToast} closeToast={closeToast} />} />
             <Route path="/post/:id" element={<Post setToast={setToast} />} />
             <Route path="/posts" element={<Posts/>} />
+            <Route path="/pomodoro" element={<Pomodoro/>} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
           {msg &&
             <Toast msg={msg} closeToast={closeToast}></Toast>
+          }
+          {logged &&
+            <NavLink to="/pomodoro"><div className='fixed hover:bg-blue-700 right-4 bottom-4 bg-blue-600 rounded-lg p-3'><i className='fa fa-glasses mr-2'></i>Start reading</div></NavLink>
           }
           <Footer></Footer>
       </div>
