@@ -86,7 +86,7 @@ function App() {
             <Route path="/post/edit/:id" element={<NewPost key={location.pathname} setToast={setToast} closeToast={closeToast} />} />
             <Route path="/post/:id" element={<Post setToast={setToast} />} />
             <Route path="/posts" element={<Posts/>} />
-            <Route path="/pomodoro" element={<Pomodoro/>} />
+            <Route path="/pomodoro" element={<Pomodoro setToast={setToast} />} />
             <Route path="*" element={<NoMatch />} />
           </Routes>
           {msg &&
