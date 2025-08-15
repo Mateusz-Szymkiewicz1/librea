@@ -497,6 +497,12 @@ app.post('/delete_comment', (req,res) => {
   })
 })
 
+app.get('/random_book', (req,res) => {
+  connection.query(`SELECT * FROM books AS t1 JOIN (SELECT id FROM books ORDER BY RAND() LIMIT 1) as t2 ON t1.id=t2.id`, (err, rows, fields) => {
+    res.send(rows)
+  })
+})
+
 app.post('/delete_post', (req,res) => {
   if(!req.session.user) return
   connection.query(`SELECT thumbnail,text FROM posts WHERE id = ?`,[req.body.id], (err, rows, fields) => {

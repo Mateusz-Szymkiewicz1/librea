@@ -99,6 +99,11 @@ function Home() {
       }
     })
   }, [])
+  const randomBook = () => {
+    fetch("http://localhost:3000/random_book").then(res => res.json()).then(res => {
+      navigate("/book/"+res[0].id)
+    })
+  }
   return (
     <>
       {!user && !loading &&
@@ -249,6 +254,14 @@ function Home() {
               </div>
             </>
           }
+        </div>
+        <div className='mx-3 sm:mx-5'>
+          <p className='text-2xl'>Don't know what to read? <i className='fa fa-book-open ml-2'></i></p>
+          <div className='flex flex-wrap mt-4  items-center gap-3'>
+            <button onClick={randomBook} type="button" className="shadow p-2 px-5 hover:bg-blue-800 font-semibold rounded bg-blue-700 text-gray-50"><i className='fa fa-shuffle mr-2'></i>Pick a random book</button>
+            <span>or</span>
+            <NavLink to="/explore"><button type="button" className="shadow p-2 px-5 hover:bg-blue-800 font-semibold rounded bg-blue-700 text-gray-50"><i className='fa fa-binoculars mr-2'></i>Go the the explore page</button></NavLink>
+          </div>
         </div>
         </>
       }
