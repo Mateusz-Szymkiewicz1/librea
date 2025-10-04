@@ -125,7 +125,7 @@ function Author(props) {
                 }
                 {author.books.length > 0 &&
                     <>
-                      <p className='text-slate-200 font-semibold text-2xl mt-16'>Books</p>
+                      <p className='text-slate-200 font-semibold text-2xl mt-16'>Books ({author.books.length})</p>
                       <div className='flex flex-wrap gap-5 my-3 mb-20'>
                         {author.books.sort((a,b) => b.ilosc_ocen - a.ilosc_ocen).slice(0,shownBooks).map((el,i) => 
                           <BookCard book={el} key={el.id}></BookCard>

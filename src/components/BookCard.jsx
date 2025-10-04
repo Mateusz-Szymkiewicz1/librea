@@ -5,6 +5,7 @@ function BookCard(props) {
   let bg, rating;
   light ? bg = "bg-neutral-600 hover:bg-neutral-500" : bg = "bg-neutral-700 hover:bg-neutral-600"
   book.ilosc_ocen == 0 ? rating = "None" : rating = (book.suma_ocen/book.ilosc_ocen).toFixed(1)
+  book.tytul.length > 17 ? book.tytul = book.tytul.slice(0,17)+"..." : book.tytul = book.tytul
   return (
     <>
       <NavLink to={"/book/"+book.id}><div className={bg+" p-5 shadow-lg"}>

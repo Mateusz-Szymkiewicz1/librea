@@ -4,6 +4,7 @@ function CollectionCard(props) {
   let light = props.light || false
   let bg;
   light ? bg = "bg-neutral-600 hover:bg-neutral-500" : bg = "bg-neutral-700 hover:bg-neutral-600"
+  collection.name.length > 12 ? collection.name = collection.name.slice(0,12)+"..." : collection.name = collection.name
   return (
     <>
       <NavLink to={"/collection/"+collection.id} key={collection.id}><div className={bg+' p-5 shadow-lg'}>

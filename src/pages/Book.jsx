@@ -615,7 +615,7 @@ function Book(props) {
                     {user.collections.find(x => x.books.includes(":"+book_id+"}")) &&
                       <span className="mr-2">In your collections:</span>
                     }    
-                    {user.collections
+                    {user.collections.find(x => x.books.includes(":"+book_id+"}")) && user.collections
                     .filter(el => el.books.includes(":" + book_id + "}"))
                     .map((el, i, arr) => (
                       <NavLink key={i} className="text-blue-500 underline" to={`/collection/${el.id}`}>
