@@ -1,4 +1,5 @@
 function TOS() {
+  document.title = `TOS | Librea`
   return (
     <>
       <h1 className="text-white text-center text-4xl mt-16">Librea's <span className="text-blue-400 italic">Terms Of Service</span></h1>

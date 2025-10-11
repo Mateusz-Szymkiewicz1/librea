@@ -5,6 +5,7 @@ import Multiselect from "multiselect-react-dropdown"
 import { useDecision } from "../components/useDecision";
 
 function NewBook(props) {
+  document.title = `New Book | Librea`
   const navigator = useNavigate()
   const [loading, setLoading] = useState(true)
   const fileUploadRef = useRef(null);

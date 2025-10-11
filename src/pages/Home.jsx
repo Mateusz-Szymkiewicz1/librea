@@ -7,6 +7,7 @@ import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react"
 
 function Home() {
+  document.title = `Librea`
   const navigate = useNavigate();
   const [user, setUser] = useState()
   const [recentlyrated, setRecentlyrated] = useState([])

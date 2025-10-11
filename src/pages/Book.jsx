@@ -170,6 +170,7 @@ function Book(props) {
     fetch('http://localhost:3000/book/'+book_id+"?offset="+((currentPage-1)*15)+"&quote_offset="+((currentQuotePage-1)*5)).then(res => res.json()).then(res => {
       if(res.status != 0){
         console.log(res[0])
+        document.title = `${res[0].tytul} | Librea`
         res[0].tagi = JSON.parse(res[0].tagi)
         setBook(res[0])
         setReviewCount(res[0].ilosc_recenzji)

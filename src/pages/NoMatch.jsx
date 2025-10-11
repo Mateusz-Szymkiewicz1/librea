@@ -1,4 +1,5 @@
 function NoMatch() {
+  document.title = `Error 404 | Librea`
   return (
     <>
       <div className="h-screen w-full flex flex-col justify-center items-center">

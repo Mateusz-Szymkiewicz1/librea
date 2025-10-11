@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useDecision } from "../components/useDecision"
 
 function Settings(props) {
+  document.title = `Settings | Librea`
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)
   const [editLogin, setEditLogin] = useState("")

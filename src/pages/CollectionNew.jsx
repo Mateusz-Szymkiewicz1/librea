@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 function CollectionNew(props) {
+  document.title = `New Collection | Librea`
   const navigator = useNavigate()
   const [search,setSearch] = useState("")
   const [autofill, setAutofill] = useState([])

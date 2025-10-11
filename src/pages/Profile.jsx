@@ -52,6 +52,7 @@ function Profile(props) {
       if(res[0]){
         console.log(res[0])
         setProfile(res[0])
+        document.title = `${res[0].login} | Librea`
         if(res[0].collections){
           res[0].collections.forEach(el => {
             el.books = JSON.parse(el.books)

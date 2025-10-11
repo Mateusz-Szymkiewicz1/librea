@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { useDecision } from "../components/useDecision"
 
 function Admin(props) {
+  document.title = `Admin Panel | Librea`
   const navigator = useNavigate()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)

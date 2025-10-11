@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 
 function Notifications() {
+  document.title = `Notifications | Librea`
   const navigator = useNavigate()
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(true)

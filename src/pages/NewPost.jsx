@@ -5,6 +5,7 @@ import { FileUpload } from 'primereact/fileupload';
 import { Editor } from 'primereact/editor';
 
 function NewPost(props) {
+  document.title = `New Post | Librea`
   const navigator = useNavigate()
   const [loading, setLoading] = useState(true)
   const [admin, setAdmin] = useState(false)

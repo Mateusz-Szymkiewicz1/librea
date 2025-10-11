@@ -5,6 +5,7 @@ import "keen-slider/keen-slider.min.css";
 import { useKeenSlider } from "keen-slider/react"
 
 function Explore() {
+  document.title = `Explore | Librea`
   const [user, setUser] = useState()
   const [loading, setLoading] = useState()
   const [popular, setPopular] = useState([])

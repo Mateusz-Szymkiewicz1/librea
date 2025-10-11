@@ -30,6 +30,7 @@ function Post(props) {
           res[0].date = res[0].date.slice(0, 10)
           setPages(Math.ceil((res[0].numOfComments)/2))
           setPost(res[0])
+          document.title = `${res[0].title} | Librea`
         }
         setLoading(false)
       })

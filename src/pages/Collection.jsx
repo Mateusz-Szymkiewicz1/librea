@@ -61,6 +61,7 @@ function Collection(props) {
           bookData[0].tagi = JSON.parse(bookData[0].tagi)
           res[0].books[index] = bookData[0];
         }
+        document.title = `${res[0].name} | Librea`
         setCollection(res[0])
         setEditDesc(res[0].description)
         setEditName(res[0].name)

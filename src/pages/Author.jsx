@@ -30,6 +30,7 @@ function Author(props) {
           res[0].all_ratings = 0
         }
         setAuthor(res[0])
+        document.title = `${res[0].names[0]} | Librea`
       }
       setLoading(false)
     })

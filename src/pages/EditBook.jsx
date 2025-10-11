@@ -5,6 +5,7 @@ import Multiselect from "multiselect-react-dropdown"
 import { FileUpload } from "primereact/fileupload"
 
 function EditBook(props) {
+  document.title = `Edit Book | Librea`
   let book_id = window.location.href.split('/').at(-1)
   const navigator = useNavigate()
   const [loading, setLoading] = useState(true)

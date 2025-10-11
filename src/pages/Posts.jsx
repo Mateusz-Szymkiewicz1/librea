@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import { useDecision } from "../components/useDecision"
 
 function Posts() {
+  document.title = `Posts | Librea`
   const navigator = useNavigate()
   const [posts, setPosts] = useState([])
   const [offset, setOffset] = useState(0)

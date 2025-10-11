@@ -58,7 +58,6 @@ function App() {
         setLogged(false);
       }
     })
-    document.title = `Librea`
   }, [location])
   return (
     <>

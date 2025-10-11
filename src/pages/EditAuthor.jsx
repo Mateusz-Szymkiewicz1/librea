@@ -4,6 +4,7 @@ import { FileUpload } from 'primereact/fileupload';
 import { useDecision } from "../components/useDecision";
 
 function EditAuthor(props) {
+  document.title = `Edit Author | Librea`
   const author_id = window.location.href.split('/').at(-1).split("#")[0]
   const navigator = useNavigate()
   const [loading, setLoading] = useState(true)

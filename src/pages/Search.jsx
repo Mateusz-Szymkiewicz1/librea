@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom"
 import Multiselect from "multiselect-react-dropdown"
 
 function Search() {
+  document.title = `Search | Librea`
   const [wyniki, setWyniki] = useState([])
   const [sort, setSort] = useState("id")
   const [tags, setTags] = useState([])
