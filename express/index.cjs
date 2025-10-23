@@ -286,15 +286,18 @@ app.post('/change_password', (req,res) => {
 })
 
 app.post('/search', (req,res) => {
-  let sort = "books.id ASC"
+  let sort = `books.id ${req.body.direction}`
   if(req.body.sort == "author"){
-    sort = "SUBSTRING_INDEX(TRIM(books.autor), ' ', -1) ASC"
+    sort = `SUBSTRING_INDEX(TRIM(books.autor), ' ', -1) ${req.body.direction}`
   }
   if(req.body.sort == "title"){
-    sort = "books.tytul ASC"
+    sort = `books.tytul ${req.body.direction}`
   }
   if(req.body.sort == "rating"){
-    sort = "(SUM(ratings.rating)/COUNT(ratings.id)) DESC" 
+    sort = `(SUM(ratings.rating)/COUNT(ratings.id)) ${req.body.direction}` 
+  }
+  if(req.body.sort == "popularity"){
+    sort = `(COUNT(ratings.id)) ${req.body.direction}` 
   }
   let tag_query = ""
   if(req.body.tags.length > 0){
@@ -307,9 +310,12 @@ app.post('/search', (req,res) => {
       }
     })
   }
-  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE (tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%')) ${tag_query} GROUP BY books.id ORDER BY ${sort} LIMIT 50`,[req.body.search,req.body.search,req.body.search], (err, rows, fields) => {
+  connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE (tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%')) ${tag_query} GROUP BY books.id ORDER BY ${sort} LIMIT 15 OFFSET ${req.body.offset}`,[req.body.search,req.body.search,req.body.search], (err, rows, fields) => {
     if(rows && rows.length > 0){
-      res.send(rows)
+      connection.query(`SELECT books.*, COUNT(ratings.id) AS ilosc_ocen, SUM(ratings.rating) AS suma_ocen FROM books LEFT JOIN ratings ON ratings.book = books.id WHERE (tytul LIKE CONCAT('%', ? ,'%') OR autor LIKE CONCAT('%', ? ,'%')) ${tag_query} GROUP BY books.id`,[req.body.search,req.body.search,req.body.search], (err2, rows2, fields2) => {
+        rows.unshift({ resultsCount: rows2.length })
+        res.send(rows)
+      })
     }else{
       res.send({ status: 0, text: "No matches found..."})
     }

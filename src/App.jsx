@@ -29,6 +29,7 @@ import NewPost from './pages/NewPost.jsx';
 import Post from './pages/Post.jsx';
 import Posts from './pages/Posts.jsx';
 import Pomodoro from './pages/Pomodoro.jsx';
+import Tag from './pages/Tag.jsx';
 
 function App() {
   const [msg,setMsg] = useState()
@@ -71,6 +72,7 @@ function App() {
             <Route path="/book/:id" element={<Book key={location.pathname} setToast={setToast} />} />
             <Route path="/author/:id" element={<Author key={location.pathname} setToast={setToast} />} />
             <Route path="/search/:search" element={<Search key={location.pathname} />} />
+            <Route path="/tag/:tag" element={<Tag key={location.pathname} />} />
             <Route path="/profile/:user" element={<Profile key={location.pathname} setToast={setToast} />} />
             <Route path="/notifications/:user" element={<Notifications key={location.pathname} setToast={setToast} />} />
             <Route path="/collection/new" element={<CollectionNew setToast={setToast} />} />
