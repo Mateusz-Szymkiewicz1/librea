@@ -593,7 +593,7 @@ function Book(props) {
                 <p className="text-white text-xl mt-1 text-neutral-400">{book.rok}</p>
                 <p className="text-white text-xl mt-1 text-neutral-400 mb-2">Page count: {book.strony}</p>
                 <div className="flex flex-wrap gap-2">
-                  {book.tagi.map(tag => <span key={tag} className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">{tag}</span>)}
+                  {book.tagi.map(tag => <NavLink to={'/tag/'+tag}><span key={tag} className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">{tag}</span></NavLink>)}
                 </div>
                 <div className="flex items-center mt-5">
                   <svg className="w-6 h-6 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
