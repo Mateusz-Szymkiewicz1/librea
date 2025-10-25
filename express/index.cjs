@@ -135,7 +135,7 @@ app.get('/book/:id', (req,res) => {
         rows[0].reviews = rows2
         connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY likes DESC LIMIT 5 OFFSET ${req.query.quote_offset}`,[req.params.id], (err3, rows3, fields3) => {
           rows[0].quotes = rows3
-          connection.query(`SELECT * FROM authors_aliases WHERE name = ?`,[rows[0].autor], (err4, rows4, fields4) => {
+          connection.query(`SELECT a.*,  CONCAT('[', GROUP_CONCAT( DISTINCT CONCAT( '{"id":', b.id, ',"title":"', REPLACE(b.tytul, '"', '\"'), '","author_name":"', REPLACE(b.autor, '"', '\"'), '"}' ) ORDER BY b.tytul SEPARATOR ',' ), ']') AS books FROM authors a JOIN authors_aliases aa_search ON a.id = aa_search.author JOIN authors_aliases aa_books ON a.id = aa_books.author JOIN books b ON b.autor = aa_books.name WHERE aa_search.name = ? GROUP BY a.id;`,[rows[0].autor], (err4, rows4, fields4) => {
             rows[0].author = rows4
             res.send(rows)
           })

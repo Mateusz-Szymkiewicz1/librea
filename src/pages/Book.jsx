@@ -585,7 +585,7 @@ function Book(props) {
               <div className="float-left mt-10 mr-10 text-slate-200">
                 <h1 className="text-white text-4xl">{book.tytul}</h1>
                 {book.author.length > 0 &&
-                  <NavLink to={"/author/"+book.author[0].author}><p className="text-blue-500 text-2xl mt-3">{book.autor}</p></NavLink>
+                  <NavLink to={"/author/"+book.author[0].id}><p className="text-blue-500 text-2xl mt-3">{book.autor}</p></NavLink>
                 }
                 {book.author.length == 0 &&
                   <p className="text-white text-2xl mt-3">{book.autor}</p>
@@ -593,7 +593,7 @@ function Book(props) {
                 <p className="text-white text-xl mt-1 text-neutral-400">{book.rok}</p>
                 <p className="text-white text-xl mt-1 text-neutral-400 mb-2">Page count: {book.strony}</p>
                 <div className="flex flex-wrap gap-2">
-                  {book.tagi.map(tag => <NavLink to={'/tag/'+tag}><span key={tag} className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">{tag}</span></NavLink>)}
+                  {book.tagi.map(tag => <NavLink key={tag} to={'/tag/'+tag}><span key={tag} className="text-sm font-medium px-2.5 py-0.5 rounded bg-blue-900 text-blue-300">{tag}</span></NavLink>)}
                 </div>
                 <div className="flex items-center mt-5">
                   <svg className="w-6 h-6 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
@@ -817,6 +817,7 @@ function Book(props) {
             </>
           }
           {book.id > 0 &&
+            <>
             <div className="sm:ml-5 ml-3 sm:mr-16 mr-3">
               <h2 id="quotes" className="text-3xl font-semibold clear-both text-slate-200 pt-20">Quotes ({book.ilosc_cytatow})</h2>
               {book.ilosc_cytatow == 0 &&
@@ -899,6 +900,18 @@ function Book(props) {
                 </>
               }
             </div>
+            {book.author.length > 0 &&
+            <div className="sm:ml-5 ml-3 sm:mr-16 mr-3">
+              <h2 className="text-3xl font-semibold clear-both text-slate-200 pt-20">Other books by {book.autor}</h2>
+              {JSON.parse(book.author[0].books).map((el, i) => {
+                return(
+                  <></>
+                )
+              })
+              }
+            </div>
+            }
+            </>
           }
           {!book.id > 0 && !loading &&
             <NoMatch></NoMatch>

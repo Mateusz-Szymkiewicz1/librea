@@ -43,6 +43,7 @@ function App() {
     setMsg(msg)
   }
   useEffect(() => {
+    window.scrollTo(0,0)
     if(msg && !msg.stay){
       setMsg()
     }
