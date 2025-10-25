@@ -1131,7 +1131,7 @@ app.post('/new_books', (req,res) => {
 })
 
 app.post('/posts', (req,res) => {
-  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id GROUP BY posts.id ORDER BY posts.date DESC LIMIT 5 OFFSET ${req.body.offset};`, (err, rows, fields) => {
+  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id GROUP BY posts.id ORDER BY posts.date ${req.body.sort == "newest" ? "DESC" : "ASC"} LIMIT 5 OFFSET ${req.body.offset};`, (err, rows, fields) => {
     connection.query(`SELECT COUNT(*) AS posts FROM posts`, (err2, rows2, fields2) => {
       rows.unshift({posts: rows2[0].posts})
       res.send(rows)
@@ -1140,7 +1140,7 @@ app.post('/posts', (req,res) => {
 })
 
 app.post('/posts_search', (req,res) => {
-  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id WHERE (posts.title LIKE CONCAT('%', ? ,'%') OR posts.text LIKE CONCAT('%', ? ,'%')) GROUP BY posts.id ORDER BY posts.date`,[req.body.search,req.body.search], (err, rows, fields) => {
+  connection.query(`SELECT posts.*, COUNT(likes.id) AS likes FROM posts LEFT JOIN likes ON likes.post = posts.id WHERE (posts.title LIKE CONCAT('%', ? ,'%') OR posts.text LIKE CONCAT('%', ? ,'%')) GROUP BY posts.id ORDER BY posts.date ${req.body.sort == "newest" ? "DESC" : "ASC"}`,[req.body.search,req.body.search], (err, rows, fields) => {
     res.send(rows)
   })
 })

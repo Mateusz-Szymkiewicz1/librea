@@ -7,6 +7,7 @@ function Posts() {
   const navigator = useNavigate()
   const [posts, setPosts] = useState([])
   const [offset, setOffset] = useState(0)
+  const [sort, setSort] = useState("newest")
   const [user, setUser] = useState()
   const [loading, setLoading] = useState(false)
   const [numOfPosts, setNumOfPosts] = useState(0)
@@ -46,7 +47,8 @@ function Posts() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        offset: offset
+        offset: offset,
+        sort: sort
       })
     }).then(res => res.json()).then(res => {
       console.log(res)
@@ -58,7 +60,7 @@ function Posts() {
       setNumOfPosts(res[0].posts)
       setPosts([...res.slice(1, res.length)])
     })
-  }, [refresh])
+  }, [refresh, sort])
 
 useEffect(() => {
     if(offset == 0) return
@@ -69,7 +71,8 @@ useEffect(() => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        offset: offset
+        offset: offset,
+        sort: sort
       })
     }).then(res => res.json()).then(res => {
       setPosts(prev => prev.concat([...res.slice(1, res.length)]))
@@ -138,14 +141,30 @@ const toggleDropdown = async (e) => {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  search: search
+                  search: search,
+                  sort: sort
                 })
               }).then(res => res.json()).then(res => {
                 console.log(res)
                 setSearchResults(res)
               })
     }
-  }, [search])
+  }, [search, sort])
+  const switchSort = () => {
+    setOffset(0)
+    let el = document.querySelector(".direction")
+    if(sort == "newest"){
+      setSort("oldest")
+      el.querySelector('i').classList.remove("fa-arrow-down-short-wide")
+      el.querySelector('i').classList.add("fa-arrow-up-wide-short")
+      el.querySelector('span').innerText = "Oldest"
+    } else {
+      setSort("newest")
+      el.querySelector('i').classList.add("fa-arrow-down-short-wide")
+      el.querySelector('i').classList.remove("fa-arrow-up-wide-short")
+      el.querySelector('span').innerText = "Newest"
+    }
+  }
   return (
     <>
       {!loading &&
@@ -153,6 +172,10 @@ const toggleDropdown = async (e) => {
         <h1 className="text-center text-3xl my-12 font-semibold">Blog posts</h1>
         <div className="flex items-center">
           <i className="fa fa-search ml-5 text-sm p-3 bg-blue-500"></i><input type="text" onChange={(e) => setSearch(e.target.value)} placeholder="Search in posts..." className="shadow w-64 sm:w-96 outline-none h-11 bg-neutral-700 text-slate-200 text-sm px-3" />
+          <span onClick={switchSort} className="cursor-pointer direction">
+            <i className="mx-2 fa-solid fa-arrow-down-short-wide text-2xl"></i>
+            <span className="text-xl select-none">Newest</span>
+          </span>
         </div>
         {searchResults.length < 1 && posts.map(el => {
           const plainText = getPlainText(el.text);
