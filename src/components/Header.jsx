@@ -71,10 +71,10 @@ function Header() {
       if(e.target.classList.contains("suggestion")){
         navigator("/book/"+e.target.dataset.book)
       }
-      if(!e.target.classList.contains("profMenu") && !document.querySelector(".dropdown_user").classList.contains("hidden")){
+      if(!e.target.classList.contains("profMenu") && document.querySelector('.dropdown_user') && !document.querySelector(".dropdown_user").classList.contains("hidden")){
         document.querySelector(".dropdown_user").classList.add("hidden")
       }
-      if(!e.target.classList.contains("notifMenu") && !document.querySelector(".dropdown_notifications").classList.contains("hidden")){
+      if(!e.target.classList.contains("notifMenu") && document.querySelector('.dropdown_user') && !document.querySelector(".dropdown_notifications").classList.contains("hidden")){
         document.querySelector(".dropdown_notifications").classList.add("hidden")
       }
       setAutofill([])

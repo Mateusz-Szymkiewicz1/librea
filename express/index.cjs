@@ -123,6 +123,15 @@ app.post('/author/:id', (req,res) => {
   })
 })
 
+function queryAsync(connection, sql, params) {
+  return new Promise((resolve, reject) => {
+    connection.query(sql, params, (err, results, fields) => {
+      if (err) reject(err);
+      else resolve(results);
+    });
+  });
+}
+
 app.get('/book/:id', (req,res) => {
   try{
     parseInt(req.query.offset)
@@ -135,9 +144,22 @@ app.get('/book/:id', (req,res) => {
         rows[0].reviews = rows2
         connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY likes DESC LIMIT 5 OFFSET ${req.query.quote_offset}`,[req.params.id], (err3, rows3, fields3) => {
           rows[0].quotes = rows3
-          connection.query(`SELECT a.*,  CONCAT('[', GROUP_CONCAT( DISTINCT CONCAT( '{"id":', b.id, ',"title":"', REPLACE(b.tytul, '"', '\"'), '","author_name":"', REPLACE(b.autor, '"', '\"'), '"}' ) ORDER BY b.tytul SEPARATOR ',' ), ']') AS books FROM authors a JOIN authors_aliases aa_search ON a.id = aa_search.author JOIN authors_aliases aa_books ON a.id = aa_books.author JOIN books b ON b.autor = aa_books.name WHERE aa_search.name = ? GROUP BY a.id;`,[rows[0].autor], (err4, rows4, fields4) => {
-            rows[0].author = rows4
-            res.send(rows)
+          connection.query(`SELECT a.*,  CONCAT('[', GROUP_CONCAT(DISTINCT b.id), ']') AS books FROM authors a JOIN authors_aliases aa_search ON a.id = aa_search.author JOIN authors_aliases aa_books ON a.id = aa_books.author JOIN books b ON b.autor = aa_books.name WHERE aa_search.name = ? AND b.id != ? GROUP BY a.id;`,[rows[0].autor, req.params.id], async  (err4, rows4, fields4) => {
+            rows4[0].books = JSON.parse(rows4[0].books);
+            for (const bookId of rows4[0].books.sort((a, b) => b.ilosc_ocen - a.ilosc_ocen).slice(0, 5)) {
+              const rows5 = await queryAsync(
+                connection,
+                `SELECT books.id, books.tytul, books.autor, books.okladka, COUNT(ratings.id) AS ilosc_ocen, IFNULL(SUM(ratings.rating), 0) AS suma_ocen
+                FROM books
+                LEFT JOIN ratings ON ratings.book = books.id
+                WHERE books.id = ?
+                GROUP BY books.id`,
+                [bookId, req.params.id]
+              );
+              rows4[0].books[rows4[0].books.indexOf(bookId)] = rows5[0];
+            }
+            rows[0].author = rows4;
+            res.send(rows);
           })
         })
       })

@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom"
 import NoMatch from "./NoMatch"
 import ReactPaginate from 'react-paginate';
 import { useDecision } from "../components/useDecision"
+import BookCard from "../components/BookCard";
 
 function Book(props) {
   const navigator = useNavigate()
@@ -903,12 +904,14 @@ function Book(props) {
             {book.author.length > 0 &&
             <div className="sm:ml-5 ml-3 sm:mr-16 mr-3">
               <h2 className="text-3xl font-semibold clear-both text-slate-200 pt-20">Other books by {book.autor}</h2>
-              {JSON.parse(book.author[0].books).map((el, i) => {
-                return(
-                  <></>
-                )
-              })
+              <div className='flex flex-wrap gap-5 my-5 mb-20'>
+              {book.author[0].books.map((el, i) => {
+                  return(
+                    <BookCard book={el} key={el.id}></BookCard>
+                  )
+                })
               }
+              </div>
             </div>
             }
             </>
