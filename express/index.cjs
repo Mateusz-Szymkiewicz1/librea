@@ -144,7 +144,15 @@ app.get('/book/:id', (req,res) => {
         rows[0].reviews = rows2
         connection.query(`SELECT quotes.*, COUNT(likes.id) AS likes FROM quotes LEFT JOIN likes ON quotes.id = likes.quote WHERE quotes.book = ? GROUP BY quotes.id ORDER BY likes DESC LIMIT 5 OFFSET ${req.query.quote_offset}`,[req.params.id], (err3, rows3, fields3) => {
           rows[0].quotes = rows3
-          connection.query(`SELECT a.*,  CONCAT('[', GROUP_CONCAT(DISTINCT b.id), ']') AS books FROM authors a JOIN authors_aliases aa_search ON a.id = aa_search.author JOIN authors_aliases aa_books ON a.id = aa_books.author JOIN books b ON b.autor = aa_books.name WHERE aa_search.name = ? AND b.id != ? GROUP BY a.id;`,[rows[0].autor, req.params.id], async  (err4, rows4, fields4) => {
+          connection.query(`SELECT a.*, COALESCE(CONCAT('[', GROUP_CONCAT(DISTINCT b.id), ']'), '[]') AS books FROM authors a JOIN authors_aliases aa_search ON a.id = aa_search.author LEFT JOIN authors_aliases aa_books ON a.id = aa_books.author LEFT JOIN books b ON b.autor = aa_books.name AND b.id != ? WHERE aa_search.name = ? GROUP BY a.id;`,[req.params.id, rows[0].autor], async  (err4, rows4, fields4) => {
+            if (err4) {
+              console.error('Failed to load related author books:', err4);
+              return res.status(500).send({ status: 0, text: "Unable to load book details." });
+            }
+            if (!rows4 || rows4.length === 0) {
+              rows[0].author = [];
+              return res.send(rows);
+            }
             rows4[0].books = JSON.parse(rows4[0].books);
             for (const bookId of rows4[0].books.sort((a, b) => b.ilosc_ocen - a.ilosc_ocen).slice(0, 5)) {
               const rows5 = await queryAsync(
