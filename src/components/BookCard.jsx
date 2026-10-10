@@ -7,14 +7,12 @@ function BookCard(props) {
   book.ilosc_ocen == 0 ? rating = "None" : rating = (book.suma_ocen/book.ilosc_ocen).toFixed(1)
   book.tytul.length > 17 ? book.tytul = book.tytul.slice(0,17)+"..." : book.tytul = book.tytul
   return (
-    <>
       <NavLink to={"/book/"+book.id}><div className={bg+" p-5 shadow-lg"}>
         <img className="h-72 w-48 border border-neutral-500" src={"/uploads/"+book.okladka} onError={(e) => e.target.src = "/default.jpg"}></img>
         <p className="text-white mt-3 text-xl">{book.tytul}</p>
         <p className="text-slate-200 mt-1 text-lg">{book.autor}</p>
         <p className="text-xl mt-1"><i className="fa fa-star text-yellow-300 mr-1"></i>{rating} ({book.ilosc_ocen})</p>
       </div></NavLink>
-    </>
   )
 }
 
